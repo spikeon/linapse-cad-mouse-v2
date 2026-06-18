@@ -89,6 +89,7 @@ for svc in ydotoold spacenav-ws linapse-service; do
     info "Copied ${svc}.service"
 done
 
+systemctl --user import-environment PATH || true
 systemctl --user daemon-reload
 systemctl --user enable --now ydotoold spacenav-ws linapse-service
 info "Services enabled and started."

@@ -9,7 +9,7 @@ from pathlib import Path
 class TestInstallerAdversarial(unittest.TestCase):
     def setUp(self):
         # Create clean temp root
-        self.test_root = Path(tempfile.mkdtemp(prefix="linapse_adv_test_"))
+        self.test_root = Path(tempfile.mkdtemp(prefix="linapse_adv_test_", dir=Path(__file__).parent))
         self.mock_bin = self.test_root / "bin"
         self.mock_home = self.test_root / "home"
         self.mock_bin.mkdir()
@@ -107,6 +107,7 @@ exec {sys.executable} "$@"
         # It must NOT contain the expanded custom path
         self.assertNotIn(custom_runtime_dir, content)
 
+    @unittest.skipIf(os.geteuid() == 0, "Cannot run write-prevention tests as root")
     def test_install_fails_when_directory_is_unwritable(self):
         # Create directory and make it read-only
         env_d_dir = self.mock_home / ".config" / "environment.d"
@@ -121,6 +122,7 @@ exec {sys.executable} "$@"
             # Restore permissions so tearDown can clean up
             env_d_dir.chmod(0o755)
 
+    @unittest.skipIf(os.geteuid() == 0, "Cannot run write-prevention tests as root")
     def test_install_fails_when_file_is_readonly(self):
         # Create file and make it read-only
         env_d_dir = self.mock_home / ".config" / "environment.d"

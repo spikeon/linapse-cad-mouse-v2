@@ -10,7 +10,7 @@ from pathlib import Path
 class TestInstallerMock(unittest.TestCase):
     def setUp(self):
         # Create a clean temp directory for this test run
-        self.test_root = Path(tempfile.mkdtemp(prefix="linapse_inst_test_"))
+        self.test_root = Path(tempfile.mkdtemp(prefix="linapse_inst_test_", dir=Path(__file__).parent))
         self.mock_bin = self.test_root / "bin"
         self.mock_home = self.test_root / "home"
         self.mock_bin.mkdir()

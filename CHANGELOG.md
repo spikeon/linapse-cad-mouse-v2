@@ -5,6 +5,12 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.2.8] - 2026-06-18
+
+### Fixed
+- **Integration Tests**: Prevented unwritable directory and read-only file test execution errors when running as the `root` user in containerized CI environments. Also modified `tempfile.mkdtemp` to use local subdirectories under the repository in `test_installer_mock.py` and `test_installer_adversarial.py` to bypass `noexec` restriction on `/tmp`.
+- **Systemd User Manager Environment**: Imported script `PATH` into the user-level systemd session manager inside `install.sh` to ensure `uv` is successfully located by the `spacenav-ws` service daemon.
+
 ## [2.2.7] - 2026-06-18
 
 ### Fixed

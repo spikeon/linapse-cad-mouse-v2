@@ -4,6 +4,7 @@ After=ydotoold.service
 
 [Service]
 Environment=YDOTOOL_SOCKET=/run/user/%U/.ydotool_socket
+Environment=PYTHONUNBUFFERED=1
 ExecStart=/usr/bin/python3 %h/.local/bin/linapse-service
 Restart=on-failure
 RestartSec=3

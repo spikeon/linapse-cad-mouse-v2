@@ -51,30 +51,38 @@ def find_package_dir():
 
 
 def patch_controller(path):
-    """Disable the button-snap-to-front-view behaviour."""
+    """Disable the button-snap-to-front-view behaviour and add EOF handling."""
     with open(path) as f:
         content = f.read()
 
-    if re.search(r"if isinstance\(event, ButtonEvent\):\s*\n\s+return\s*\n", content):
+    modified = False
+
+    # 1. Disable button-snap
+    if "isinstance(event, ButtonEvent)" in content and not re.search(r"if isinstance\(event, ButtonEvent\):\s*\n\s+return\s*\n", content):
+        content = re.sub(
+            r"(        if isinstance\(event, ButtonEvent\):)(?:\n            [^\n]+)+",
+            r"\1\n            return",
+            content,
+        )
+        modified = True
+        print(f"  controller.py: patched button-snap")
+
+    # 2. EOF detection to trigger reconnect
+    if 'if not mouse_event:' not in content:
+        target = '            mouse_event = await self.reader.read(32)'
+        replacement = '            mouse_event = await self.reader.read(32)\n            if not mouse_event:\n                raise ConnectionError("spacenav socket closed")'
+        if target in content:
+            content = content.replace(target, replacement)
+            modified = True
+            print(f"  controller.py: patched EOF connection handler")
+        else:
+            print(f"  controller.py: ERROR — read target not found", file=sys.stderr)
+
+    if modified:
+        with open(path, "w") as f:
+            f.write(content)
+    else:
         print(f"  controller.py: already patched")
-        return True
-
-    if "isinstance(event, ButtonEvent)" not in content:
-        print(f"  controller.py: ERROR — ButtonEvent check not found", file=sys.stderr)
-        return False
-
-    patched = re.sub(
-        r"(        if isinstance\(event, ButtonEvent\):)(?:\n            [^\n]+)+",
-        r"\1\n            return",
-        content,
-    )
-    if patched == content:
-        print(f"  controller.py: ERROR — patch target not found", file=sys.stderr)
-        return False
-
-    with open(path, "w") as f:
-        f.write(patched)
-    print(f"  controller.py: patched")
     return True
 
 

@@ -70,7 +70,15 @@ def load_actions():
 def ydotool(*args):
     env = os.environ.copy()
     env["YDOTOOL_SOCKET"] = YDOTOOL_SOCKET
-    subprocess.run(["ydotool"] + list(args), env=env, capture_output=True)
+    flat_args = []
+    for arg in args:
+        if isinstance(arg, str):
+            flat_args.extend(arg.split())
+        else:
+            flat_args.append(arg)
+    res = subprocess.run(["ydotool"] + flat_args, env=env, capture_output=True)
+    if res.returncode != 0:
+        print(f"[ydotool] ERROR (exit {res.returncode}): {res.stderr.decode().strip()}")
 
 _MOUSE_BTN = {"left": 0x40001, "right": 0x40002, "middle": 0x40003}
 
@@ -78,6 +86,7 @@ def dispatch(action_obj):
     if not action_obj:
         return
     act = action_obj.get("action", "none")
+    print(f"[dispatch] action: {act} obj: {action_obj}")
     if act == "none":
         pass
     elif act == "key":
@@ -245,7 +254,10 @@ def hid_thread(actions_ref):
         if not r:
             continue
         data = fd.read(64)
-        if not data or data[0] != BUTTON_REPORT_ID:
+        if not data:
+            continue
+        print(f"[hid] read data: {list(data)}")
+        if data[0] != BUTTON_REPORT_ID:
             continue
         bits = data[1] & 0x03
         if bits == prev_bits:
@@ -306,6 +318,7 @@ def serial_thread(actions_ref):
                             coords = [int(round(float(p))) for p in parts]
                             x, y, z, rx, ry, rz = coords
                             z = -z
+                            y = -y
                             period = 10
                             # Swap Y and Z: [0, x, z, y, rx, ry, rz, period]
                             packet = struct.pack("iiiiiiii", 0, x, z, y, rx, ry, rz, period)

@@ -1,0 +1,12 @@
+[Unit]
+Description=Linapse configurator (static web UI)
+After=linapse-service.service
+
+[Service]
+# __CONFIGURATOR_DIR__ and __PORT__ are substituted by setup.sh at install time.
+ExecStart=/usr/bin/python3 -m http.server __PORT__ --bind 127.0.0.1 --directory __CONFIGURATOR_DIR__
+Restart=on-failure
+RestartSec=5
+
+[Install]
+WantedBy=default.target

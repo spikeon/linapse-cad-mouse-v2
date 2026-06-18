@@ -56,12 +56,26 @@ Two independent paths share the device:
 
 | Path | What it is |
 |------|------------|
+| [`setup.sh`](setup.sh) | Top-level installer — packages, firmware (`--flash`), host integration, and configurator service. |
 | [`firmware/`](firmware/) | RP2040 firmware (PlatformIO). Motion decode, filtering, tap detection, LED engine, USB HID + serial protocol. See [firmware/README.md](firmware/README.md) and [firmware/LED_COLOR_CONFIG.md](firmware/LED_COLOR_CONFIG.md). |
 | [`linux/`](linux/) | Host-side integration: `install.sh`, `linapse-service` (serial ↔ WebSocket bridge), `spacenav-ws` patch, udev rules, systemd user units, OnShape userscript, tap calibration tools. See [linux/README.md](linux/README.md). |
 | [`configurator/`](configurator/) | Linapse web configurator — a static web app (Three.js 3D viewport) that talks to `linapse-service` over WebSocket. |
 | [`platformio.ini`](platformio.ini) | Firmware build configuration. |
 
 ## Quick start
+
+### One-step setup
+
+The top-level [`setup.sh`](setup.sh) orchestrates the whole stack: it installs the distro packages (`spacenavd`, `ydotool`, `uv`), runs the host integration, and installs a systemd user service that serves the configurator.
+
+```bash
+./setup.sh                 # packages + host integration + configurator service
+./setup.sh --flash         # also build & flash the firmware first (needs PlatformIO)
+./setup.sh --port 7890     # configurator port (default 7890)
+./setup.sh --yes           # don't prompt before installing packages
+```
+
+It still leaves two inherently hands-on steps to you: flashing the firmware (the RP2040 must be physically put into BOOTSEL mode — `--flash` walks you through it) and installing the Tampermonkey userscript (browser extensions can't be scripted). The manual breakdown below documents each piece if you'd rather run them yourself.
 
 ### 1. Flash the firmware
 

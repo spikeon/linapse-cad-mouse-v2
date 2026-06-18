@@ -1,0 +1,133 @@
+#!/bin/bash
+# Linapse — CAD Mouse MK2 full setup
+#
+# Front door for setting up the entire stack on a fresh machine:
+#   1. install distro packages (spacenavd, ydotool, uv)
+#   2. (optional) flash the firmware            --flash
+#   3. install the host integration             linux/install.sh
+#   4. install + enable the configurator service
+#   5. print the OnShape userscript steps
+#
+# Usage:
+#   ./setup.sh                 # packages + host + configurator
+#   ./setup.sh --flash         # also build & flash firmware first
+#   ./setup.sh --port 7890     # configurator port (default 7890)
+#   ./setup.sh --yes           # don't prompt before installing packages
+set -e
+
+REPO_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+SYSTEMD_USER="$HOME/.config/systemd/user"
+CONFIGURATOR_DIR="$REPO_DIR/configurator"
+
+DO_FLASH=0
+ASSUME_YES=0
+PORT=7890
+
+err()  { echo "ERROR: $*" >&2; exit 1; }
+info() { echo "  $*"; }
+section() { echo; echo "######## $*"; }
+
+while [ $# -gt 0 ]; do
+    case "$1" in
+        --flash) DO_FLASH=1 ;;
+        --yes|-y) ASSUME_YES=1 ;;
+        --port) shift; PORT="$1" ;;
+        --port=*) PORT="${1#*=}" ;;
+        -h|--help) sed -n '2,20p' "$0"; exit 0 ;;
+        *) err "Unknown argument: $1" ;;
+    esac
+    shift
+done
+
+[[ "$PORT" =~ ^[0-9]+$ ]] || err "--port must be a number"
+
+# ── 1. Distro packages ────────────────────────────────────────────────────────
+section "1. Distro packages"
+
+# Detect package manager.
+if   command -v pacman >/dev/null; then PM=pacman
+elif command -v apt-get >/dev/null; then PM=apt
+elif command -v dnf    >/dev/null; then PM=dnf
+else PM=""; fi
+[ -n "$PM" ] && info "Detected package manager: $PM" || info "No supported package manager detected (pacman/apt/dnf)."
+
+# spacenavd + ydotool come from the distro repos. uv is handled separately
+# because it is not packaged everywhere.
+missing=()
+command -v spacenavd >/dev/null || missing+=(spacenavd)
+command -v ydotool   >/dev/null || missing+=(ydotool)
+
+install_pkgs() {
+    [ ${#missing[@]} -eq 0 ] && { info "spacenavd and ydotool already installed."; return; }
+    echo "  Will install: ${missing[*]}"
+    if [ "$ASSUME_YES" -eq 0 ]; then
+        read -rp "  Install these with sudo $PM? [y/N] " ans
+        [[ "$ans" =~ ^[Yy]$ ]] || err "Declined. Install ${missing[*]} manually and re-run."
+    fi
+    case "$PM" in
+        pacman) sudo pacman -S --needed "${missing[@]}" ;;
+        apt)    sudo apt-get update && sudo apt-get install -y "${missing[@]}" ;;
+        dnf)    sudo dnf install -y "${missing[@]}" ;;
+        *)      err "No supported package manager. Install manually: ${missing[*]}" ;;
+    esac
+}
+install_pkgs
+
+# uv: try the package manager, fall back to the official installer.
+if command -v uv >/dev/null || command -v uvx >/dev/null; then
+    info "uv already installed."
+else
+    info "Installing uv..."
+    case "$PM" in
+        pacman) sudo pacman -S --needed uv || true ;;
+        dnf)    sudo dnf install -y uv || true ;;
+    esac
+    if ! command -v uv >/dev/null; then
+        info "Falling back to the official uv installer (astral.sh)."
+        curl -LsSf https://astral.sh/uv/install.sh | sh
+        export PATH="$HOME/.local/bin:$HOME/.cargo/bin:$PATH"
+    fi
+fi
+command -v uvx >/dev/null || command -v uv >/dev/null || err "uv install failed. See https://docs.astral.sh/uv/"
+
+# ── 2. Firmware (optional) ─────────────────────────────────────────────────────
+if [ "$DO_FLASH" -eq 1 ]; then
+    section "2. Firmware"
+    bash "$REPO_DIR/linux/flash.sh"
+else
+    section "2. Firmware (skipped)"
+    info "Run with --flash to build and flash, or flash manually. See README.md."
+fi
+
+# ── 3. Host integration ────────────────────────────────────────────────────────
+section "3. Host integration (linux/install.sh)"
+( cd "$REPO_DIR/linux" && chmod +x install.sh && ./install.sh )
+
+# ── 4. Configurator service ────────────────────────────────────────────────────
+section "4. Configurator service (port $PORT)"
+
+[ -f "$CONFIGURATOR_DIR/index.html" ] || err "configurator/index.html not found at $CONFIGURATOR_DIR"
+mkdir -p "$SYSTEMD_USER"
+sed -e "s|__CONFIGURATOR_DIR__|$CONFIGURATOR_DIR|g" \
+    -e "s|__PORT__|$PORT|g" \
+    "$REPO_DIR/linux/systemd/linapse-configurator.service" \
+    > "$SYSTEMD_USER/linapse-configurator.service"
+systemctl --user daemon-reload
+systemctl --user enable --now linapse-configurator
+info "Serving $CONFIGURATOR_DIR at http://localhost:$PORT"
+
+# ── 5. Userscript ──────────────────────────────────────────────────────────────
+section "5. OnShape userscript (manual)"
+cat <<EOF
+
+  Tampermonkey can't be scripted, so finish these by hand:
+    1. Install the Tampermonkey browser extension.
+    2. Drag linux/onshape-spacenav.user.js onto the Tampermonkey dashboard.
+    3. Open https://cad.onshape.com and move the mouse — the viewport should respond.
+
+######## Done
+
+  Configurator:  http://localhost:$PORT   (see docs/USAGE.md)
+  If buttons don't work, log out and back in so the 'input' group takes effect.
+  If the device was plugged in before install, unplug and replug it.
+EOF

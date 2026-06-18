@@ -252,17 +252,6 @@ exec {sys.executable} "$@"
             spacenav_content = f.read()
         self.assertIn("SPACENAV_SOCKET_PATH = f\"/run/user/{os.getuid()}/spnav.sock\"", spacenav_content)
 
-    def test_platformio_ini_vid_pid_commented(self):
-        # Verify platformio.ini has commented out lines for USB VID/PID spoofing
-        repo_dir = Path(__file__).resolve().parents[1]
-        platformio_path = repo_dir / "platformio.ini"
-        
-        with open(platformio_path) as f:
-            content = f.read()
-            
-        # Check lines for VID/PID spoofing are commented out
-        self.assertIn(";board_build.arduino.earlephilhower.usb_vid = 0xXXXX", content)
-        self.assertIn(";board_build.arduino.earlephilhower.usb_pid = 0xYYYY", content)
 
 if __name__ == "__main__":
     unittest.main()

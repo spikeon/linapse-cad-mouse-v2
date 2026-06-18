@@ -11,7 +11,7 @@
 
 ## What it does
 
-- **6DoF motion in OnShape, SketchUp Web, and Native Linux apps.** The firmware presents the device to the OS as a SpaceMouse, so `spacenavd` drives it. A WebSocket bridge plus a Tampermonkey userscript carry motion into browser apps (OnShape, SketchUp Web), while native apps (Blender, FreeCAD, Bambu Studio, etc.) connect directly via UNIX socket.
+- **6DoF motion in OnShape, SketchUp Web, and Native Linux apps.** The firmware presents the device to the OS as a SpaceMouse, so `spacenavd` drives it. A WebSocket bridge plus a Tampermonkey userscript carry motion into browser apps (OnShape, SketchUp Web), while native apps (Blender, FreeCAD, OrcaSlicer, etc.) connect directly via UNIX socket.
 - **Physical buttons, taps, and gestures.** The host service maps the two buttons (and tap-on-the-cap gestures detected in firmware) to keystrokes, clicks, scrolling, and macros via `ydotool` (Wayland-native input injection).
 - **Addressable RGB lighting.** SK6812 LEDs with multiple effects (solid, breathing, motion-reactive, swirls) configured live.
 - **Linapse web configurator.** A browser UI to remap buttons/taps, design lighting, and tune the motion filter — with a live 3D Benchy viewport you can push around with the puck to feel sensitivity changes in real time.

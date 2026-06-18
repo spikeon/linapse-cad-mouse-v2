@@ -7,7 +7,7 @@ Guide on how to configure and verify 6DoF motion for various 3D, CAD, and game e
 | Application | Platform/Type | Support Status | Method |
 |---|---|---|---|
 | **Blender** | Native Linux | Fully Supported | UNIX Socket (`libspnav`) |
-| **Bambu Studio** | Native Linux | Fully Supported | UNIX Socket (`libspnav`) |
+| **OrcaSlicer** | Native Linux | Fully Supported | UNIX Socket (`libspnav`) |
 | **FreeCAD** | Native Linux | Fully Supported | UNIX Socket (`libspnav`) |
 | **OpenSCAD** | Native Linux | Fully Supported | UNIX Socket (`libspnav`) |
 | **Autodesk Maya** | Native Linux | Fully Supported | UNIX Socket (`libspnav`) + Plugin |
@@ -41,11 +41,14 @@ Native Linux applications connect to the local SpaceMouse daemon via `libspnav`.
   2. Navigate to `Edit -> Preferences -> Input -> NDOF`.
   3. Enable and tune NDOF settings (sensitivity, pan/zoom options).
 
-#### Bambu Studio
+#### OrcaSlicer
 - Connection: Automatic.
 - Setup:
-  1. Open Bambu Studio.
+  1. Open OrcaSlicer.
   2. Go to `Preferences` and verify 3D Mouse is enabled.
+  
+  > [!NOTE]
+  > The official Linux builds (AppImage and Flatpak) of Bambu Studio are compiled without `libspnav` support. OrcaSlicer (a popular fork) retains this support and works out of the box with Linapse.
 
 #### FreeCAD
 - Connection: Automatic.

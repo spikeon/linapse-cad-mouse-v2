@@ -15,12 +15,43 @@ section() { echo; echo "==> $*"; }
 section "Checking prerequisites"
 
 command -v python3 >/dev/null || err "python3 not found"
-command -v spacenavd >/dev/null || err "spacenavd not found. Install via your package manager."
+
 command -v ydotool >/dev/null || err "ydotool not found. Install via your package manager."
 command -v uvx >/dev/null || err "uv not found. Install from https://docs.astral.sh/uv/"
 command -v systemctl >/dev/null || err "systemd not found"
 
 info "All prerequisites found."
+
+# Detect package manager.
+if   command -v pacman >/dev/null; then PM=pacman
+elif command -v apt-get >/dev/null; then PM=apt
+elif command -v dnf    >/dev/null; then PM=dnf
+else PM=""; fi
+
+# Stop and disable active or enabled spacenavd service
+if systemctl is-active --quiet spacenavd 2>/dev/null || systemctl is-enabled --quiet spacenavd 2>/dev/null; then
+    info "Stopping and disabling active/enabled spacenavd service..."
+    sudo systemctl stop spacenavd || true
+    sudo systemctl disable spacenavd || true
+fi
+
+# Uninstall spacenavd package if installed
+if [ -n "$PM" ]; then
+    has_spacenavd=0
+    case "$PM" in
+        pacman) pacman -Qi spacenavd >/dev/null 2>&1 && has_spacenavd=1 ;;
+        apt)    dpkg -l spacenavd >/dev/null 2>&1 && has_spacenavd=1 ;;
+        dnf)    rpm -q spacenavd >/dev/null 2>&1 && has_spacenavd=1 ;;
+    esac
+    if [ "$has_spacenavd" -eq 1 ]; then
+        info "Uninstalling spacenavd package..."
+        case "$PM" in
+            pacman) sudo pacman -Rns --noconfirm spacenavd || true ;;
+            apt)    sudo apt-get remove -y spacenavd || true ;;
+            dnf)    sudo dnf remove -y spacenavd || true ;;
+        esac
+    fi
+fi
 
 # ── Input group ──────────────────────────────────────────────────────────────
 section "Adding $USER to 'input' group"
@@ -59,21 +90,7 @@ systemctl --user daemon-reload
 systemctl --user enable --now ydotoold spacenav-ws linapse-service
 info "Services enabled and started."
 
-# ── /etc/spnavrc ─────────────────────────────────────────────────────────────
-section "Writing /etc/spnavrc (sensitivity config)"
 
-sudo cp "$SCRIPT_DIR/spnavrc" /etc/spnavrc
-info "Written. Edit /etc/spnavrc to tune sensitivity, then: sudo systemctl restart spacenavd"
-
-# ── udev rules ───────────────────────────────────────────────────────────────
-section "Installing udev rules"
-
-sudo cp "$SCRIPT_DIR/udev/99-spacemouse.rules" /etc/udev/rules.d/99-spacemouse.rules
-sudo cp "$SCRIPT_DIR/udev/restart-spacemouse-services" /usr/local/bin/restart-spacemouse-services
-sudo chmod +x /usr/local/bin/restart-spacemouse-services
-sudo udevadm control --reload-rules
-sudo udevadm trigger --subsystem-match=usb --action=add
-info "udev rules installed and reloaded."
 
 # ── spacenav-ws patch ────────────────────────────────────────────────────────
 section "Patching spacenav-ws (disabling button-snap behaviour)"
@@ -87,15 +104,6 @@ python3 "$SCRIPT_DIR/patch-spacenav-ws.py"
 # Restart spacenav-ws to pick up the patch
 systemctl --user restart spacenav-ws || true
 
-# ── spacenavd ────────────────────────────────────────────────────────────────
-section "Ensuring spacenavd is running"
-
-if ! sudo systemctl is-active --quiet spacenavd; then
-    sudo systemctl enable --now spacenavd
-    info "spacenavd started."
-else
-    info "spacenavd already running."
-fi
 
 # ── Done ─────────────────────────────────────────────────────────────────────
 section "Done!"
@@ -109,6 +117,4 @@ Next steps:
 
 If the mouse was already plugged in before installing, unplug and replug it.
 If buttons don't work, log out and back in (or reboot) so the 'input' group takes effect.
-
-To tune sensitivity, edit /etc/spnavrc then: sudo systemctl restart spacenavd
 EOF

@@ -19,7 +19,9 @@ import glob
 import json
 import os
 import select
+import signal
 import serial
+import struct
 import subprocess
 import threading
 import time
@@ -51,6 +53,7 @@ DIR_MAP = {
 
 _loop: asyncio.AbstractEventLoop = None
 _ws_clients: set = set()
+_socket_clients: set = set()
 _serial_queue: asyncio.Queue = None
 _ser_holder: list = [None]  # [serial.Serial | None]
 
@@ -178,6 +181,51 @@ async def _broadcast(msg: str):
             dead.add(ws)
     _ws_clients.difference_update(dead)
 
+# ── Unix Socket Helpers ───────────────────────────────────────────────────────
+
+async def handle_socket_client(reader: asyncio.StreamReader, writer: asyncio.StreamWriter):
+    _socket_clients.add(writer)
+    print(f"[sock] client connected ({len(_socket_clients)} total)")
+    try:
+        while not writer.is_closing():
+            data = await reader.read(1024)
+            if not data:
+                break
+    except (asyncio.CancelledError, ConnectionError):
+        pass
+    except Exception as e:
+        print(f"[sock] client error: {e}")
+    finally:
+        _socket_clients.discard(writer)
+        try:
+            writer.close()
+            await writer.wait_closed()
+        except Exception:
+            pass
+        print(f"[sock] client disconnected ({len(_socket_clients)} total)")
+
+async def _send_to_socket_client(writer: asyncio.StreamWriter, packet: bytes):
+    try:
+        writer.write(packet)
+        await asyncio.wait_for(writer.drain(), timeout=0.1)
+    except Exception:
+        _socket_clients.discard(writer)
+        try:
+            writer.close()
+            await writer.wait_closed()
+        except Exception:
+            pass
+
+async def _broadcast_socket(packet: bytes):
+    if not _socket_clients:
+        return
+    for writer in list(_socket_clients):
+        asyncio.create_task(_send_to_socket_client(writer, packet))
+
+def _broadcast_socket_from_thread(packet: bytes):
+    if _loop:
+        asyncio.run_coroutine_threadsafe(_broadcast_socket(packet), _loop)
+
 # ── HID thread ────────────────────────────────────────────────────────────────
 
 def hid_thread(actions_ref):
@@ -251,6 +299,18 @@ def serial_thread(actions_ref):
                             _broadcast_from_thread(f"TAP:{human}:{count_str}")
                 elif line.startswith(">MOTION:"):
                     _broadcast_from_thread(line[1:])  # strip '>' → MOTION:...
+                    try:
+                        parts = line[8:].split(",")
+                        if len(parts) == 6:
+                            # Convert floats to rounded integers
+                            coords = [int(round(float(p))) for p in parts]
+                            x, y, z, rx, ry, rz = coords
+                            period = 10
+                            # Swap Y and Z: [0, x, z, y, rx, ry, rz, period]
+                            packet = struct.pack("iiiiiiii", 0, x, z, y, rx, ry, rz, period)
+                            _broadcast_socket_from_thread(packet)
+                    except Exception as e:
+                        print(f"[serial] motion parse/pack error: {e}")
                 elif not line.startswith(">"):
                     # Command response (OK, ERR ..., JSON from config get, etc.)
                     _broadcast_from_thread(line)
@@ -325,6 +385,15 @@ async def main():
     _loop = asyncio.get_running_loop()
     _serial_queue = asyncio.Queue()
 
+    main_task = asyncio.current_task()
+
+    def handle_signal():
+        print("[main] signal received, cancelling main task")
+        main_task.cancel()
+
+    _loop.add_signal_handler(signal.SIGINT, handle_signal)
+    _loop.add_signal_handler(signal.SIGTERM, handle_signal)
+
     actions_ref = [load_actions()]
 
     threading.Thread(target=serial_thread,  args=(actions_ref,), daemon=True).start()
@@ -333,10 +402,39 @@ async def main():
 
     asyncio.create_task(serial_writer())
 
+    # Unix Socket Setup
+    socket_path = Path(f"/run/user/{os.getuid()}/spnav.sock")
+    socket_path.parent.mkdir(parents=True, exist_ok=True)
+    if socket_path.exists():
+        try:
+            socket_path.unlink()
+        except Exception as e:
+            print(f"[sock] failed to unlink stale socket: {e}")
+
+    print(f"[sock] server starting on {socket_path}")
+    unix_server = await asyncio.start_unix_server(handle_socket_client, path=str(socket_path))
+
     handler = lambda ws: ws_handler(ws, actions_ref)
     print(f"[ws] server starting on ws://{WS_HOST}:{WS_PORT}")
-    async with websockets.serve(handler, WS_HOST, WS_PORT):
-        await asyncio.Future()  # run forever
+    try:
+        async with websockets.serve(handler, WS_HOST, WS_PORT):
+            await asyncio.Future()  # run forever
+    except asyncio.CancelledError:
+        pass
+    finally:
+        print("[sock] server shutting down")
+        for writer in list(_socket_clients):
+            try:
+                writer.close()
+            except Exception:
+                pass
+        unix_server.close()
+        await unix_server.wait_closed()
+        if socket_path.exists():
+            try:
+                socket_path.unlink()
+            except Exception as e:
+                print(f"[sock] failed to unlink socket on shutdown: {e}")
 
 if __name__ == "__main__":
     asyncio.run(main())

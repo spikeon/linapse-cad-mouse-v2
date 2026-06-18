@@ -51,14 +51,38 @@ elif command -v dnf    >/dev/null; then PM=dnf
 else PM=""; fi
 [ -n "$PM" ] && info "Detected package manager: $PM" || info "No supported package manager detected (pacman/apt/dnf)."
 
-# spacenavd + ydotool come from the distro repos. uv is handled separately
+# Stop and disable active or enabled spacenavd service
+if systemctl is-active --quiet spacenavd 2>/dev/null || systemctl is-enabled --quiet spacenavd 2>/dev/null; then
+    info "Stopping and disabling active/enabled spacenavd service..."
+    sudo systemctl stop spacenavd || true
+    sudo systemctl disable spacenavd || true
+fi
+
+# Uninstall spacenavd package if installed
+if [ -n "$PM" ]; then
+    has_spacenavd=0
+    case "$PM" in
+        pacman) pacman -Qi spacenavd >/dev/null 2>&1 && has_spacenavd=1 ;;
+        apt)    dpkg -l spacenavd >/dev/null 2>&1 && has_spacenavd=1 ;;
+        dnf)    rpm -q spacenavd >/dev/null 2>&1 && has_spacenavd=1 ;;
+    esac
+    if [ "$has_spacenavd" -eq 1 ]; then
+        info "Uninstalling spacenavd package..."
+        case "$PM" in
+            pacman) sudo pacman -Rns --noconfirm spacenavd || true ;;
+            apt)    sudo apt-get remove -y spacenavd || true ;;
+            dnf)    sudo dnf remove -y spacenavd || true ;;
+        esac
+    fi
+fi
+
+# ydotool comes from the distro repos. uv is handled separately
 # because it is not packaged everywhere.
 missing=()
-command -v spacenavd >/dev/null || missing+=(spacenavd)
 command -v ydotool   >/dev/null || missing+=(ydotool)
 
 install_pkgs() {
-    [ ${#missing[@]} -eq 0 ] && { info "spacenavd and ydotool already installed."; return; }
+    [ ${#missing[@]} -eq 0 ] && { info "ydotool already installed."; return; }
     echo "  Will install: ${missing[*]}"
     if [ "$ASSUME_YES" -eq 0 ]; then
         read -rp "  Install these with sudo $PM? [y/N] " ans

@@ -1,10 +1,13 @@
 #!/usr/bin/env python3
 """
-Patches spacenav-ws with two fixes:
+Patches spacenav-ws with three fixes:
 
 1. controller.py — buttons no longer snap the OnShape view to front
 2. main.py — spacenav-ws reconnects to spacenavd automatically on replug,
              keeping the OnShape WebSocket alive (no tab refresh needed)
+             and uses user-specific runtime directory socket path
+3. spacenav.py — uses user-specific runtime directory socket path dynamically
+                 resolved via os.getuid()
 
 Usage:
     python3 patch-spacenav-ws.py           # auto-find and patch
@@ -86,7 +89,8 @@ _RECONNECT_WRAPPER = """\
                 while True:
                     await asyncio.sleep(1)
                     try:
-                        _r, _ = await asyncio.open_unix_connection("/var/run/spnav.sock")
+                        from spacenav_ws.spacenav import SPACENAV_SOCKET_PATH
+                        _r, _ = await asyncio.open_unix_connection(SPACENAV_SOCKET_PATH)
                         ctrl.reader = _r
                         logging.info("Reconnected to spacenavd")
                         break
@@ -110,9 +114,24 @@ def patch_main(path):
     with open(path) as f:
         content = f.read()
 
-    if "_mouse_with_reconnect" in content:
-        print(f"  main.py: already patched")
+    if "_mouse_with_reconnect" in content and "SPACENAV_SOCKET_PATH" in content:
+        print(f"  main.py: already patched with dynamic reconnect")
         return True
+
+    if "_mouse_with_reconnect" in content:
+        # Already patched with old reconnect wrapper, update the socket connection string
+        target = '                        _r, _ = await asyncio.open_unix_connection("/var/run/spnav.sock")'
+        replacement = '                        from spacenav_ws.spacenav import SPACENAV_SOCKET_PATH\n                        _r, _ = await asyncio.open_unix_connection(SPACENAV_SOCKET_PATH)'
+        
+        if target in content:
+            patched = content.replace(target, replacement)
+            with open(path, "w") as f:
+                f.write(patched)
+            print(f"  main.py: updated old patch to use dynamic SPACENAV_SOCKET_PATH")
+            return True
+        else:
+            print(f"  main.py: ERROR — old patch target not found for replacement", file=sys.stderr)
+            return False
 
     if _OLD_TASKGROUP not in content:
         print(f"  main.py: ERROR — patch target not found (version mismatch?)", file=sys.stderr)
@@ -123,6 +142,30 @@ def patch_main(path):
     with open(path, "w") as f:
         f.write(patched)
     print(f"  main.py: patched")
+    return True
+
+
+def patch_spacenav(path):
+    """Make spacenav.py use dynamic socket path based on user ID."""
+    with open(path) as f:
+        content = f.read()
+
+    if 'SPACENAV_SOCKET_PATH = f"/run/user/{os.getuid()}/spnav.sock"' in content:
+        print(f"  spacenav.py: already patched")
+        return True
+
+    if 'SPACENAV_SOCKET_PATH = "/var/run/spnav.sock"' not in content:
+        print(f"  spacenav.py: ERROR — SPACENAV_SOCKET_PATH not found", file=sys.stderr)
+        return False
+
+    patched = content.replace(
+        'SPACENAV_SOCKET_PATH = "/var/run/spnav.sock"',
+        'import os\nSPACENAV_SOCKET_PATH = f"/run/user/{os.getuid()}/spnav.sock"'
+    )
+
+    with open(path, "w") as f:
+        f.write(patched)
+    print(f"  spacenav.py: patched")
     return True
 
 
@@ -144,4 +187,5 @@ if __name__ == "__main__":
     ok = True
     ok &= patch_controller(os.path.join(pkg_dir, "controller.py"))
     ok &= patch_main(os.path.join(pkg_dir, "main.py"))
+    ok &= patch_spacenav(os.path.join(pkg_dir, "spacenav.py"))
     sys.exit(0 if ok else 1)

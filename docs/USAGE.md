@@ -27,15 +27,14 @@ The 3D device is annotated with every input zone. Click a callout to open its ac
 
 ### Action Configuration Screens
 
-````carousel
-![Key Combo Action Configuration](images/configurator-customize-key.png)
-<!-- slide -->
-![Scroll Action Configuration](images/configurator-customize-scroll.png)
-<!-- slide -->
-![Tap & Mouse Action Configuration](images/configurator-customize-tap.png)
-<!-- slide -->
-![Macro Action Configuration](images/configurator-customize-macro.png)
-````
+- **Key Combo Configuration**:
+  ![Key Combo Action Configuration](images/configurator-customize-key.png)
+- **Scroll Configuration**:
+  ![Scroll Action Configuration](images/configurator-customize-scroll.png)
+- **Tap & Mouse Configuration**:
+  ![Tap & Mouse Action Configuration](images/configurator-customize-tap.png)
+- **Macro Configuration**:
+  ![Macro Action Configuration](images/configurator-customize-macro.png)
 
 **Input zones (8):**
 

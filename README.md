@@ -21,19 +21,20 @@
 
 A single static web app with three tabs, talking to `linapse-service` over WebSocket and writing changes to the device live. Full walkthrough: **[docs/USAGE.md](docs/USAGE.md)**.
 
-````carousel
+### Customize Tab
 ![Customize Tab](docs/images/configurator-customize-tap.png)
 
-**Customize Tab**: Remap the 2 buttons, the chord, and 5 cap-tap zones to keys, clicks, scrolls, commands, or macros.
-<!-- slide -->
+Remap the 2 buttons, the chord, and 5 cap-tap zones to keys, clicks, scrolls, commands, or macros.
+
+### Lighting Tab
 ![Lighting Tab](docs/images/configurator-lighting.gif)
 
-**Lighting Tab**: Drive the SK6812 ring — solid, breathing, motion-reactive, swirl, gradient, rainbow — with live color and brightness.
-<!-- slide -->
+Drive the SK6812 ring — solid, breathing, motion-reactive, swirl, gradient, rainbow — with live color and brightness.
+
+### Sensitivity Tab
 ![Sensitivity Tab](docs/images/configurator-sensitivity.gif)
 
-**Sensitivity Tab**: Tune dead zones, the Kalman filter, and the response curve against a live 3D Benchy you push with the puck.
-````
+Tune dead zones, the Kalman filter, and the response curve against a live 3D Benchy you push with the puck.
 
 ## Architecture
 

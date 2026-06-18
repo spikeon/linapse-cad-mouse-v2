@@ -25,6 +25,18 @@ The three tabs — **Customize**, **Lighting**, **Sensitivity** — run across t
 
 The 3D device is annotated with every input zone. Click a callout to open its action panel on the right.
 
+### Action Configuration Screens
+
+````carousel
+![Key Combo Action Configuration](images/configurator-customize-key.png)
+<!-- slide -->
+![Scroll Action Configuration](images/configurator-customize-scroll.png)
+<!-- slide -->
+![Tap & Mouse Action Configuration](images/configurator-customize-tap.png)
+<!-- slide -->
+![Macro Action Configuration](images/configurator-customize-macro.png)
+````
+
 **Input zones (8):**
 
 | Zone | What triggers it |
@@ -55,7 +67,7 @@ Pick the action type, fill in its parameters, then hit **Apply** to write the ma
 
 ## Lighting — RGB effects
 
-![Lighting tab](images/configurator-lighting.png)
+![Lighting tab](images/configurator-lighting.gif)
 
 Controls the SK6812 LED ring. Pick an **Effect**, watch the **LED Preview** ring update, then **Apply to Device**.
 
@@ -81,7 +93,7 @@ The **LED Preview** ring is a live mock of what the device will show before you 
 
 ## Sensitivity — motion tuning
 
-![Sensitivity tab](images/configurator-sensitivity.png)
+![Sensitivity tab](images/configurator-sensitivity.gif)
 
 Tune the 6DoF motion filter against a live 3D **Benchy** test model. **Changes apply live** — there's no Apply button; drag the puck and feel the difference immediately. The viewport prompt reads **MOVE PUCK TO TEST**.
 

@@ -207,6 +207,19 @@ jobs:
         run: |
           pyinstaller --onefile --name linapse-service --hidden-import=pynput --hidden-import=hid --hidden-import=websockets --hidden-import=pycaw service/linapse-service
 
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Build Electron Configurator (Windows)
+        run: |
+          cd configurator
+          npm install
+          npm run pack
+          cd ..
+        shell: bash
+
       - name: Update AppVersion in installer.iss
         shell: powershell
         run: |
@@ -277,11 +290,25 @@ jobs:
         run: |
           pyinstaller --onefile --name linapse-service --hidden-import=pynput --hidden-import=hid --hidden-import=websockets service/linapse-service
 
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Build Electron Configurator (macOS)
+        run: |
+          cd configurator
+          npm install
+          npm run pack
+          cd ..
+
       - name: Prepare launchd agent payload directory structures
         run: |
           mkdir -p payload/usr/local/bin
           mkdir -p payload/Library/LaunchAgents
+          mkdir -p payload/Applications
           cp dist/linapse-service payload/usr/local/bin/linapse-service
+          cp -R "configurator/dist/mac/Linapse Configurator.app" payload/Applications/
           cat << 'EOF' > payload/Library/LaunchAgents/com.linapse.service.plist
           <?xml version="1.0" encoding="UTF-8"?>
           <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">

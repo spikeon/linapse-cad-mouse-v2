@@ -5,6 +5,14 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.10.6] - 2026-06-19
+
+### Added
+- **CI/CD Releases**: Added a `release` job to the GitHub Actions workflow to compile, build, and publish official Windows and macOS service installers to GitHub Releases automatically on push to the main or master branch.
+
+### Fixed
+- **Installer Download Links**: Resolved broken Windows setup and macOS package installer links in the README and documentation by publishing built binaries to GitHub Releases.
+
 ## [2.10.5] - 2026-06-19
 
 ### Fixed

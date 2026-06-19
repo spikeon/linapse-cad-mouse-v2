@@ -326,3 +326,46 @@ jobs:
           name: status-macos
           path: results/macos
 
+  release:
+    needs: [test, build-windows, build-macos]
+    runs-on: ubuntu-latest
+    if: (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master') && github.event_name == 'push'
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Read version
+        id: get_version
+        run: |
+          VERSION=$(cat VERSION | tr -d '\r\n[:space:]')
+          echo "VERSION=$VERSION" >> $GITHUB_ENV
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+
+      - name: Download Windows Installer
+        uses: actions/download-artifact@v4
+        with:
+          name: LinapseServiceSetup
+          path: .
+
+      - name: Download macOS Package
+        uses: actions/download-artifact@v4
+        with:
+          name: linapse-service-pkg
+          path: .
+
+      - name: Create or Update Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: v${{ steps.get_version.outputs.version }}
+          name: Release v${{ steps.get_version.outputs.version }}
+          draft: false
+          prerelease: false
+          files: |
+            LinapseServiceSetup.exe
+            linapse-service.pkg
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+

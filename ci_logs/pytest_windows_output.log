@@ -1,0 +1,73 @@
+============================= test session starts =============================
+platform win32 -- Python 3.11.9, pytest-9.1.0, pluggy-1.6.0
+rootdir: D:\a\linapse-cad-mouse-v2\linapse-cad-mouse-v2
+collected 55 items
+
+service\test_cross_platform.py ....                                      [  7%]
+service\test_installer_adversarial.py ssss                               [ 14%]
+service\test_installer_config.py ..                                      [ 18%]
+service\test_installer_mock.py ss                                        [ 21%]
+service\test_linapse_socket.py ssss                                      [ 29%]
+service\test_linapse_socket_stress.py sssss                              [ 38%]
+service\test_m1_adversarial_bugfix.py ss                                 [ 41%]
+service\test_m3_adversarial.py ssss                                      [ 49%]
+service\test_m3_challenger_verification.py sss                           [ 54%]
+service\test_m5_adversarial.py ssss                                      [ 61%]
+service\test_multi_click.py sss                                          [ 67%]
+service\test_playwright_benchy.py F                                      [ 69%]
+service\test_signal_integration.py sssssss                               [ 81%]
+service\test_signal_integration_stress.py sss                            [ 87%]
+service\test_stress.py ssssss                                            [ 98%]
+service\test_userscript_headers.py .                                     [100%]
+
+================================== FAILURES ===================================
+___________________ test_benchy_viewport_motion_and_toasts ____________________
+service\test_playwright_benchy.py:397: in test_benchy_viewport_motion_and_toasts
+    assert not saved_actions.get("inversion", {}).get("y"), f"Y inversion failed to untoggle on disk: {saved_actions}"
+E   AssertionError: Y inversion failed to untoggle on disk: {'current_mode': 'Default', 'modes': {'Default': {'buttons': {'0': {'action': 'mouse_click', 'button': 'left'}}, 'taps': {'top:1': {'action': 'key', 'value': 'ctrl+alt+t'}}, 'led': {'effect': 'solid', 'color': 'FFFFFF', 'brightness': 128}}, 'Browser': {'buttons': {'0': {'action': 'key', 'value': 'ctrl+pageup'}, '1': {'action': 'key', 'value': 'ctrl+pagedown'}}, 'taps': {'top:2': {'action': 'mode', 'value': 'Media'}}, 'led': {'effect': 'solid', 'color': '0000FF', 'brightness': 128}}, 'Media': {'buttons': {'0': {'action': 'key', 'value': 'prev'}, '1': {'action': 'key', 'value': 'next'}}, 'taps': {'top:2': {'action': 'mode', 'value': 'Default'}}, 'led': {'effect': 'dot_swirl', 'color': '00FF00', 'brightness': 128}}}, 'sensitivity': {'x_pos': 1, 'x_neg': 1, 'y_pos': 1, 'y_neg': 1, 'z_pos': 1, 'z_neg': 1, 'rx_pos': 1, 'rx_neg': 1, 'ry_pos': 1, 'ry_neg': 1, 'rz_pos': 1, 'rz_neg': 1}, 'inversion': {'x': False, 'y': True, 'z': False, 'rx': False, 'ry': False, 'rz': False}}
+E   assert not True
+E    +  where True = <built-in method get of dict object at 0x000001E13057CAC0>('y')
+E    +    where <built-in method get of dict object at 0x000001E13057CAC0> = {'x': False, 'y': True, 'z': False, 'rx': False, ...}.get
+E    +      where {'x': False, 'y': True, 'z': False, 'rx': False, ...} = <built-in method get of dict object at 0x000001E1304CDB00>('inversion', {})
+E    +        where <built-in method get of dict object at 0x000001E1304CDB00> = {'current_mode': 'Default', 'modes': {'Default': {'buttons': {'0': {'action': 'mouse_click', 'button': 'left'}}, 'taps..._pos': 1, 'x_neg': 1, 'y_pos': 1, 'y_neg': 1, ...}, 'inversion': {'x': False, 'y': True, 'z': False, 'rx': False, ...}}.get
+---------------------------- Captured stdout call -----------------------------
+[actions] migrated and saved to C:\Users\runneradmin\AppData\Local\Temp\pytest-of-runneradmin\pytest-0\test_benchy_viewport_motion_an0\actions.json
+[serial] connected to MOCK_COM
+[hid] disabled on Windows/macOS
+[ws] server starting on ws://localhost:62276
+[config] reloaded C:\Users\runneradmin\AppData\Local\Temp\pytest-of-runneradmin\pytest-0\test_benchy_viewport_motion_an0\actions.json
+[ws] client connected (1 total)
+[config] saved C:\Users\runneradmin\AppData\Local\Temp\pytest-of-runneradmin\pytest-0\test_benchy_viewport_motion_an0\actions.json
+[config] reloaded C:\Users\runneradmin\AppData\Local\Temp\pytest-of-runneradmin\pytest-0\test_benchy_viewport_motion_an0\actions.json
+[config] saved C:\Users\runneradmin\AppData\Local\Temp\pytest-of-runneradmin\pytest-0\test_benchy_viewport_motion_an0\actions.json
+[config] reloaded C:\Users\runneradmin\AppData\Local\Temp\pytest-of-runneradmin\pytest-0\test_benchy_viewport_motion_an0\actions.json
+[config] saved C:\Users\runneradmin\AppData\Local\Temp\pytest-of-runneradmin\pytest-0\test_benchy_viewport_motion_an0\actions.json
+[config] reloaded C:\Users\runneradmin\AppData\Local\Temp\pytest-of-runneradmin\pytest-0\test_benchy_viewport_motion_an0\actions.json
+[config] saved C:\Users\runneradmin\AppData\Local\Temp\pytest-of-runneradmin\pytest-0\test_benchy_viewport_motion_an0\actions.json
+[config] reloaded C:\Users\runneradmin\AppData\Local\Temp\pytest-of-runneradmin\pytest-0\test_benchy_viewport_motion_an0\actions.json
+[config] saved C:\Users\runneradmin\AppData\Local\Temp\pytest-of-runneradmin\pytest-0\test_benchy_viewport_motion_an0\actions.json
+[config] reloaded C:\Users\runneradmin\AppData\Local\Temp\pytest-of-runneradmin\pytest-0\test_benchy_viewport_motion_an0\actions.json
+[config] saved C:\Users\runneradmin\AppData\Local\Temp\pytest-of-runneradmin\pytest-0\test_benchy_viewport_motion_an0\actions.json
+[config] reloaded C:\Users\runneradmin\AppData\Local\Temp\pytest-of-runneradmin\pytest-0\test_benchy_viewport_motion_an0\actions.json
+[config] saved C:\Users\runneradmin\AppData\Local\Temp\pytest-of-runneradmin\pytest-0\test_benchy_viewport_motion_an0\actions.json
+[config] reloaded C:\Users\runneradmin\AppData\Local\Temp\pytest-of-runneradmin\pytest-0\test_benchy_viewport_motion_an0\actions.json
+[config] saved C:\Users\runneradmin\AppData\Local\Temp\pytest-of-runneradmin\pytest-0\test_benchy_viewport_motion_an0\actions.json
+[config] reloaded C:\Users\runneradmin\AppData\Local\Temp\pytest-of-runneradmin\pytest-0\test_benchy_viewport_motion_an0\actions.json
+[config] saved C:\Users\runneradmin\AppData\Local\Temp\pytest-of-runneradmin\pytest-0\test_benchy_viewport_motion_an0\actions.json
+[config] reloaded C:\Users\runneradmin\AppData\Local\Temp\pytest-of-runneradmin\pytest-0\test_benchy_viewport_motion_an0\actions.json
+[config] saved C:\Users\runneradmin\AppData\Local\Temp\pytest-of-runneradmin\pytest-0\test_benchy_viewport_motion_an0\actions.json
+[config] reloaded C:\Users\runneradmin\AppData\Local\Temp\pytest-of-runneradmin\pytest-0\test_benchy_viewport_motion_an0\actions.json
+[config] saved C:\Users\runneradmin\AppData\Local\Temp\pytest-of-runneradmin\pytest-0\test_benchy_viewport_motion_an0\actions.json
+[config] reloaded C:\Users\runneradmin\AppData\Local\Temp\pytest-of-runneradmin\pytest-0\test_benchy_viewport_motion_an0\actions.json
+[config] save error: [WinError 5] Access is denied: 'C:\\Users\\runneradmin\\AppData\\Local\\Temp\\pytest-of-runneradmin\\pytest-0\\test_benchy_viewport_motion_an0\\actions.tmp' -> 'C:\\Users\\runneradmin\\AppData\\Local\\Temp\\pytest-of-runneradmin\\pytest-0\\test_benchy_viewport_motion_an0\\actions.json'
+[ws] client disconnected (0 total)
+[sock] server shutting down
+- generated xml file: D:\a\linapse-cad-mouse-v2\linapse-cad-mouse-v2\pytest_windows_results.xml -
+=========================== short test summary info ===========================
+FAILED service/test_playwright_benchy.py::test_benchy_viewport_motion_and_toasts - AssertionError: Y inversion failed to untoggle on disk: {'current_mode': 'Default', 'modes': {'Default': {'buttons': {'0': {'action': 'mouse_click', 'button': 'left'}}, 'taps': {'top:1': {'action': 'key', 'value': 'ctrl+alt+t'}}, 'led': {'effect': 'solid', 'color': 'FFFFFF', 'brightness': 128}}, 'Browser': {'buttons': {'0': {'action': 'key', 'value': 'ctrl+pageup'}, '1': {'action': 'key', 'value': 'ctrl+pagedown'}}, 'taps': {'top:2': {'action': 'mode', 'value': 'Media'}}, 'led': {'effect': 'solid', 'color': '0000FF', 'brightness': 128}}, 'Media': {'buttons': {'0': {'action': 'key', 'value': 'prev'}, '1': {'action': 'key', 'value': 'next'}}, 'taps': {'top:2': {'action': 'mode', 'value': 'Default'}}, 'led': {'effect': 'dot_swirl', 'color': '00FF00', 'brightness': 128}}}, 'sensitivity': {'x_pos': 1, 'x_neg': 1, 'y_pos': 1, 'y_neg': 1, 'z_pos': 1, 'z_neg': 1, 'rx_pos': 1, 'rx_neg': 1, 'ry_pos': 1, 'ry_neg': 1, 'rz_pos': 1, 'rz_neg': 1}, 'inversion': {'x': False, 'y': True, 'z': False, 'rx': False, 'ry': False, 'rz': False}}
+assert not True
+ +  where True = <built-in method get of dict object at 0x000001E13057CAC0>('y')
+ +    where <built-in method get of dict object at 0x000001E13057CAC0> = {'x': False, 'y': True, 'z': False, 'rx': False, ...}.get
+ +      where {'x': False, 'y': True, 'z': False, 'rx': False, ...} = <built-in method get of dict object at 0x000001E1304CDB00>('inversion', {})
+ +        where <built-in method get of dict object at 0x000001E1304CDB00> = {'current_mode': 'Default', 'modes': {'Default': {'buttons': {'0': {'action': 'mouse_click', 'button': 'left'}}, 'taps..._pos': 1, 'x_neg': 1, 'y_pos': 1, 'y_neg': 1, ...}, 'inversion': {'x': False, 'y': True, 'z': False, 'rx': False, ...}}.get
+================== 1 failed, 7 passed, 47 skipped in 26.77s ===================

@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Linapse Browser Connector
 // @namespace    https://github.com/sb-ocr/cad-mouse-mk2
-// @version      2.5.4
+// @version      2.6.0
 // @description  Makes OnShape and SketchUp Web connect to the local spacenav-ws bridge on Linux
 // @author       CAD Mouse MK2 contributors
 // @match        https://cad.onshape.com/*

@@ -308,7 +308,11 @@ jobs:
           mkdir -p payload/Library/LaunchAgents
           mkdir -p payload/Applications
           cp dist/linapse-service payload/usr/local/bin/linapse-service
-          cp -R "configurator/dist/mac/Linapse Configurator.app" payload/Applications/
+          if [ -d "configurator/dist/mac-arm64" ]; then
+            cp -R "configurator/dist/mac-arm64/Linapse Configurator.app" payload/Applications/
+          else
+            cp -R "configurator/dist/mac/Linapse Configurator.app" payload/Applications/
+          fi
           cat << 'EOF' > payload/Library/LaunchAgents/com.linapse.service.plist
           <?xml version="1.0" encoding="UTF-8"?>
           <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">

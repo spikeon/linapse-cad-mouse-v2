@@ -22,6 +22,7 @@ void EffectEngine::update(unsigned long now, float motionMag) {
     case LedEffect::DotSwirl:      doDotSwirl(now);                break;
     case LedEffect::GradientSwirl: doGradientSwirl(now);           break;
     case LedEffect::RainbowSwirl:  doRainbowSwirl(now);            break;
+    case LedEffect::Volume:        doVolume();                     break;
     default:                       doSolid();                      break;
   }
   lastMs_ = now;
@@ -122,6 +123,30 @@ void EffectEngine::doRainbowSwirl(unsigned long now) {
   for (int i = 0; i < n; i++) {
     float hue = fmodf((swirlPos_ + (float)i / n) * 360.0f, 360.0f);
     ledController.effectPixel(i, hsvToRgb(hue, 1.0f, v));
+  }
+  ledController.effectCommit();
+}
+
+void EffectEngine::doVolume() {
+  extern int g_currentVolume;
+  float vol = (float)g_currentVolume;
+  if (vol < 0.0f) vol = 0.0f;
+  if (vol > 100.0f) vol = 100.0f;
+
+  float active_leds = (vol / 100.0f) * 8.0f;
+  const int n = ledController.numPixels();
+
+  ledController.effectBegin();
+  for (int i = 0; i < n; i++) {
+    float factor = 0.0f;
+    if (active_leds >= (float)(i + 1)) {
+      factor = 1.0f;
+    } else if (active_leds > (float)i) {
+      factor = active_leds - (float)i;
+    } else {
+      factor = 0.0f;
+    }
+    ledController.effectPixel(i, scaledColor(factor));
   }
   ledController.effectCommit();
 }

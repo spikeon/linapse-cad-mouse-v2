@@ -1,6 +1,6 @@
 {
   "name": "linapse-configurator",
-  "version": "2.6.14",
+  "version": "2.7.0",
   "description": "CAD Mouse MK2 Linapse Web Configurator",
   "main": "main.js",
   "scripts": {

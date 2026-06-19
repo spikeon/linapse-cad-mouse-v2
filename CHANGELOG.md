@@ -5,6 +5,13 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.7.0] - 2026-06-19
+
+### Added
+- **Volume Lighting Mode**: Introduced a new cross-platform lighting effect ("Volume") that visualizes system volume level on LEDs 1 to 8, with fractional volume represented by smooth dimming/brightening on the highest active LED.
+- **Volume Synchronization**: Implemented background system volume monitoring in `linapse-service` using native tools (Windows `pycaw` fallback, macOS `osascript`, Linux `amixer`/`pactl`) to sync volume changes over serial to the device in real-time.
+- **Configurator Integration**: Added the "Volume" chip to the web configurator's lighting tab with a custom local preview animation.
+
 ## [2.6.14] - 2026-06-19
 
 ### Added

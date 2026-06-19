@@ -54,7 +54,7 @@ def custom_init(self, *args, **kwargs):
     target = kwargs.get("target")
     if target:
         name = getattr(target, "__name__", "")
-        if name in ("serial_thread", "hid_thread", "config_watcher", "_scroll_loop", "_on_single"):
+        if name in ("serial_thread", "hid_thread", "config_watcher", "volume_watcher", "_scroll_loop", "_on_single"):
             is_ours = True
     elif isinstance(self, threading.Timer) or self.__class__.__name__ == "Timer":
         is_ours = True

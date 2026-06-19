@@ -26,6 +26,7 @@ EffectEngine       effectEngine;
 //   config reset                — factory reset
 
 bool g_debugAxes = false;  // accessed by IdleState
+int g_currentVolume = 50;  // accessed by EffectEngine
 
 namespace {
 String serialBuf;
@@ -38,6 +39,7 @@ const char* effectName(LedEffect fx) {
     case LedEffect::DotSwirl:      return "dot_swirl";
     case LedEffect::GradientSwirl: return "gradient_swirl";
     case LedEffect::RainbowSwirl:  return "rainbow_swirl";
+    case LedEffect::Volume:        return "volume";
     default:                       return "unknown";
   }
 }
@@ -49,6 +51,7 @@ LedEffect effectFromName(const String& name) {
   if (name == "dot_swirl")      return LedEffect::DotSwirl;
   if (name == "gradient_swirl") return LedEffect::GradientSwirl;
   if (name == "rainbow_swirl")  return LedEffect::RainbowSwirl;
+  if (name == "volume")         return LedEffect::Volume;
   return LedEffect::kCount;  // invalid sentinel
 }
 
@@ -92,7 +95,7 @@ void handleLedCommand(const String& args) {
     String name = args.substring(7); name.trim();
     LedEffect fx = effectFromName(name);
     if (fx == LedEffect::kCount) {
-      Serial.println("ERR effect: solid|breathing|reactive|dot_swirl|gradient_swirl|rainbow_swirl");
+      Serial.println("ERR effect: solid|breathing|reactive|dot_swirl|gradient_swirl|rainbow_swirl|volume");
       return;
     }
     ledConfig.effect = fx;
@@ -177,6 +180,15 @@ void handleSerial() {
       else if (serialBuf.startsWith("config ")) handleConfigCommand(serialBuf.substring(7));
       else if (serialBuf.startsWith("sens "))   handleSensCommand(serialBuf.substring(5));
       else if (serialBuf.startsWith("debug "))  handleDebugCommand(serialBuf.substring(6));
+      else if (serialBuf.startsWith("volume ")) {
+        int val = serialBuf.substring(7).toInt();
+        if (val >= 0 && val <= 100) {
+          g_currentVolume = val;
+          Serial.println("OK");
+        } else {
+          Serial.println("ERR volume 0-100");
+        }
+      }
       serialBuf = "";
     } else {
       serialBuf += c;

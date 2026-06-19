@@ -32,7 +32,7 @@ If you prefer to run the daemon manually from source:
 1. Ensure [Python 3](https://www.python.org/downloads/) is installed and added to your `PATH`.
 2. Open PowerShell or Command Prompt and install the required dependencies:
    ```cmd
-   pip install websockets pyserial pynput
+   pip install websockets pyserial pynput pycaw
    ```
 3. Run the service:
    ```cmd

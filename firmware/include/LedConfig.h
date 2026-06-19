@@ -9,6 +9,7 @@ enum class LedEffect : uint8_t {
   DotSwirl      = 3,  // single LED orbiting the ring
   GradientSwirl = 4,  // comet with fading trail
   RainbowSwirl  = 5,  // full rainbow rotating around ring
+  Volume        = 6,  // show volume 0-100% on LEDs 1-8
   kCount
 };
 

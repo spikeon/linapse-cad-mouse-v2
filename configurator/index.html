@@ -968,6 +968,7 @@ input[type=range]::-webkit-slider-thumb {
             <div class="effect-chip" onclick="selectEffect('dot_swirl', this)">Dot Swirl</div>
             <div class="effect-chip" onclick="selectEffect('gradient_swirl', this)">Gradient</div>
             <div class="effect-chip" onclick="selectEffect('rainbow_swirl', this)">Rainbow</div>
+            <div class="effect-chip" onclick="selectEffect('volume', this)">Volume</div>
           </div>
         </div>
 
@@ -3050,16 +3051,29 @@ function animateLedPreview() {
           ? (lit < 0.15 ? 1 : 0.08)
           : (0.2 + 0.8 * (1 - Math.abs(lit - 0.5) * 2)));
         ringAlpha = bright * 0.6;
+      } else if (currentEffect === 'volume') {
+        const mockVol = 50 + 50 * Math.sin(ledPhase * Math.PI * 0.5);
+        const active_leds = (mockVol / 100.0) * 8.0;
+        let factor = 0.0;
+        if (active_leds >= (i + 1)) {
+          factor = 1.0;
+        } else if (active_leds > i) {
+          factor = active_leds - i;
+        } else {
+          factor = 0.0;
+        }
+        alpha = bright * factor;
+        ringAlpha = bright * (mockVol / 100.0);
       }
       const col = `rgba(${r},${g},${b},${alpha})`;
       dot.style.background = col;
-      if (currentEffect === 'dot_swirl' || currentEffect === 'gradient_swirl') {
+      if (currentEffect === 'dot_swirl' || currentEffect === 'gradient_swirl' || currentEffect === 'volume') {
         setSourceColor(i, col, alpha);
       }
     });
 
     // Per-source effects set each source individually above; skip uniform overwrite
-    if (currentEffect !== 'dot_swirl' && currentEffect !== 'gradient_swirl') {
+    if (currentEffect !== 'dot_swirl' && currentEffect !== 'gradient_swirl' && currentEffect !== 'volume') {
       setRingColor(ringR, ringG, ringB, ringAlpha);
     }
     if (currentEffect !== 'solid') ledAnimFrame = requestAnimationFrame(frame);

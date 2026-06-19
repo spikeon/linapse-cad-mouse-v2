@@ -161,7 +161,7 @@ jobs:
 
       - name: Install dependencies
         run: |
-          pip install pyinstaller websockets pyserial pynput hidapi pytest playwright pyyaml
+          pip install pyinstaller websockets pyserial pynput hidapi pytest playwright pyyaml pycaw
 
       - name: Install Playwright Browsers
         run: |
@@ -181,7 +181,7 @@ jobs:
 
       - name: Compile linapse-service
         run: |
-          pyinstaller --onefile --name linapse-service --hidden-import=pynput --hidden-import=hid --hidden-import=websockets service/linapse-service
+          pyinstaller --onefile --name linapse-service --hidden-import=pynput --hidden-import=hid --hidden-import=websockets --hidden-import=pycaw service/linapse-service
 
       - name: Update AppVersion in installer.iss
         shell: powershell

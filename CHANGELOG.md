@@ -5,6 +5,12 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.9.8] - 2026-06-19
+
+### Added
+- **Equalizer GIF Generation**: Created a Playwright script `generate_equalizer_gif.js` to automatically capture frames of the configurator's Equalizer LED animation and compile them into an animated GIF using ImageMagick.
+- **Lighting Documentation GIF**: Replaced static Equalizer image reference with the newly generated animated GIF in `LIGHTING.md`.
+
 ## [2.9.7] - 2026-06-19
 
 ### Added

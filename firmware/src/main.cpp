@@ -184,7 +184,7 @@ void handleSerial() {
       else if (serialBuf.startsWith("config ")) handleConfigCommand(serialBuf.substring(7));
       else if (serialBuf.startsWith("sens "))   handleSensCommand(serialBuf.substring(5));
       else if (serialBuf.startsWith("debug "))  handleDebugCommand(serialBuf.substring(6));
-      else if (serialBuf == "version")          { Serial.println("version=2.9.7"); }
+      else if (serialBuf == "version")          { Serial.println("version=2.9.8"); }
       else if (serialBuf.startsWith("volume ")) {
         int val = serialBuf.substring(7).toInt();
         if (val >= 0 && val <= 100) {

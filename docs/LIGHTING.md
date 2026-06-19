@@ -96,7 +96,7 @@ Translates host system audio levels into a two-channel stereo visualizer on the 
 - **Host Syncing**: `linapse-service` captures playback from the default monitor output on Linux (`parec` + IIR filters), computes low-frequency and high-frequency energy levels (0 to 100), and sends them over serial (command: `eq <bass> <treble>\n`).
 - **Configurability**: Respects the configured max brightness.
 
-![Equalizer Effect](images/led-effect-equalizer.png)
+![Equalizer Effect](images/led-effect-equalizer.gif)
 
 ---
 

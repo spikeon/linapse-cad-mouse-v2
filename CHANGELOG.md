@@ -5,6 +5,11 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.6.14] - 2026-06-19
+
+### Added
+- **Platform Documentation**: Added comprehensive installation and quick-start guides for Windows (`docs/WINDOWS.md`) and macOS (`docs/MACOS.md`), including details on binary installers, building from source, userscript configuration, system permissions, and feature support matrices.
+
 ## [2.6.13] - 2026-06-19
 
 ### Fixed

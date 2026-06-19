@@ -72,7 +72,7 @@ class TestInstallerConfig(unittest.TestCase):
         # Check [Setup] settings
         setup = dict(parser.items("Setup"))
         self.assertEqual(setup.get("appname"), "Linapse CAD Mouse Service")
-        self.assertEqual(setup.get("appversion"), "2.5.1")
+        self.assertEqual(setup.get("appversion"), "2.5.2")
         self.assertEqual(setup.get("defaultdirname"), "{autopf}\\LinapseCADMouse")
         self.assertEqual(setup.get("defaultgroupname"), "Linapse CAD Mouse")
         self.assertEqual(setup.get("outputdir"), ".")

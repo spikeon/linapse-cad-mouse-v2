@@ -139,7 +139,11 @@ jobs:
 
       - name: Install dependencies
         run: |
-          pip install pyinstaller websockets pyserial pynput hidapi
+          pip install pyinstaller websockets pyserial pynput hidapi pytest
+
+      - name: Run tests on Windows
+        run: |
+          pytest linux/
 
       - name: Compile linapse-service
         run: |
@@ -175,7 +179,11 @@ jobs:
 
       - name: Install dependencies
         run: |
-          pip install pyinstaller websockets pyserial pynput hidapi
+          pip install pyinstaller websockets pyserial pynput hidapi pytest
+
+      - name: Run tests on macOS
+        run: |
+          pytest linux/
 
       - name: Compile linapse-service
         run: |

@@ -5,6 +5,12 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.5.2] - 2026-06-19
+
+### Added
+- **Multi-OS CI/CD Test Environments**: Configured native Windows (`windows-latest`) and macOS (`macos-latest`) CI runners to execute the Pytest test suite prior to compilation.
+- **Cross-Platform Test Filtering**: Created `linux/conftest.py` to dynamically discover and skip Linux-only systemd, udev, and unix socket tests when running on Windows and macOS, enabling cross-platform automated test suites.
+
 ## [2.5.1] - 2026-06-19
 
 ### Added

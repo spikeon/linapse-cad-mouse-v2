@@ -1298,7 +1298,7 @@ input[type=range]::-webkit-slider-thumb {
       </div>
       <p style="font-size: 13px; color: var(--text2); margin: 0; line-height: 1.5;">
         Your CAD Mouse is running firmware <strong id="currentFwVersion">unknown</strong>. 
-        The latest firmware version is <strong id="latestFwVersion">2.10.0</strong>. 
+        The latest firmware version is <strong id="latestFwVersion">2.10.1</strong>. 
         Please update the firmware to enable new features like the <strong>Volume</strong> lighting effect and other enhancements.
       </p>
     </div>
@@ -3580,11 +3580,11 @@ function handleFlashMessage(msg) {
   }
 }
 
-let serviceVersion = '2.10.0';
+let serviceVersion = '2.10.1';
 let firmwareVersion = 'unknown';
 
 function handleVersionInfo(info) {
-  serviceVersion = info.service || '2.10.0';
+  serviceVersion = info.service || '2.10.1';
   firmwareVersion = info.firmware || 'unknown';
   
   const badge = document.getElementById('fwBadge');

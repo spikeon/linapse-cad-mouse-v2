@@ -73,7 +73,7 @@ jobs:
         id: run_tests
         run: |
           docker exec -e XDG_RUNTIME_DIR=/run/user/0 -e DBUS_SESSION_BUS_ADDRESS=unix:path=/run/user/0/bus \
-            systemd-container sh -c "cd /workspace && pytest service/ --junitxml=pytest_${{ matrix.distro }}_results.xml --tb=short 2>&1 | tee pytest_${{ matrix.distro }}_output.log; status=\$?; chmod 666 pytest_${{ matrix.distro }}_results.xml pytest_${{ matrix.distro }}_output.log || true; exit \$status"
+            systemd-container sh -c "cd /workspace && pytest service/ --junitxml=pytest_${{ matrix.distro }}_results.xml --tb=short > pytest_${{ matrix.distro }}_output.log 2>&1; status=\$?; cat pytest_${{ matrix.distro }}_output.log; chmod 666 pytest_${{ matrix.distro }}_results.xml pytest_${{ matrix.distro }}_output.log || true; exit \$status"
 
       - name: Publish Test Report
         uses: dorny/test-reporter@v1

@@ -4,6 +4,10 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+## [2.10.1] - 2026-06-19
+
+### Fixed
+- **Websocket Broadcast Dropout**: Fixed a race condition where high-frequency broadcasts concurrently running on the event loop would drop messages because of a simplistic global `_broadcasting` flag. Replaced with connection-specific async Locks and checks. Removed unsupported `.closed` attribute access on modern websockets connections.
 
 ## [2.10.0] - 2026-06-19
 

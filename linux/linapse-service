@@ -43,8 +43,8 @@ if sys.platform in ("win32", "darwin"):
         from pynput.mouse import Controller as MouseController, Button
         pynput_keyboard = KeyboardController()
         pynput_mouse = MouseController()
-    except ImportError:
-        print("[pynput] warning: pynput not installed. Emulation will fail on Windows/macOS.")
+    except Exception as e:
+        print(f"[pynput] warning: failed to initialize pynput: {e}. Emulation will fail on Windows/macOS.")
 
 
 try:

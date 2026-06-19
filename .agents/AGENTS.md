@@ -31,6 +31,12 @@ You MUST update [CHANGELOG.md](file:///home/spikeon/Dev/linapse-cad-mouse-v2/CHA
 
 You MUST ignore the `git_token` (or any environment variables containing git/github auth tokens) when executing git commands. Do NOT try to read them, use them, or prompt the user for them. Assume git authentication is handled by the user/system credential helper.
 
+If git commands (like `git push`) fail with authentication/token errors, it is likely because `GITHUB_TOKEN` or `GH_TOKEN` environment variables are present and invalid, overriding the valid credentials stored in the system's keyring. To bypass this, run git push with these invalid environment variables explicitly unset:
+```bash
+env -u GITHUB_TOKEN -u GH_TOKEN git push
+```
+
+
 ## Documentation Requirement
 
 Whenever a new feature is added to the codebase, you MUST:

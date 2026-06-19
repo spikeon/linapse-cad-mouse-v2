@@ -27,8 +27,8 @@
 
 ## What it does
 
-- **6DoF motion in OnShape, SketchUp Web, and Native Linux apps.** The firmware presents the device to the OS as a SpaceMouse, so `spacenavd` drives it. A WebSocket bridge plus a Tampermonkey userscript carry motion into browser apps (OnShape, SketchUp Web), while native apps (Blender, FreeCAD, OrcaSlicer, etc.) connect directly via UNIX socket.
-- **Physical buttons, taps, and gestures.** The host service maps the two buttons (and tap-on-the-cap gestures detected in firmware) to keystrokes, clicks, scrolling, and macros via `ydotool` (Wayland-native input injection).
+- **6DoF motion in OnShape, SketchUp Web, and Native Linux apps.** Motion coordinates are decoded in firmware and sent via USB serial to `linapse-service`. The service processes the motion and exposes it through a user-space UNIX socket, eliminating the need for system-wide `spacenavd`. A WebSocket bridge plus a Tampermonkey userscript carry motion into browser apps (OnShape, SketchUp Web), while native apps (Blender, FreeCAD, OrcaSlicer, etc.) connect directly via the UNIX socket.
+- **Physical buttons, taps, and gestures.** The host service maps the two buttons (read via `hidraw` from the USB HID interface) and tap-on-the-cap gestures (detected in firmware and sent over serial) to keystrokes, clicks, scrolling, and macros via `ydotool` (Wayland-native input injection).
 - **Addressable RGB lighting.** SK6812 LEDs with multiple effects (solid, breathing, motion-reactive, swirls) configured live.
 - **Linapse web configurator.** A browser UI to remap buttons/taps, design lighting, and tune the motion filter — with a live 3D Benchy viewport you can push around with the puck to feel sensitivity changes in real time.
 
@@ -59,27 +59,32 @@ Tune dead zones, the Kalman filter, and the response curve against a live 3D Ben
 │  firmware/                                                         │
 │   • 6DoF motion decode + Kalman filter + sensitivity curve         │
 │   • tap detection, LED effect engine                               │
-│   • USB HID (spoofed as a SpaceMouse)  +  serial telemetry/config  │
+│   • USB HID (buttons)  +  USB serial (telemetry/config)            │
 └───────────────┬───────────────────────────────┬──────────────────┘
-                │ USB HID (6DoF)                 │ USB serial
-                ▼                                ▼
-        spacenavd                        linapse-service  (linux/)
-        /var/run/spnav.sock              ws://localhost:13000
-                │                          • owns the serial port
-                ▼                          • dispatches buttons/taps → ydotool
-        spacenav-ws  (ws :8181)           • broadcasts TAP / MOTION events
-                │                          • reads/writes device config
-                ▼                                ▲
-        Web Apps (OnShape, SketchUp)             │ WebSocket
-        (Tampermonkey userscript)                │
-                                          Linapse configurator  (configurator/)
-                                           • buttons / taps / lighting / sensitivity
-                                           • live 3D Benchy motion test
+                │ USB HID (buttons)             │ USB serial (telemetry, config)
+                ▼                               ▼
+        /dev/input/hidraw               linapse-service  (linux/)
+                │                        • reads serial & button hidraw
+                │                        • dispatches buttons/taps → ydotool
+                │                        • scales/inverts & writes motion
+                └──────────────────────► • creates /run/user/<uid>/spnav.sock
+                                         • ws://localhost:13000
+                                                │                  ▲
+                ┌───────────────────────────────┤                  │ WebSocket
+                ▼                               ▼                  ▼
+        Native Linux Apps               spacenav-ws       Linapse configurator
+        (Blender, FreeCAD, etc.)        (ws :8181)        • profile/lighting/sens
+        (reads spnav.sock)                      │         • live 3D Benchy viewport
+                                                ▼
+                                        Web Apps (OnShape, SketchUp)
+                                        (Tampermonkey userscript)
 ```
 
-Two independent paths share the device:
-- **Motion** flows over USB HID → `spacenavd` → `spacenav-ws` → Web Apps (OnShape, SketchUp), or directly to native Linux apps (Blender, FreeCAD, Maya, etc.) via the UNIX socket.
-- **Buttons, taps, lighting, and config** flow over USB serial ↔ `linapse-service` ↔ the configurator.
+How the data flows:
+- **Motion** is decoded on the device, sent as raw 6DoF telemetry over **USB serial** to `linapse-service`. The service scales and inverts the coordinates according to user configuration, then writes them to the user-space UNIX socket at `/run/user/<uid>/spnav.sock`. Native applications read this socket directly, while `spacenav-ws` (running `linapse-ws-proxy`) bridges it to browser-based CAD applications.
+- **Buttons** are sent as HID report events over the USB HID interface, read by `linapse-service` via `hidraw`, and mapped to keystrokes/macros using `ydotool`.
+- **Taps and Gestures** are detected in firmware, sent over **USB serial** to `linapse-service`, and dispatched via `ydotool`.
+- **Configuration** (sensitivity, deadzones, lighting patterns) flows bidirectionally over **USB serial** between `linapse-service` and the device, controlled via the WebSocket connection (`ws://localhost:13000`) from the Linapse web configurator.
 
 ## Repository layout
 
@@ -96,7 +101,7 @@ Two independent paths share the device:
 
 ### One-step setup
 
-The top-level [`setup.sh`](setup.sh) orchestrates the whole stack: it installs the distro packages (`spacenavd`, `ydotool`, `uv`), runs the host integration, and installs a systemd user service that serves the configurator.
+The top-level [`setup.sh`](setup.sh) orchestrates the whole stack: it installs the distro packages (`ydotool`, `uv`), disables and uninstalls `spacenavd` (since `linapse-service` replaces it), runs the host integration, and installs a systemd user service that serves the configurator.
 
 ```bash
 ./setup.sh                 # packages + host integration + configurator service
@@ -109,14 +114,7 @@ It still leaves two inherently hands-on steps to you: flashing the firmware (the
 
 ### 1. Flash the firmware
 
-The firmware spoofs its USB VID/PID to a 3Dconnexion SpaceMouse so `spacenavd` recognises it automatically. **You must supply the VID/PID yourself** — they are intentionally left blank in [`platformio.ini`](platformio.ini):
-
-```ini
-; board_build.arduino.earlephilhower.usb_vid = 0xXXXX
-; board_build.arduino.earlephilhower.usb_pid = 0xYYYY
-```
-
-Uncomment and fill in the VID/PID of the SpaceMouse model you want to emulate, then build and flash:
+Build and flash the firmware to the Seeed Studio XIAO RP2040:
 
 ```bash
 pio run                       # build
@@ -152,11 +150,7 @@ It connects to `linapse-service` at `ws://localhost:13000`. From there you can r
 
 - **Feel / gains / deadzones:** firmware defaults live in `firmware/include/Config.h` — see [firmware/README.md](firmware/README.md).
 - **Live motion filter** (Kalman responsiveness/smoothness, dead zones, sensitivity curve): the configurator's Sensitivity tab, applied to the device over serial in real time.
-- **spacenavd sensitivity:** `/etc/spnavrc` (installed by `install.sh`).
-
-## Security note
-
-The USB VID/PID used to emulate a SpaceMouse are **not** included in this repository — they are placeholders (`0xXXXX` / `0xYYYY`). Supply your own before flashing.
+- **Sensitivity/Inversion:** custom axis scaling, deadzones, and direction inversions are applied in `linapse-service` using user configuration (see configurator Sensitivity tab).
 
 ## Credits & license
 

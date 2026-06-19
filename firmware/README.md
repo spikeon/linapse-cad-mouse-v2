@@ -15,7 +15,7 @@ const float DEAD_R = 20.0;
 const float SMOOTH_TAU_S = 0.08;
 ```
 
-⚠️ Refer to the video at [6:23](https://youtu.be/62xlzGs8LXA?si=ld2shDCaTxOLIGB8&t=383) for a demo of driver support. Related settings can be found commented in[`platformio.ini`](../platformio.ini).
+⚠️ Refer to the video at [6:23](https://youtu.be/62xlzGs8LXA?si=ld2shDCaTxOLIGB8&t=383) for a demo of driver support. Related USB settings can be found in [`platformio.ini`](../platformio.ini).
 
 ⚠️ As mentioned in the video, the motion processing still needs work and may eventually be replaced entirely. This is beyond me for now, so contributions and improvements are welcome.
 

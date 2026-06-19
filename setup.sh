@@ -2,7 +2,7 @@
 # Linapse — CAD Mouse MK2 full setup
 #
 # Front door for setting up the entire stack on a fresh machine:
-#   1. install distro packages (spacenavd, ydotool, uv)
+#   1. install distro packages (ydotool, uv)
 #   2. (optional) flash the firmware            --flash
 #   3. install the host integration             linux/install.sh
 #   4. install + enable the configurator service

@@ -5,6 +5,14 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.2.9] - 2026-06-18
+
+### Changed
+- **Documentation**: Updated the top-level README.md architecture diagram and description to reflect that the system-wide `spacenavd` daemon is not used, and that `linapse-service` manages inputs directly (reading 6DoF motion coordinates over USB serial telemetry and button status over USB HID).
+- **Documentation**: Removed obsolete SpaceMouse USB VID/PID hardware spoofing instructions and "Security note" from README.md.
+- **Documentation**: Updated `setup.sh` comments and `firmware/README.md` to remove outdated references to `spacenavd` package installation and hardware spoofing configurations.
+- **Configuration**: Updated `platformio.ini` USB comments to reflect the correct usage of the USB product name `CAD Mouse MK2` for local identification.
+
 ## [2.2.8] - 2026-06-18
 
 ### Fixed

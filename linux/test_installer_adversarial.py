@@ -122,7 +122,7 @@ exec {sys.executable} "$@"
             # Restore permissions so tearDown can clean up
             env_d_dir.chmod(0o755)
 
-    @unittest.skipIf(os.geteuid() == 0, "Cannot run write-prevention tests as root")
+    @unittest.skipIf(getattr(os, "geteuid", lambda: -1)() == 0, "Cannot run write-prevention tests as root")
     def test_install_fails_when_file_is_readonly(self):
         # Create file and make it read-only
         env_d_dir = self.mock_home / ".config" / "environment.d"

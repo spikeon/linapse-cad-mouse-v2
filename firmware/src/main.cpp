@@ -29,6 +29,8 @@ bool g_debugAxes = false;  // accessed by IdleState
 int g_currentVolume = 50;  // accessed by EffectEngine
 int g_bassLevel = 0;       // accessed by EffectEngine
 int g_trebleLevel = 0;     // accessed by EffectEngine
+bool g_serviceHidMode = false;
+unsigned long g_lastServicePacketMs = 0;
 
 namespace {
 String serialBuf;
@@ -184,7 +186,42 @@ void handleSerial() {
       else if (serialBuf.startsWith("config ")) handleConfigCommand(serialBuf.substring(7));
       else if (serialBuf.startsWith("sens "))   handleSensCommand(serialBuf.substring(5));
       else if (serialBuf.startsWith("debug "))  handleDebugCommand(serialBuf.substring(6));
-      else if (serialBuf == "version")          { Serial.println("version=2.9.9"); }
+      else if (serialBuf == "version")          { Serial.println("version=2.10.0"); }
+      else if (serialBuf.startsWith("service_hid ")) {
+        int val = serialBuf.substring(12).toInt();
+        g_serviceHidMode = (val != 0);
+        g_lastServicePacketMs = millis();
+        Serial.println("OK");
+      }
+      else if (serialBuf.startsWith("hid_report ")) {
+        g_lastServicePacketMs = millis();
+        String args = serialBuf.substring(11);
+        float motion[6] = {0};
+        int parsed = 0;
+        int startIdx = 0;
+        for (int i = 0; i < 6; i++) {
+          int commaIdx = args.indexOf(',', startIdx);
+          if (commaIdx == -1 && i < 5) {
+            break;
+          }
+          String valStr;
+          if (commaIdx == -1) {
+            valStr = args.substring(startIdx);
+          } else {
+            valStr = args.substring(startIdx, commaIdx);
+            startIdx = commaIdx + 1;
+          }
+          valStr.trim();
+          motion[i] = valStr.toFloat();
+          parsed++;
+        }
+        if (parsed == 6) {
+          hidController.sendAxesReport(motion);
+          Serial.println("OK");
+        } else {
+          Serial.println("ERR hid_report requires 6 comma-separated floats");
+        }
+      }
       else if (serialBuf.startsWith("volume ")) {
         int val = serialBuf.substring(7).toInt();
         if (val >= 0 && val <= 100) {

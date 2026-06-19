@@ -52,12 +52,15 @@ def equalizer_watcher(actions_ref):
                             active = True
                 
                 if active and not state.flashing_active:
-                    phase += 0.1
+                    phase += 0.03
                     bass = int(50 + 50 * math.sin(phase))
                     treble = int(50 + 50 * math.cos(phase * 1.5))
+                    state.last_bass_level = bass
+                    state.last_treble_level = treble
+                    state.broadcast_from_thread(f"EQ:{bass}:{treble}")
                     if state.loop and state.serial_queue:
                         state.loop.call_soon_threadsafe(state.serial_queue.put_nowait, f"eq {bass} {treble}")
-                time.sleep(0.05)
+                time.sleep(0.015)
             except Exception:
                 time.sleep(1.0)
         return
@@ -96,7 +99,7 @@ def equalizer_watcher(actions_ref):
                 )
                 time.sleep(0.1)
                 
-            chunk_size = 2048
+            chunk_size = 512
             data = proc.stdout.read(chunk_size)
             if not data:
                 proc.terminate()
@@ -110,9 +113,21 @@ def equalizer_watcher(actions_ref):
                 samples = struct.unpack(f"<{num_samples}h", data[:num_samples*2])
                 bass_avg, treble_avg = audio_filter.process(samples)
                 
-                bass_level = int(min(1.0, bass_avg / 8000.0) * 100)
-                treble_level = int(min(1.0, treble_avg / 4000.0) * 100)
+                if bass_avg < 150.0:
+                    bass_level = 0
+                else:
+                    x_bass = max(0.0, min(1.0, (bass_avg - 150.0) / 4850.0))
+                    bass_level = int(10 + 90 * (x_bass ** 0.4))
+
+                if treble_avg < 100.0:
+                    treble_level = 0
+                else:
+                    x_treb = max(0.0, min(1.0, (treble_avg - 100.0) / 2400.0))
+                    treble_level = int(10 + 90 * (x_treb ** 0.4))
                 
+                state.last_bass_level = bass_level
+                state.last_treble_level = treble_level
+                state.broadcast_from_thread(f"EQ:{bass_level}:{treble_level}")
                 if state.loop and state.serial_queue:
                     state.loop.call_soon_threadsafe(state.serial_queue.put_nowait, f"eq {bass_level} {treble_level}")
                     

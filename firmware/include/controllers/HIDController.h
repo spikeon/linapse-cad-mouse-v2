@@ -8,6 +8,8 @@ class HIDController {
   void begin();
   void task();
   bool sendReports(const float motion[6], uint16_t buttonBits);
+  bool sendAxesReport(const float motion[6]);
+  bool sendButtonsReport(uint16_t buttonBits);
 
  private:
   struct __attribute__((packed)) ReportAxes {

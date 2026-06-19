@@ -50,6 +50,8 @@ def volume_watcher():
                 if last_val != -1:
                     state.last_volume_change_time = time.time()
                 last_val = vol
+                state.last_system_volume = vol
+                state.broadcast_from_thread(f"VOLUME:{vol}")
                 if state.loop and state.serial_queue:
                     state.loop.call_soon_threadsafe(state.serial_queue.put_nowait, f"volume {vol}")
         except Exception:

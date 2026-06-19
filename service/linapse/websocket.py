@@ -36,6 +36,10 @@ async def ws_handler(websocket, actions_ref=None):
                 await websocket.send("OK actions saved" if ok else "ERR actions save failed")
             elif message == "actions_get":
                 await websocket.send("ACTIONS:" + json.dumps(state.actions_ref[0]))
+            elif message == "volume_get":
+                await websocket.send(f"VOLUME:{state.last_system_volume}")
+            elif message == "eq_get":
+                await websocket.send(f"EQ:{state.last_bass_level}:{state.last_treble_level}")
             elif message == "version_get":
                 await websocket.send(f"VERSION_INFO:{{\"service\":\"{state.service_version}\",\"firmware\":\"{state.firmware_version}\"}}")
             elif message == "flash":

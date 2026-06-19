@@ -17,3 +17,6 @@ extern HIDController       hidController;
 extern TelemetryController telemetryController;
 extern TapDetector         tapDetector;
 extern EffectEngine        effectEngine;
+
+extern bool g_serviceHidMode;
+extern unsigned long g_lastServicePacketMs;

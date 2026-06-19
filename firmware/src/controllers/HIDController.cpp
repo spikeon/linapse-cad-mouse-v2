@@ -94,3 +94,30 @@ bool HIDController::sendReports(const float motion[6], uint16_t buttonBits) {
 
   return true;
 }
+
+bool HIDController::sendAxesReport(const float motion[6]) {
+  const ReportAxes axes = makeAxesReport(motion);
+  const bool sendAxes = axesReportChanged(axes);
+
+  if (!usbHid_.ready() || !sendAxes) {
+    return false;
+  }
+
+  usbHid_.sendReport(0x01, &axes, sizeof(axes));
+  lastSentAxes_ = axes;
+  return true;
+}
+
+bool HIDController::sendButtonsReport(uint16_t buttonBits) {
+  const bool sendButtons = (buttonBits != buttonBitsSent_);
+
+  if (!usbHid_.ready() || !sendButtons) {
+    return false;
+  }
+
+  ReportButtons btn{};
+  btn.bits = buttonBits & 0x0003;
+  usbHid_.sendReport(0x03, &btn, sizeof(btn));
+  buttonBitsSent_ = buttonBits;
+  return true;
+}

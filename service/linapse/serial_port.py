@@ -32,6 +32,15 @@ def find_serial(actions_ref=None):
             prod = getattr(p, "product", "") or ""
             if vid == 0x2886:
                 return p.device
+            if actions_ref and actions_ref[0] and isinstance(actions_ref[0], dict):
+                custom_usb = actions_ref[0].get("custom_usb", {})
+                if custom_usb.get("enabled", False) and custom_usb.get("vid"):
+                    try:
+                        custom_vid = int(custom_usb.get("vid"), 16)
+                        if vid == custom_vid:
+                            return p.device
+                    except Exception:
+                        pass
             for term in ("Seeed", "CAD Mouse", "CAD_Mouse"):
                 if term in desc or term in prod:
                     return p.device
@@ -74,15 +83,20 @@ def serial_thread(actions_ref):
                         ser.write(f"led effect {effect}\n".encode())
                         ser.write(f"led color {color}\n".encode())
                         ser.write(f"led brightness {brightness}\n".encode())
+                        ser.write(b"service_hid 1\n")
                         ser.write(b"version\n")
                     except Exception as e:
-                        print(f"[serial] failed to write initial LED commands: {e}")
+                        print(f"[serial] failed to write initial LED/HID commands: {e}")
                         
             while True:
                 if state.flashing_active:
                     break
                 line = ser.readline().decode(errors="replace").strip()
                 if not line:
+                    try:
+                        ser.write(b"service_hid 1\n")
+                    except Exception as e:
+                        print(f"[serial] failed to write heartbeat: {e}")
                     continue
                 if line.startswith("TAP:"):
                     parts = line.split(":")
@@ -185,6 +199,15 @@ def serial_thread(actions_ref):
                                     for _ in range(presses):
                                         dispatch({"action": "key", "value": "voldown"})
                                     _rx_volume_accumulator += presses * 250.0
+
+                            # Send processed coordinates back to the device to emit via USB HID
+                            try:
+                                if current_mode not in ("Browser", "Media"):
+                                    ser.write(f"hid_report {x:.1f},{y:.1f},{z:.1f},{rx:.1f},{ry:.1f},{rz:.1f}\n".encode())
+                                else:
+                                    ser.write(b"hid_report 0,0,0,0,0,0\n")
+                            except Exception as e:
+                                print(f"[serial] failed to write hid_report back: {e}")
 
                             if current_mode not in ("Browser", "Media"):
                                 # Apply direction inversions for spacenav mapping

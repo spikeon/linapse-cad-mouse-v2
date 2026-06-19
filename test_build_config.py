@@ -33,3 +33,14 @@ if is_test:
         "+<states/IdleState.cpp>",
         "+<states/SleepState.cpp>"
     ])
+
+# Handle custom USB VID/PID overriding
+import os
+vid = os.environ.get("LINAPSE_USB_VID")
+pid = os.environ.get("LINAPSE_USB_PID")
+if vid and pid:
+    print(f"Applying custom USB override: VID={vid}, PID={pid}")
+    board = env.BoardConfig()
+    board.update("build.arduino.earlephilhower.usb_vid", vid)
+    board.update("build.arduino.earlephilhower.usb_pid", pid)
+

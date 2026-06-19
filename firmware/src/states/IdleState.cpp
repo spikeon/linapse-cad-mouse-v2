@@ -58,7 +58,21 @@ void IdleState::runMotionPipeline(float dt, unsigned long now) {
   lastMotionMag_ = mag;
 
   const uint16_t buttonBits   = inputController.buttonBits();
-  const bool     hidReportSent = hidController.sendReports(motion, buttonBits);
+
+  if (g_serviceHidMode) {
+    if (now - g_lastServicePacketMs > 2000) {
+      g_serviceHidMode = false;
+      Serial.println("service_hid timeout, reverting to local_hid");
+    }
+  }
+
+  bool hidReportSent = false;
+  if (g_serviceHidMode) {
+    hidReportSent = hidController.sendButtonsReport(buttonBits);
+  } else {
+    hidReportSent = hidController.sendReports(motion, buttonBits);
+  }
+
   if (telemetryController.enabled()) {
     telemetryController.publish(motion, buttonBits, hidReportSent);
   }

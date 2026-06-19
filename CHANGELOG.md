@@ -5,6 +5,12 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.10.0] - 2026-06-19
+
+### Added
+- **SpaceMouse HID Emulation**: Support routing 6DoF motion telemetry through the host Python service before writing it to a virtual/spoofed SpaceMouse USB HID device. Added watchdog timeout (2s) on the device to fall back to local HID reporting if the service is stopped.
+- **Custom USB PID/VID Configuration**: Added a checkbox and custom PID/VID entry fields in the Firmware tab of the Electron configurator. Overrides default board descriptors at build-time using PlatformIO SCons scripting.
+
 ## [2.9.9] - 2026-06-19
 
 ### Added

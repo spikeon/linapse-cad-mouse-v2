@@ -132,5 +132,42 @@ class TestCrossPlatform(unittest.TestCase):
         linapse_service.dispatch(action_move)
         mock_mouse.move.assert_called_with(10, -15)
 
+    @patch("linapse.flashing.state")
+    @patch("linapse.flashing.asyncio.create_subprocess_exec")
+    @patch("linapse.flashing.find_repo_root")
+    @patch("linapse.flashing.locate_or_mount_rpi_rp2")
+    @patch("linapse.flashing.shutil.copy")
+    def test_flash_device_custom_usb(self, mock_copy, mock_mount, mock_repo_root, mock_exec, mock_state):
+        mock_repo_root.return_value = Path("/mock/repo")
+        mock_mount.return_value = Path("/mock/mount")
+        
+        mock_process = MagicMock()
+        mock_process.communicate = MagicMock()
+        async def mock_communicate():
+            return (b"stdout", b"stderr")
+        mock_process.communicate.side_effect = mock_communicate
+        mock_process.returncode = 0
+        
+        self.captured_env = {}
+        async def mock_exec_coro(*args, **kwargs):
+            self.captured_env = kwargs.get("env", {})
+            return mock_process
+        mock_exec.side_effect = mock_exec_coro
+        
+        mock_state.actions_ref = [{"custom_usb": {"enabled": True, "vid": "0x1234", "pid": "0x5678"}}]
+        mock_state.flashing_active = False
+        
+        async def mock_broadcast(msg):
+            pass
+        mock_state.broadcast = mock_broadcast
+        
+        with patch("pathlib.Path.exists", return_value=True):
+            import asyncio
+            from linapse.flashing import flash_device
+            asyncio.run(flash_device())
+            
+        self.assertEqual(self.captured_env.get("LINAPSE_USB_VID"), "0x1234")
+        self.assertEqual(self.captured_env.get("LINAPSE_USB_PID"), "0x5678")
+
 if __name__ == "__main__":
     unittest.main()

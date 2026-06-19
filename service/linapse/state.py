@@ -2,7 +2,7 @@ import asyncio
 import threading
 
 # Version information
-service_version = "2.9.9"
+service_version = "2.10.0"
 firmware_version = "unknown"
 
 # Shared state variables
@@ -16,15 +16,26 @@ actions_ref: list = [None]  # [dict | None]
 config_lock = threading.Lock()
 flashing_active = False
 last_volume_change_time = 0.0
+last_system_volume = 50
+last_bass_level = 0
+last_treble_level = 0
+_broadcasting = False
 
 async def broadcast(msg: str):
-    dead = set()
-    for ws in list(ws_clients):
-        try:
-            await ws.send(msg)
-        except Exception:
-            dead.add(ws)
-    ws_clients.difference_update(dead)
+    global _broadcasting
+    if _broadcasting:
+        return
+    _broadcasting = True
+    try:
+        dead = set()
+        for ws in list(ws_clients):
+            try:
+                await asyncio.wait_for(ws.send(msg), timeout=0.05)
+            except Exception:
+                dead.add(ws)
+        ws_clients.difference_update(dead)
+    finally:
+        _broadcasting = False
 
 def broadcast_from_thread(msg: str):
     if loop:

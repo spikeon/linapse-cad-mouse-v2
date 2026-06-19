@@ -116,6 +116,12 @@ async def flash_device():
         return
     await state.broadcast("FLASH:status:Building firmware with PlatformIO...")
     env = os.environ.copy()
+    if state.actions_ref and state.actions_ref[0]:
+        custom_usb = state.actions_ref[0].get("custom_usb", {})
+        if custom_usb.get("enabled", False):
+            env["LINAPSE_USB_VID"] = custom_usb.get("vid", "")
+            env["LINAPSE_USB_PID"] = custom_usb.get("pid", "")
+            print(f"[flash] Building with custom VID={custom_usb.get('vid')}, PID={custom_usb.get('pid')}")
     pio_path = Path.home() / ".platformio" / "penv" / "bin"
     if pio_path.exists():
         env["PATH"] = str(pio_path) + os.pathsep + env.get("PATH", "")

@@ -457,6 +457,37 @@ def test_websocket_server_integration(running_service):
             
     loop.run_until_complete(run())
 
+def test_websocket_volume_eq_integration(running_service):
+    """Verify that volume_get, eq_get, and real-time volume/EQ broadcasts work over WebSockets."""
+    loop = running_service["loop"]
+    ws_port = running_service["ws_port"]
+    
+    async def run():
+        uri = f"ws://localhost:{ws_port}"
+        async with websockets.connect(uri) as ws:
+            # 1. Query Volume
+            await ws.send("volume_get")
+            response = await asyncio.wait_for(ws.recv(), timeout=1.0)
+            assert response.startswith("VOLUME:")
+            
+            # 2. Query EQ
+            await ws.send("eq_get")
+            response = await asyncio.wait_for(ws.recv(), timeout=1.0)
+            assert response.startswith("EQ:")
+            
+            # 3. Test manual broadcast of volume
+            from linapse import state
+            state.broadcast_from_thread("VOLUME:88")
+            response = await asyncio.wait_for(ws.recv(), timeout=1.0)
+            assert response == "VOLUME:88"
+            
+            # 4. Test manual broadcast of EQ
+            state.broadcast_from_thread("EQ:42:73")
+            response = await asyncio.wait_for(ws.recv(), timeout=1.0)
+            assert response == "EQ:42:73"
+            
+    loop.run_until_complete(run())
+
 def test_button_chord_timing_debouncing(running_service):
     """Verify button chord combination logic, timing delays, debouncing, and race condition / boundary overlaps."""
     actions = {

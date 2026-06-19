@@ -5,6 +5,23 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.3.1] - 2026-06-18
+
+### Fixed
+- **Configuration Erasure & Truncation**: Implemented atomic configuration file saving using a temporary file and `os.replace` to prevent truncation race conditions.
+- **Save Fail-safe**: Added thread-safety with `_config_lock` and implemented fallback to in-memory configuration when file is corrupted, preventing loading defaults.
+- **JSON Validation**: Added dictionary type validation to prevent AttributeError crashes on invalid JSON layouts.
+- **Asyncio Event Loop Responsiveness**: Moved synchronous file writing operations to a separate thread in the WebSocket handler using `asyncio.to_thread`.
+- **Pytest Coroutine Warning**: Fixed coroutine warning in `test_directional_sensitivity_and_inversion` by mocking the broadcast helper correctly.
+
+## [2.3.0] - 2026-06-18
+
+### Added
+- **Backend Modes Feature**: Added support for backend configuration modes. Legacy root-level `buttons` and `taps` configurations are automatically migrated to a modes structure under a `"Default"` mode.
+- **Mode Switching Action**: Added `"mode"` action inside `dispatch` to transition between profiles thread-safely.
+- **Serial Connection Sync**: Sends the active mode's LED settings (effect, color, brightness) to the device on serial thread startup.
+- **Integration Tests**: Added tests in `linux/test_signal_integration.py` covering migration, mode switching, LED serial command transmission, WS broadcasting, and robustness.
+
 ## [2.2.9] - 2026-06-18
 
 ### Changed

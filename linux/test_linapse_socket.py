@@ -139,11 +139,13 @@ class TestLinapseSocket(unittest.TestCase):
         orig_serial_class = linapse_service.serial.Serial
         orig_ser_holder = linapse_service._ser_holder
         orig_broadcast = linapse_service._broadcast_socket_from_thread
+        orig_broadcast_from_thread = linapse_service._broadcast_from_thread
         
         linapse_service.find_serial = MagicMock(return_value="/dev/ttyACM0")
         linapse_service.serial.Serial = MagicMock(return_value=mock_ser)
         linapse_service._ser_holder = [mock_ser]
         linapse_service._broadcast_socket_from_thread = mock_broadcast_socket
+        linapse_service._broadcast_from_thread = MagicMock()
         
         try:
             try:
@@ -156,6 +158,7 @@ class TestLinapseSocket(unittest.TestCase):
             linapse_service.serial.Serial = orig_serial_class
             linapse_service._ser_holder = orig_ser_holder
             linapse_service._broadcast_socket_from_thread = orig_broadcast
+            linapse_service._broadcast_from_thread = orig_broadcast_from_thread
             
         self.assertEqual(len(packets_sent), 1)
         unpacked = struct.unpack("iiiiiiii", packets_sent[0])

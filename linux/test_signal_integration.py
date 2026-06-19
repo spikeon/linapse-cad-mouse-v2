@@ -391,7 +391,7 @@ def test_websocket_server_integration(running_service):
             response = await asyncio.wait_for(ws.recv(), timeout=1.0)
             assert response.startswith("ACTIONS:")
             config_data = json.loads(response[8:])
-            assert "buttons" in config_data
+            assert "buttons" in config_data or "modes" in config_data
             
             # 2. Save Config
             new_config = {
@@ -599,3 +599,114 @@ def test_config_reloading_on_file_change(running_service):
     # It should have reloaded and now dispatches right mouse click (0xc1)
     assert len(ydotool_calls) == 1
     assert ydotool_calls[0] == ["ydotool", "click", "0xc1"]
+
+def test_modes_feature_integration(running_service):
+    """Verify configuration migration, mode switching, button mapping updates, and robustness."""
+    loop = running_service["loop"]
+    ws_port = running_service["ws_port"]
+    mock_serial = running_service["mock_serial"]
+    actions_path = running_service["actions_path"]
+    
+    # 1. Configuration Migration: Write a legacy config directly
+    legacy_actions = {
+        "button_override": False,
+        "buttons": {
+            "0": {"action": "key", "value": "a"}
+        },
+        "taps": {
+            "top:1": {"action": "mode", "value": "Game"}
+        }
+    }
+    with open(actions_path, "w") as f:
+        json.dump(legacy_actions, f)
+        
+    # Force reload
+    future_time = time.time() + 10.0
+    os.utime(actions_path, (future_time, future_time))
+    time.sleep(0.1)
+    
+    # Verify that the loaded config in memory (and on disk) has been migrated
+    with open(actions_path) as f:
+        migrated_config = json.load(f)
+    assert "modes" in migrated_config
+    assert "current_mode" in migrated_config
+    assert migrated_config["current_mode"] == "Default"
+    assert "buttons" not in migrated_config
+    assert "taps" not in migrated_config
+    
+    default_mode = migrated_config["modes"]["Default"]
+    assert default_mode["buttons"] == {"0": {"action": "key", "value": "a"}}
+    assert default_mode["taps"] == {"top:1": {"action": "mode", "value": "Game"}}
+    assert default_mode["led"] == {"effect": "solid", "color": "FFFFFF", "brightness": 128}
+
+    # Add Game mode
+    migrated_config["modes"]["Game"] = {
+        "buttons": {
+            "0": {"action": "key", "value": "g"}
+        },
+        "taps": {
+            "top:1": {"action": "mode", "value": "Default"}
+        },
+        "led": {"effect": "breathe", "color": "FF0000", "brightness": 200}
+    }
+    with open(actions_path, "w") as f:
+        json.dump(migrated_config, f)
+        
+    # Force reload
+    future_time = time.time() + 20.0
+    os.utime(actions_path, (future_time, future_time))
+    time.sleep(0.1)
+    
+    global ydotool_calls
+    ydotool_calls.clear()
+    
+    # Trigger button 0 press in Default mode
+    linapse_service._on_press(0, linapse_service._actions_ref[0])
+    timer = linapse_service._timers[0]
+    timer.cancel()
+    linapse_service._on_single(0, linapse_service._actions_ref[0])
+    
+    assert len(ydotool_calls) == 1
+    assert ydotool_calls[0] == ["ydotool", "key", "30:1", "30:0"]
+    ydotool_calls.clear()
+    
+    # 2. Mode Switching via tap event
+    mock_serial.written_data.clear()
+    
+    async def run_ws_check():
+        uri = f"ws://localhost:{ws_port}"
+        async with websockets.connect(uri) as ws:
+            # Send the tap event
+            mock_serial.input_queue.put(b"TAP:NegZ:1\n")
+            
+            # Wait for WS notification of mode change
+            first_msg = await asyncio.wait_for(ws.recv(), timeout=1.0)
+            second_msg = await asyncio.wait_for(ws.recv(), timeout=1.0)
+            assert {first_msg, second_msg} == {"TAP:top:1", "MODE:Game"}
+            
+    loop.run_until_complete(run_ws_check())
+    
+    # Check that current_mode on disk is updated to "Game"
+    with open(actions_path) as f:
+        saved_config = json.load(f)
+    assert saved_config["current_mode"] == "Game"
+    
+    # Check that LED commands were written to mock serial
+    assert b"led effect breathe\n" in mock_serial.written_data
+    assert b"led color FF0000\n" in mock_serial.written_data
+    assert b"led brightness 200\n" in mock_serial.written_data
+    
+    # 3. Verification of button mappings in the new active mode
+    ydotool_calls.clear()
+    linapse_service._on_press(0, linapse_service._actions_ref[0])
+    timer = linapse_service._timers[0]
+    timer.cancel()
+    linapse_service._on_single(0, linapse_service._actions_ref[0])
+    
+    assert len(ydotool_calls) == 1
+    assert ydotool_calls[0] == ["ydotool", "key", "34:1", "34:0"]
+    ydotool_calls.clear()
+    
+    # 4. Robustness: switching to a non-existent mode does nothing
+    linapse_service.switch_mode("NonExistent")
+    assert linapse_service._actions_ref[0]["current_mode"] == "Game"

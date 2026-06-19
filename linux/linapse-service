@@ -56,16 +56,105 @@ _ws_clients: set = set()
 _socket_clients: set = set()
 _serial_queue: asyncio.Queue = None
 _ser_holder: list = [None]  # [serial.Serial | None]
+_actions_ref: list = [None]  # [dict | None]
+_config_lock = threading.Lock()
+
 
 # ── Actions ───────────────────────────────────────────────────────────────────
 
+def get_active_mode_config(actions, category):
+    if not isinstance(actions, dict):
+        actions = {"button_override": False, "buttons": {}, "taps": {}}
+    if "modes" in actions:
+        current_mode = actions.get("current_mode")
+        if current_mode and current_mode in actions["modes"]:
+            mode_config = actions["modes"][current_mode]
+            return mode_config.get(category, {})
+        return {}
+    else:
+        return actions.get(category, {})
+
+def switch_mode(target_mode):
+    global _config_lock
+    with _config_lock:
+        actions = _actions_ref[0]
+        if not actions or not isinstance(actions, dict) or "modes" not in actions:
+            return
+        if target_mode not in actions["modes"]:
+            print(f"[mode] target mode '{target_mode}' does not exist")
+            return
+
+        actions["current_mode"] = target_mode
+
+        try:
+            ACTIONS_PATH.parent.mkdir(parents=True, exist_ok=True)
+            tmp_path = ACTIONS_PATH.with_suffix(".tmp")
+            with open(tmp_path, "w") as f:
+                json.dump(actions, f, indent=2)
+            os.replace(tmp_path, ACTIONS_PATH)
+            print(f"[mode] switched to '{target_mode}' and saved configuration")
+        except Exception as e:
+            print(f"[mode] error saving configuration: {e}")
+
+    led_config = actions["modes"][target_mode].get("led", {})
+    effect = led_config.get("effect", "solid")
+    color = led_config.get("color", "FFFFFF")
+    brightness = led_config.get("brightness", 128)
+
+    if _loop and _serial_queue:
+        async def queue_cmds():
+            await _serial_queue.put(f"led effect {effect}")
+            await _serial_queue.put(f"led color {color}")
+            await _serial_queue.put(f"led brightness {brightness}")
+        asyncio.run_coroutine_threadsafe(queue_cmds(), _loop)
+
+    _broadcast_from_thread(f"MODE:{target_mode}")
+
 def load_actions():
-    try:
-        with open(ACTIONS_PATH) as f:
-            return json.load(f)
-    except Exception as e:
-        print(f"[actions] {e}")
-        return {"button_override": False, "buttons": {}, "taps": {}}
+    global _config_lock
+    with _config_lock:
+        actions = None
+        file_existed = False
+        parsing_error = False
+        try:
+            if ACTIONS_PATH.exists():
+                file_existed = True
+                with open(ACTIONS_PATH) as f:
+                    actions = json.load(f)
+        except Exception as e:
+            print(f"[actions] {e}")
+            parsing_error = True
+            if file_existed and _actions_ref[0] is not None:
+                return _actions_ref[0]
+
+        if actions is None or not isinstance(actions, dict):
+            actions = {"button_override": False, "buttons": {}, "taps": {}}
+
+        migrated = False
+        if "buttons" in actions or "taps" in actions:
+            legacy_buttons = actions.pop("buttons", {})
+            legacy_taps = actions.pop("taps", {})
+            actions["modes"] = {
+                "Default": {
+                    "buttons": legacy_buttons,
+                    "taps": legacy_taps,
+                    "led": {"effect": "solid", "color": "FFFFFF", "brightness": 128}
+                }
+            }
+            actions["current_mode"] = "Default"
+            migrated = True
+
+        if migrated and not parsing_error:
+            try:
+                ACTIONS_PATH.parent.mkdir(parents=True, exist_ok=True)
+                tmp_path = ACTIONS_PATH.with_suffix(".tmp")
+                with open(tmp_path, "w") as f:
+                    json.dump(actions, f, indent=2)
+                os.replace(tmp_path, ACTIONS_PATH)
+                print(f"[actions] migrated and saved to {ACTIONS_PATH}")
+            except Exception as e:
+                print(f"[actions] failed to save migrated actions: {e}")
+        return actions
 
 def ydotool(*args):
     env = os.environ.copy()
@@ -144,6 +233,10 @@ def dispatch(action_obj):
     print(f"[dispatch] action: {act} obj: {action_obj}")
     if act == "none":
         pass
+    elif act == "mode":
+        val = action_obj.get("value", "")
+        if val:
+            switch_mode(val)
     elif act == "key":
         val = action_obj.get("value", "")
         if val:
@@ -188,8 +281,9 @@ _timers = {}
 _scroll_threads = {}
 
 def _scroll_loop(btn, stop_event, actions):
-    act = actions.get("buttons", {}).get(str(btn), {"action": "scroll_down" if btn == 0 else "scroll_up"})
     while not stop_event.is_set():
+        mode_buttons = get_active_mode_config(actions, "buttons")
+        act = mode_buttons.get(str(btn), {"action": "scroll_down" if btn == 0 else "scroll_up"})
         dispatch(act)
         time.sleep(SCROLL_INTERVAL)
 
@@ -199,7 +293,8 @@ def _on_single(btn, actions):
     _broadcast_from_thread(f"BUTTON:{btn}:1")
     if actions.get("button_override", False):
         return
-    act = actions.get("buttons", {}).get(str(btn), {"action": "scroll_down" if btn == 0 else "scroll_up"})
+    mode_buttons = get_active_mode_config(actions, "buttons")
+    act = mode_buttons.get(str(btn), {"action": "scroll_down" if btn == 0 else "scroll_up"})
     if act.get("action") in ("scroll_up", "scroll_down"):
         stop_event = threading.Event()
         t = threading.Thread(target=_scroll_loop, args=(btn, stop_event, actions), daemon=True)
@@ -210,7 +305,8 @@ def _on_single(btn, actions):
 
 def _on_chord(actions):
     _broadcast_from_thread("BUTTON:chord:1")
-    act = actions.get("buttons", {}).get("chord", {"action": "key", "value": "shift+7"})
+    mode_buttons = get_active_mode_config(actions, "buttons")
+    act = mode_buttons.get("chord", {"action": "key", "value": "shift+7"})
     dispatch(act)
 
 def _on_press(btn, actions):
@@ -363,6 +459,23 @@ def serial_thread(actions_ref):
             ser = serial.Serial(port, SERIAL_BAUD, timeout=1.0)
             _ser_holder[0] = ser
             print(f"[serial] connected to {port}")
+            
+            # Send initial active mode's LED settings to the device so they are in sync on startup.
+            actions = actions_ref[0]
+            if actions and "modes" in actions:
+                current_mode = actions.get("current_mode", "Default")
+                if current_mode in actions["modes"]:
+                    led_config = actions["modes"][current_mode].get("led", {})
+                    effect = led_config.get("effect", "solid")
+                    color = led_config.get("color", "FFFFFF")
+                    brightness = led_config.get("brightness", 128)
+                    try:
+                        ser.write(f"led effect {effect}\n".encode())
+                        ser.write(f"led color {color}\n".encode())
+                        ser.write(f"led brightness {brightness}\n".encode())
+                    except Exception as e:
+                        print(f"[serial] failed to write initial LED commands: {e}")
+                        
             while True:
                 line = ser.readline().decode(errors="replace").strip()
                 if not line:
@@ -374,7 +487,8 @@ def serial_thread(actions_ref):
                         human = DIR_MAP.get(fw_dir)
                         if human:
                             key = f"{human}:{count_str}"
-                            act = actions_ref[0].get("taps", {}).get(key)
+                            mode_taps = get_active_mode_config(actions_ref[0], "taps")
+                            act = mode_taps.get(key)
                             if act:
                                 print(f"[tap] {key} → {act}")
                                 dispatch(act)
@@ -465,12 +579,30 @@ async def serial_writer():
 # ── WebSocket handler ─────────────────────────────────────────────────────────
 
 def _save_actions(json_str, actions_ref):
+    global _config_lock
     try:
         data = json.loads(json_str)
-        ACTIONS_PATH.parent.mkdir(parents=True, exist_ok=True)
-        with open(ACTIONS_PATH, "w") as f:
-            json.dump(data, f, indent=2)
-        actions_ref[0] = data
+        if not isinstance(data, dict):
+            data = {"button_override": False, "buttons": {}, "taps": {}}
+        if "buttons" in data or "taps" in data:
+            legacy_buttons = data.pop("buttons", {})
+            legacy_taps = data.pop("taps", {})
+            data["modes"] = {
+                "Default": {
+                    "buttons": legacy_buttons,
+                    "taps": legacy_taps,
+                    "led": {"effect": "solid", "color": "FFFFFF", "brightness": 128}
+                }
+            }
+            data["current_mode"] = "Default"
+            
+        with _config_lock:
+            ACTIONS_PATH.parent.mkdir(parents=True, exist_ok=True)
+            tmp_path = ACTIONS_PATH.with_suffix(".tmp")
+            with open(tmp_path, "w") as f:
+                json.dump(data, f, indent=2)
+            os.replace(tmp_path, ACTIONS_PATH)
+            actions_ref[0] = data
         print(f"[config] saved {ACTIONS_PATH}")
         return True
     except Exception as e:
@@ -483,7 +615,7 @@ async def ws_handler(websocket, actions_ref):
     try:
         async for message in websocket:
             if message.startswith("actions "):
-                ok = _save_actions(message[8:], actions_ref)
+                ok = await asyncio.to_thread(_save_actions, message[8:], actions_ref)
                 await websocket.send("OK actions saved" if ok else "ERR actions save failed")
             elif message == "actions_get":
                 await websocket.send("ACTIONS:" + json.dumps(actions_ref[0]))
@@ -511,7 +643,9 @@ async def main():
     _loop.add_signal_handler(signal.SIGINT, handle_signal)
     _loop.add_signal_handler(signal.SIGTERM, handle_signal)
 
-    actions_ref = [load_actions()]
+    global _actions_ref
+    _actions_ref[0] = load_actions()
+    actions_ref = _actions_ref
 
     threading.Thread(target=serial_thread,  args=(actions_ref,), daemon=True).start()
     threading.Thread(target=hid_thread,     args=(actions_ref,), daemon=True).start()

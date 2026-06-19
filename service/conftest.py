@@ -11,8 +11,5 @@ def pytest_runtest_setup(item):
             "test_playwright_benchy.py",
             "test_multi_click.py"
         }
-        if sys.platform == "darwin":
-            cross_platform_files.add("test_installer_mock.py")
-            cross_platform_files.add("test_installer_adversarial.py")
         if filename not in cross_platform_files:
             pytest.skip(f"Linux-only test: skipped on {sys.platform}")

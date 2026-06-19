@@ -5,6 +5,11 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.10.10] - 2026-06-19
+
+### Fixed
+- **macOS CI/CD Test Run**: Removed Linux-specific mock installer tests from executing on the macOS runner since they depend on the Linux `ydotool` binary which is not present or supported on macOS.
+
 ## [2.10.9] - 2026-06-19
 
 ### Fixed

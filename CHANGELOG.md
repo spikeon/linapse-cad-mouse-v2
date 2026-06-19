@@ -5,6 +5,14 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.10.8] - 2026-06-19
+
+### Added
+- **Cross-Platform Tests**: Enabled `test_multi_click.py` to run on Windows and macOS.
+
+### Fixed
+- **CI/CD Build**: Resized the Electron configurator logo image to 512x512 to resolve the electron-builder validation failure on Windows (>= 256x256) and macOS (>= 512x512).
+
 ## [2.10.7] - 2026-06-19
 
 ### Added

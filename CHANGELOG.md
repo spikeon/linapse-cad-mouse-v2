@@ -5,6 +5,11 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.10.4] - 2026-06-19
+
+### Added
+- **Integration Testing**: Added a comprehensive Playwright integration test (`test_benchy_sensitivity_and_dead_zones`) to verify all 12 directional sensitivity settings, 6 axis inverts, and 5 device configuration parameters (dead zones, Kalman filter Q/R, curve exponent) against UI controls, reload/refresh persistence, visual boat movement, and daemon scaling behavior.
+
 ## [2.10.3] - 2026-06-19
 
 ### Fixed

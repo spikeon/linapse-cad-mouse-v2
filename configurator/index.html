@@ -3580,11 +3580,11 @@ function handleFlashMessage(msg) {
   }
 }
 
-let serviceVersion = '2.10.3';
+let serviceVersion = '2.10.4';
 let firmwareVersion = 'unknown';
 
 function handleVersionInfo(info) {
-  serviceVersion = info.service || '2.10.3';
+  serviceVersion = info.service || '2.10.4';
   firmwareVersion = info.firmware || 'unknown';
   
   const badge = document.getElementById('fwBadge');

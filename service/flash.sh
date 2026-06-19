@@ -21,8 +21,29 @@ export PATH="$PATH:$HOME/.platformio/penv/bin"
 
 command -v pio >/dev/null || err "PlatformIO (pio) not found. Install with: pipx install platformio  (or pip install platformio)"
 [ -f "$INI" ] || err "platformio.ini not found at $INI"
-
-
+# Read custom USB configuration if exists
+ACTIONS_JSON="$HOME/.config/cad-mouse/actions.json"
+if [ -f "$ACTIONS_JSON" ]; then
+    USB_CONFIG=$(python3 -c "
+import json
+try:
+    with open('$ACTIONS_JSON') as f:
+        data = json.load(f)
+        usb = data.get('custom_usb', {})
+        if usb.get('enabled', False):
+            print(f\"{usb.get('vid', '')} {usb.get('pid', '')}\")
+except Exception:
+    pass
+" 2>/dev/null)
+    if [ -n "$USB_CONFIG" ]; then
+        read -r VID PID <<< "$USB_CONFIG"
+        if [ -n "$VID" ] && [ -n "$PID" ]; then
+            export LINAPSE_USB_VID="$VID"
+            export LINAPSE_USB_PID="$PID"
+            info "Applying custom USB override from actions.json: VID=$VID, PID=$PID"
+        fi
+    fi
+fi
 
 # ── Build ─────────────────────────────────────────────────────────────────────
 section "Building firmware (pio run -e $ENV)"

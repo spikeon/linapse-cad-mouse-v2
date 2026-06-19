@@ -171,7 +171,8 @@ def test_benchy_viewport_motion_and_toasts(tmp_path):
             }
         },
         "sensitivity": {},
-        "inversion": {}
+        "inversion": {},
+        "custom_usb": {"enabled": True}
     }
     with open(temp_actions_path, "w") as f:
         json.dump(initial_actions, f)
@@ -474,7 +475,8 @@ def test_benchy_sensitivity_and_dead_zones(tmp_path):
             }
         },
         "sensitivity": {},
-        "inversion": {}
+        "inversion": {},
+        "custom_usb": {"enabled": True}
     }
     with open(temp_actions_path, "w") as f:
         json.dump(initial_actions, f)

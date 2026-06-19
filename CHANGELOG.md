@@ -5,6 +5,13 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.6.4] - 2026-06-19
+
+### Added
+- **Axis Inversion E2E Tests**: Added comprehensive Playwright tests in [test_playwright_benchy.py](file:///home/spikeon/Dev/linapse-cad-mouse-v2/linux/test_playwright_benchy.py) to test axis inversions (X, Z, RX, RY, RZ, Y) under both positive and negative movement signals.
+- **Direction and Magnitude Verification**: Enabled verification that visual movements in the 3D Benchy viewport are in the correct and opposite directions when inversions are active, confirming movement with a strict sign multiplication check and magnitude threshold.
+- **Disk Sync Validation**: Added automated assertions verifying that toggling axis inversions in the configurator UI correctly updates and persists settings to `actions.json` on the disk.
+
 ## [2.6.3] - 2026-06-19
 
 ### Fixed

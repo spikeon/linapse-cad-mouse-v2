@@ -280,61 +280,112 @@ def test_benchy_viewport_motion_and_toasts(tmp_path):
 
             # Get initial position and rotation
             initial = page.evaluate("() => { const b = benchyScene.benchy; return { x: b.position.x, y: b.position.y, rx: b.rotation.x, ry: b.rotation.y, rz: b.rotation.z }; }")
-
             # Helper to get current coordinates
             def get_current():
                 return page.evaluate("() => { const b = benchyScene.benchy; return { x: b.position.x, y: b.position.y, rx: b.rotation.x, ry: b.rotation.y, rz: b.rotation.z }; }")
 
-            # Test X Translation (Left/Right) via serial input
-            mock_serial.input_queue.put(b">MOTION:100.0,0,0,0,0,0\n")
+            # Helper to reset benchy position and rotation
+            def reset_benchy():
+                page.evaluate("() => { const b = benchyScene.benchy; b.position.set(0, 0, 0); b.rotation.set(0, 0, 0); }")
+                time.sleep(0.05)
+
+            # We test all 5 visible axes: X, Z (which maps to Y on screen), RX, RY, RZ
+            # For each axis, we verify movement direction under normal configuration,
+            # then verify that enabling inversion results in movement in the opposite direction.
+            # We also ensure the absolute movement magnitude is significant (> 0.01) to verify
+            # it is actually moving and not just showing noise/float drift.
+            axes_to_test = [
+                # (axis_name, pos_input, neg_input, coord_getter, normal_pos_increases, selector)
+                ("X", "100.0,0,0,0,0,0", "-100.0,0,0,0,0,0", lambda c: c['x'], True, "#invX"),
+                ("Z", "0,0,100.0,0,0,0", "0,0,-100.0,0,0,0", lambda c: c['y'], False, "#invZ"),
+                ("RX", "0,0,0,100.0,0,0", "0,0,0,-100.0,0,0", lambda c: c['rx'], True, "#invRx"),
+                ("RY", "0,0,0,0,100.0,0", "0,0,0,0,-100.0,0", lambda c: c['ry'], True, "#invRy"),
+                ("RZ", "0,0,0,0,0,100.0", "0,0,0,0,0,-100.0", lambda c: c['rz'], False, "#invRz"),
+            ]
+
+            for name, pos_input, neg_input, get_val, normal_pos_increases, selector in axes_to_test:
+                # --- 1. Test normal (uninverted) movement ---
+                # Positive Input
+                reset_benchy()
+                initial = get_current()
+                mock_serial.input_queue.put(f">MOTION:{pos_input}\n".encode())
+                time.sleep(0.3)
+                curr = get_current()
+                delta_pos_normal = get_val(curr) - get_val(initial)
+                if normal_pos_increases:
+                    assert delta_pos_normal > 0.01, f"{name} normal positive movement failed: expected positive delta, got {delta_pos_normal}"
+                else:
+                    assert delta_pos_normal < -0.01, f"{name} normal positive movement failed: expected negative delta, got {delta_pos_normal}"
+
+                # Negative Input
+                reset_benchy()
+                initial = get_current()
+                mock_serial.input_queue.put(f">MOTION:{neg_input}\n".encode())
+                time.sleep(0.3)
+                curr = get_current()
+                delta_neg_normal = get_val(curr) - get_val(initial)
+                if normal_pos_increases:
+                    assert delta_neg_normal < -0.01, f"{name} normal negative movement failed: expected negative delta, got {delta_neg_normal}"
+                else:
+                    assert delta_neg_normal > 0.01, f"{name} normal negative movement failed: expected positive delta, got {delta_neg_normal}"
+
+                # --- 2. Enable inversion and verify configuration saves to disk ---
+                page.click(selector)
+                time.sleep(0.3)
+                with open(temp_actions_path, "r") as f:
+                    saved_actions = json.load(f)
+                assert saved_actions.get("inversion", {}).get(name.lower()) is True, f"{name} inversion failed to save on disk"
+
+                # --- 3. Test inverted movement ---
+                # Positive Input (should move opposite of normal positive)
+                reset_benchy()
+                initial = get_current()
+                mock_serial.input_queue.put(f">MOTION:{pos_input}\n".encode())
+                time.sleep(0.3)
+                curr = get_current()
+                delta_pos_inv = get_val(curr) - get_val(initial)
+                # Confirm sign of movement is opposite
+                assert delta_pos_inv * delta_pos_normal < 0, f"{name} inverted positive movement failed: expected opposite direction, normal={delta_pos_normal}, inverted={delta_pos_inv}"
+                if normal_pos_increases:
+                    assert delta_pos_inv < -0.01, f"{name} inverted positive movement failed: expected negative delta, got {delta_pos_inv}"
+                else:
+                    assert delta_pos_inv > 0.01, f"{name} inverted positive movement failed: expected positive delta, got {delta_pos_inv}"
+
+                # Negative Input (should move opposite of normal negative)
+                reset_benchy()
+                initial = get_current()
+                mock_serial.input_queue.put(f">MOTION:{neg_input}\n".encode())
+                time.sleep(0.3)
+                curr = get_current()
+                delta_neg_inv = get_val(curr) - get_val(initial)
+                # Confirm sign of movement is opposite
+                assert delta_neg_inv * delta_neg_normal < 0, f"{name} inverted negative movement failed: expected opposite direction, normal={delta_neg_normal}, inverted={delta_neg_inv}"
+                if normal_pos_increases:
+                    assert delta_neg_inv > 0.01, f"{name} inverted negative movement failed: expected positive delta, got {delta_neg_inv}"
+                else:
+                    assert delta_neg_inv < -0.01, f"{name} inverted negative movement failed: expected negative delta, got {delta_neg_inv}"
+
+                # --- 4. Turn inversion back off ---
+                page.click(selector)
+                time.sleep(0.3)
+                with open(temp_actions_path, "r") as f:
+                    saved_actions = json.load(f)
+                assert not saved_actions.get("inversion", {}).get(name.lower()), f"{name} inversion failed to untoggle on disk"
+
+            # --- 5. Test Y Axis inversion updates actions on disk ---
+            page.click("#invY")
             time.sleep(0.3)
-            curr = get_current()
-            assert curr['x'] > initial['x'], f"X translation (right) failed: expected > {initial['x']}, got {curr['x']}"
+            with open(temp_actions_path, "r") as f:
+                saved_actions = json.load(f)
+            assert saved_actions.get("inversion", {}).get("y") is True, f"Y inversion failed to save on disk: {saved_actions}"
 
-            mock_serial.input_queue.put(b">MOTION:-200.0,0,0,0,0,0\n")
+            # Untoggle Y Inversion
+            page.click("#invY")
             time.sleep(0.3)
-            curr = get_current()
-            assert curr['x'] < initial['x'], f"X translation (left) failed: expected < {initial['x']}, got {curr['x']}"
-
-            # Reset position for next tests
-            page.evaluate("() => { const b = benchyScene.benchy; b.position.set(0, 0, 0); b.rotation.set(0, 0, 0); }")
-            initial = get_current()
-
-            # Test Z Translation (Pull Up / Push Down on Z axis, maps to Y on screen)
-            # Pull Up (negative Z value in motion, e.g. v[2] < 0) -> Benchy moves UP (y increases)
-            mock_serial.input_queue.put(b">MOTION:0,0,-100.0,0,0,0\n")
-            time.sleep(0.3)
-            curr = get_current()
-            assert curr['y'] > initial['y'], f"Z translation (Pull Up) failed: expected y > {initial['y']}, got {curr['y']}"
-
-            # Push Down (positive Z value in motion, e.g. v[2] > 0) -> Benchy moves DOWN (y decreases)
-            mock_serial.input_queue.put(b">MOTION:0,0,200.0,0,0,0\n")
-            time.sleep(0.3)
-            curr = get_current()
-            assert curr['y'] < initial['y'], f"Z translation (Push Down) failed: expected y < {initial['y']}, got {curr['y']}"
-
-            # Reset
-            page.evaluate("() => { const b = benchyScene.benchy; b.position.set(0, 0, 0); b.rotation.set(0, 0, 0); }")
-            initial = get_current()
-
-            # Test Pitch (RX Axis rotation)
-            mock_serial.input_queue.put(b">MOTION:0,0,0,100.0,0,0\n")
-            time.sleep(0.3)
-            curr = get_current()
-            assert curr['rx'] > initial['rx'], f"RX Pitch failed: expected rx > {initial['rx']}, got {curr['rx']}"
-
-            # Test Yaw (RY Axis rotation)
-            mock_serial.input_queue.put(b">MOTION:0,0,0,0,100.0,0\n")
-            time.sleep(0.3)
-            curr = get_current()
-            assert curr['ry'] > initial['ry'], f"RY Yaw failed: expected ry > {initial['ry']}, got {curr['ry']}"
-
-            # Test Roll (RZ Axis rotation)
-            # v[5] > 0 -> rotation.z decreases
-            mock_serial.input_queue.put(b">MOTION:0,0,0,0,0,100.0\n")
-            time.sleep(0.3)
-            curr = get_current()
-            assert curr['rz'] < initial['rz'], f"RZ Roll failed: expected rz < {initial['rz']}, got {curr['rz']}"
+            with open(temp_actions_path, "r") as f:
+                saved_actions = json.load(f)
+            assert not saved_actions.get("inversion", {}).get("y"), f"Y inversion failed to untoggle on disk: {saved_actions}"
+            
 
             # Test Tap Gesture Toast via mock serial
             # TAP:NegZ:1 maps to top tap, which is configured to key shortcut in initial_actions

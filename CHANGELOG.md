@@ -5,6 +5,11 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.14.13] - 2026-06-20
+
+### Fixed
+- **Equalizer Scaling**: Fixed saturation issues in host-side `equalizer.py` by dividing raw 16-bit audio samples by `32768.0` (normalization) and calibrating the 8 log-spaced frequency scales, resolving the problem where LEDs were constantly stuck at maximum intensity (red).
+
 ## [2.14.12] - 2026-06-20
 
 ### Added

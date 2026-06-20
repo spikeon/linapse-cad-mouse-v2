@@ -42,14 +42,14 @@ bands_bins = [
 ]
 
 bands_scales = [
-    1.0 / 12000.0,
-    1.0 / 8000.0,
-    1.0 / 6000.0,
-    1.0 / 4000.0,
-    1.0 / 3000.0,
-    1.0 / 2000.0,
-    1.0 / 1200.0,
-    1.0 / 600.0
+    1.0 / 50.0,
+    1.0 / 25.0,
+    1.0 / 10.0,
+    1.0 / 5.0,
+    1.0 / 3.0,
+    1.0 / 2.0,
+    1.0 / 1.2,
+    1.0 / 0.6
 ]
 
 def equalizer_watcher(actions_ref):
@@ -130,7 +130,7 @@ def equalizer_watcher(actions_ref):
             num_samples = len(data) // 2
             if num_samples >= 256:
                 samples = struct.unpack(f"<256h", data[:512])
-                complex_samples = [(float(s), 0.0) for s in samples]
+                complex_samples = [(float(s) / 32768.0, 0.0) for s in samples]
                 spectrum = fft(complex_samples)
                 
                 temp = [0] * 8

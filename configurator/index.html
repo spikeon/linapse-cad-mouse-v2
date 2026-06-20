@@ -3639,7 +3639,22 @@ function handleWizardMotion(vals) {
   const step = wizardStepData[wizardStep];
   if (!step || step.axisIndex === undefined || step.peakCaptured) return;
   
-  const val = vals[step.axisIndex];
+  const inv = (actions && actions.inversion) ? actions.inversion : {};
+  let val = vals[step.axisIndex];
+  
+  // Undo user inversion to calibrate raw/physical direction
+  let axisKey = '';
+  if (step.axisIndex === 0) axisKey = 'x';
+  else if (step.axisIndex === 1) axisKey = 'y';
+  else if (step.axisIndex === 2) axisKey = 'z';
+  else if (step.axisIndex === 3) axisKey = 'rx';
+  else if (step.axisIndex === 4) axisKey = 'ry';
+  else if (step.axisIndex === 5) axisKey = 'rz';
+  
+  if (axisKey && inv[axisKey]) {
+    val = -val;
+  }
+  
   let v = 0;
   if (step.isPositive) {
     v = val > 0 ? val : 0;
@@ -4147,7 +4162,7 @@ function handleFlashMessage(msg) {
   }
 }
 
-let serviceVersion = '2.14.1';
+let serviceVersion = '2.14.2';
 let firmwareVersion = 'unknown';
 
 function handleVersionInfo(info) {

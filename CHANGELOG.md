@@ -5,6 +5,11 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.14.2] - 2026-06-20
+
+### Fixed
+- **Calibration Wizard**: Un-inverted incoming telemetry values within the step deflection check to ensure physical deflection matches the requested direction even when axis inversions are active.
+
 ## [2.14.1] - 2026-06-20
 
 ### Changed

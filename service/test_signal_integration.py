@@ -343,18 +343,18 @@ def test_motion_bounds_scaling_inversion_and_invalid(running_service):
         # Test normal motion with sensitivity and inversion
         # Input: x=10.0, y=-20.0, z=5.0, rx=2.0, ry=-3.0, rz=4.0
         # Calculation:
-        # X: 10.0, invert -> -10.0, scales by x_pos (2.0) -> -20.0. ix = -20
+        # X: 10.0, invert -> -10.0, scales by x_neg (0.5) -> -5.0. ix = -5
         # Y: -20.0, scales by y_neg (0.8) -> -16.0. Spacenav mapping: y = -y = 16.0. iy = 16
-        # Z: 5.0, invert -> -5.0, scales by z_pos (3.0) -> -15.0. Spacenav mapping: z = -z = 15.0. iz = 15
+        # Z: 5.0, invert -> -5.0, scales by z_neg (0.2) -> -1.0. Spacenav mapping: z = -z = 1.0. iz = 1
         # RX: 2.0. irx = 2
         # RY: -3.0, invert -> 3.0, scales by ry_pos (1.0) -> 3.0. iry = 3
         # RZ: 4.0. irz = 4
-        # Swapped layout: [0, ix, iz, iy, irx, irz, iry, period] -> [0, -20, 15, 16, 2, 4, 3, 10]
+        # Swapped layout: [0, ix, iz, iy, irx, irz, iry, period] -> [0, -5, 1, 16, 2, 4, 3, 10]
         
         mock_serial.input_queue.put(b">MOTION:10.0,-20.0,5.0,2.0,-3.0,4.0\n")
         data = await asyncio.wait_for(reader.readexactly(32), timeout=1.0)
         unpacked = struct.unpack("iiiiiiii", data)
-        assert unpacked == (0, -20, 15, 16, 2, 4, 3, 10)
+        assert unpacked == (0, -5, 1, 16, 2, 4, 3, 10)
         
         # Test invalid coordinates (NaN, Inf, overflow, non-numeric, incomplete, empty)
         invalid_lines = [
@@ -381,17 +381,17 @@ def test_motion_bounds_scaling_inversion_and_invalid(running_service):
         # Send a final valid motion to ensure the loop is still alive and processing correctly
         mock_serial.input_queue.put(b">MOTION:1.0,1.0,1.0,1.0,1.0,1.0\n")
         
-        # x = 1.0, invert -> -1.0, scales by x_pos (2.0) -> -2.0 -> round -> -2. ix = -2
+        # x = 1.0, invert -> -1.0, scales by x_neg (0.5) -> -0.5 -> round -> 0. ix = 0
         # y = 1.0, scales by y_pos (1.5) -> 1.5, mapping: y = -y = -1.5 -> round -> -2. iy = -2
-        # z = 1.0, invert -> -1.0, scales by z_pos (3.0) -> -3.0, mapping: z = -z = 3.0 -> round -> 3. iz = 3
+        # z = 1.0, invert -> -1.0, scales by z_neg (0.2) -> -0.2 -> round -> 0, mapping: z = -z = 0. iz = 0
         # rx = 1.0. irx = 1
         # ry = 1.0, invert -> -1.0, scales by ry_neg (1.0) -> -1.0. iry = -1
         # rz = 1.0. irz = 1
-        # Swapped layout: [0, ix, iz, iy, irx, irz, iry, period] -> [0, -2, 3, -2, 1, 1, -1, 10]
+        # Swapped layout: [0, ix, iz, iy, irx, irz, iry, period] -> [0, 0, 0, -2, 1, 1, -1, 10]
         
         data = await asyncio.wait_for(reader.readexactly(32), timeout=1.0)
         unpacked = struct.unpack("iiiiiiii", data)
-        assert unpacked == (0, -2, 3, -2, 1, 1, -1, 10)
+        assert unpacked == (0, 0, 0, -2, 1, 1, -1, 10)
 
         
         writer.close()

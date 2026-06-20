@@ -623,7 +623,7 @@ def test_benchy_sensitivity_and_dead_zones(tmp_path):
             
             # Send input at ~20Hz (every 50ms) for 0.5s
             for _ in range(10):
-                mock_serial.input_queue.put(b">MOTION:0,0,-30.0,0,0,0\n")
+                mock_serial.input_queue.put(b">MOTION:0,0,30.0,0,0,0\n")
                 time.sleep(0.05)
                 
             page.screenshot(path=str(tmp_path / "screenshot_2_after_move.png"))
@@ -655,7 +655,7 @@ def test_benchy_sensitivity_and_dead_zones(tmp_path):
             page.screenshot(path=str(tmp_path / "screenshot_3_max_initial.png"))
             
             for _ in range(10):
-                mock_serial.input_queue.put(b">MOTION:0,0,-30.0,0,0,0\n")
+                mock_serial.input_queue.put(b">MOTION:0,0,30.0,0,0,0\n")
                 time.sleep(0.05)
                 
             page.screenshot(path=str(tmp_path / "screenshot_4_max_after_move.png"))
@@ -686,7 +686,7 @@ def test_benchy_sensitivity_and_dead_zones(tmp_path):
             page.screenshot(path=str(tmp_path / "screenshot_5_min_initial.png"))
             
             for _ in range(10):
-                mock_serial.input_queue.put(b">MOTION:0,0,-30.0,0,0,0\n")
+                mock_serial.input_queue.put(b">MOTION:0,0,30.0,0,0,0\n")
                 time.sleep(0.05)
                 
             page.screenshot(path=str(tmp_path / "screenshot_6_min_after_move.png"))
@@ -706,12 +706,12 @@ def test_benchy_sensitivity_and_dead_zones(tmp_path):
             # Define all 12 sensitivity parameters, UI elements, raw input packets, and index of expected non-zero axis in hid_report
             all_sens_tests = [
                 # (param_name, val_input_id, raw_telemetry_packet, axis_index_in_report, expected_sign)
-                ("x_pos", "#sensXPosVal", ">MOTION:-20.0,0,0,0,0,0\n", 0, -1),
-                ("x_neg", "#sensXNegVal", ">MOTION:20.0,0,0,0,0,0\n", 0, 1),
+                ("x_pos", "#sensXPosVal", ">MOTION:20.0,0,0,0,0,0\n", 0, 1),
+                ("x_neg", "#sensXNegVal", ">MOTION:-20.0,0,0,0,0,0\n", 0, -1),
                 ("y_pos", "#sensYPosVal", ">MOTION:0,20.0,0,0,0,0\n", 1, 1),
                 ("y_neg", "#sensYNegVal", ">MOTION:0,-20.0,0,0,0,0\n", 1, -1),
-                ("z_pos", "#sensZPosVal", ">MOTION:0,0,-20.0,0,0,0\n", 2, -1),
-                ("z_neg", "#sensZNegVal", ">MOTION:0,0,20.0,0,0,0\n", 2, 1),
+                ("z_pos", "#sensZPosVal", ">MOTION:0,0,20.0,0,0,0\n", 2, 1),
+                ("z_neg", "#sensZNegVal", ">MOTION:0,0,-20.0,0,0,0\n", 2, -1),
                 ("rx_pos", "#sensRxPosVal", ">MOTION:0,0,0,20.0,0,0\n", 3, 1),
                 ("rx_neg", "#sensRxNegVal", ">MOTION:0,0,0,-20.0,0,0\n", 3, -1),
                 ("ry_pos", "#sensRyPosVal", ">MOTION:0,0,0,0,20.0,0\n", 4, 1),

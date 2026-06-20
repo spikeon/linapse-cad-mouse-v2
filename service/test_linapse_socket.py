@@ -169,8 +169,8 @@ class TestLinapseSocket(unittest.TestCase):
         self.assertEqual(len(packets_sent), 1)
         unpacked = struct.unpack("iiiiiiii", packets_sent[0])
         self.assertEqual(unpacked[0], 0)   # Type
-        self.assertEqual(unpacked[1], 10)  # X (since raw x=10.0 > 0, it uses x_neg which is default 1.0)
-        self.assertEqual(unpacked[2], 60)  # Z (swapped from Y, inverted z=-30, scaled using z_pos=2.0 -> -60, spacenav maps z=-z=60)
+        self.assertEqual(unpacked[1], 20)  # X (since raw x=10.0 >= 0, it uses x_pos which is 2.0)
+        self.assertEqual(unpacked[2], 15)  # Z (swapped from Y, inverted z=-30, scaled using z_neg=0.5 -> -15, spacenav maps z=-z=15)
         self.assertEqual(unpacked[3], 10)  # Y (swapped from Z, raw y=-20, scaled using y_neg=0.5 -> -10, spacenav maps y=-y=10)
         self.assertEqual(unpacked[4], -5)  # RX
         self.assertEqual(unpacked[5], 0)   # RZ (swapped from RY)

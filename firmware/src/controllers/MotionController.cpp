@@ -5,6 +5,7 @@
 
 #include "Config.h"
 #include "SensConfig.h"
+#include "Controllers.h"
 
 namespace {
 enum RawIndex {
@@ -42,15 +43,21 @@ const float kMag1PosY = -kSqrt3Over3;
 }  // namespace
 
 void MotionController::geometricDecomp(const float raw[9], const float* baseline, float out[6]) {
-  const float m1x = raw[0] - baseline[0];
-  const float m1y = raw[1] - baseline[1];
-  const float m1z = raw[2] - baseline[2];
-  const float m2x = raw[3] - baseline[3];
-  const float m2y = raw[4] - baseline[4];
-  const float m2z = raw[5] - baseline[5];
-  const float m3x = raw[6] - baseline[6];
-  const float m3y = raw[7] - baseline[7];
-  const float m3z = raw[8] - baseline[8];
+  float m1x = raw[0] - baseline[0];
+  float m1y = raw[1] - baseline[1];
+  float m1z = raw[2] - baseline[2];
+  float m2x = raw[3] - baseline[3];
+  float m2y = raw[4] - baseline[4];
+  float m2z = raw[5] - baseline[5];
+  float m3x = raw[6] - baseline[6];
+  float m3y = raw[7] - baseline[7];
+  float m3z = raw[8] - baseline[8];
+
+  if (sensorController.magnetsFlipped()) {
+    m1x = -m1x; m1y = -m1y; m1z = -m1z;
+    m2x = -m2x; m2y = -m2y; m2z = -m2z;
+    m3x = -m3x; m3y = -m3y; m3z = -m3z;
+  }
 
   out[AXIS_TX] = (m1x + m2x + m3x) * kOneThird;
   out[AXIS_TY] = (m1y + m2y + m3y) * kOneThird;
@@ -115,15 +122,21 @@ float MotionController::sensitivityCurve(float value, float dead, float limit) {
 void MotionController::compute(const float raw[9], const float* baseline, float dt,
                                float out[6]) {
   // Baseline subtraction converts magnetic deltas around the calibrated rest pose.
-  const float mag1x = raw[RAW_MAG1_X] - baseline[RAW_MAG1_X];
-  const float mag1y = raw[RAW_MAG1_Y] - baseline[RAW_MAG1_Y];
-  const float mag1z = raw[RAW_MAG1_Z] - baseline[RAW_MAG1_Z];
-  const float mag2x = raw[RAW_MAG2_X] - baseline[RAW_MAG2_X];
-  const float mag2y = raw[RAW_MAG2_Y] - baseline[RAW_MAG2_Y];
-  const float mag2z = raw[RAW_MAG2_Z] - baseline[RAW_MAG2_Z];
-  const float mag3x = raw[RAW_MAG3_X] - baseline[RAW_MAG3_X];
-  const float mag3y = raw[RAW_MAG3_Y] - baseline[RAW_MAG3_Y];
-  const float mag3z = raw[RAW_MAG3_Z] - baseline[RAW_MAG3_Z];
+  float mag1x = raw[RAW_MAG1_X] - baseline[RAW_MAG1_X];
+  float mag1y = raw[RAW_MAG1_Y] - baseline[RAW_MAG1_Y];
+  float mag1z = raw[RAW_MAG1_Z] - baseline[RAW_MAG1_Z];
+  float mag2x = raw[RAW_MAG2_X] - baseline[RAW_MAG2_X];
+  float mag2y = raw[RAW_MAG2_Y] - baseline[RAW_MAG2_Y];
+  float mag2z = raw[RAW_MAG2_Z] - baseline[RAW_MAG2_Z];
+  float mag3x = raw[RAW_MAG3_X] - baseline[RAW_MAG3_X];
+  float mag3y = raw[RAW_MAG3_Y] - baseline[RAW_MAG3_Y];
+  float mag3z = raw[RAW_MAG3_Z] - baseline[RAW_MAG3_Z];
+
+  if (sensorController.magnetsFlipped()) {
+    mag1x = -mag1x; mag1y = -mag1y; mag1z = -mag1z;
+    mag2x = -mag2x; mag2y = -mag2y; mag2z = -mag2z;
+    mag3x = -mag3x; mag3y = -mag3y; mag3z = -mag3z;
+  }
 
   // Translation: average of all three sensors.
   const float tx = (mag1x + mag2x + mag3x) * kOneThird;

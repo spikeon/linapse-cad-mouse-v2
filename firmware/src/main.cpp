@@ -182,8 +182,17 @@ void handleSensCommand(const String& args) {
 void handleDebugCommand(const String& args) {
   if (args == "axes on")  { g_debugAxes = true;  Serial.println("OK debug axes on");  return; }
   if (args == "axes off") { g_debugAxes = false; Serial.println("OK debug axes off"); return; }
-  Serial.println("ERR unknown: debug axes on|off");
+  if (args == "baseline") {
+    const float* bl = sensorController.baseline();
+    char buf[128];
+    snprintf(buf, sizeof(buf), "baseline:%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f\n",
+             bl[0], bl[1], bl[2], bl[3], bl[4], bl[5], bl[6], bl[7], bl[8]);
+    Serial.print(buf);
+    return;
+  }
+  Serial.println("ERR unknown: debug axes on|off|baseline");
 }
+
 
 void handleSerial() {
   while (Serial.available()) {
@@ -194,7 +203,7 @@ void handleSerial() {
       else if (serialBuf.startsWith("config ")) handleConfigCommand(serialBuf.substring(7));
       else if (serialBuf.startsWith("sens "))   handleSensCommand(serialBuf.substring(5));
       else if (serialBuf.startsWith("debug "))  handleDebugCommand(serialBuf.substring(6));
-      else if (serialBuf == "version")          { Serial.println("version=2.12.0"); }
+      else if (serialBuf == "version")          { Serial.println("version=2.13.0"); }
       else if (serialBuf.startsWith("service_hid ")) {
         int val = serialBuf.substring(12).toInt();
         g_serviceHidMode = (val != 0);

@@ -16,6 +16,8 @@ class SensorController {
   bool calibrationDone() const;
 
   const float* baseline() const;
+  bool magnetsFlipped() const { return magnetsFlipped_; }
+  void setMagnetsFlipped(bool flipped) { magnetsFlipped_ = flipped; }
 
  private:
   static void powerOff(int pin);
@@ -25,6 +27,7 @@ class SensorController {
   ifx::tlx493d::TLx493D_A2B6 mag2Sensor_;
   ifx::tlx493d::TLx493D_A2B6 mag3Sensor_;
 
+  bool magnetsFlipped_ = false;
   bool calibrationActive_ = false;
   bool calibrationDone_ = false;
   int calibrationSamples_ = 0;

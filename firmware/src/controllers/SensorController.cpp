@@ -128,6 +128,11 @@ void SensorController::updateCalibration() {
     baseline_[i] = calibrationSum_[i] / Config::ZERO_SAMPLES;
   }
 
+  // Auto-detect flipped magnet orientation by checking baseline Z components sum.
+  // Standard magnets have a negative Z-axis baseline, while flipped magnets have positive Z.
+  float sumZ = baseline_[2] + baseline_[5] + baseline_[8];
+  magnetsFlipped_ = (sumZ > 0.0f);
+
   calibrationActive_ = false;
   calibrationDone_ = true;
 }

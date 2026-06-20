@@ -118,7 +118,9 @@ class TestLinapseSocket(unittest.TestCase):
         actions_ref = [{
             "sensitivity": {
                 "x_pos": 2.0,
-                "y_neg": 0.5
+                "y_neg": 0.5,
+                "z_pos": 2.0,
+                "z_neg": 0.5
             },
             "inversion": {
                 "z": True,
@@ -168,11 +170,12 @@ class TestLinapseSocket(unittest.TestCase):
         unpacked = struct.unpack("iiiiiiii", packets_sent[0])
         self.assertEqual(unpacked[0], 0)   # Type
         self.assertEqual(unpacked[1], 10)  # X (since raw x=10.0 > 0, it uses x_neg which is default 1.0)
-        self.assertEqual(unpacked[2], 30)  # Z (swapped from Y, scaled y=-10, inverted z=-30, spacenav maps z=-z=30, y=-y=10)
-        self.assertEqual(unpacked[3], 10)  # Y
+        self.assertEqual(unpacked[2], 60)  # Z (swapped from Y, inverted z=-30, scaled using z_pos=2.0 -> -60, spacenav maps z=-z=60)
+        self.assertEqual(unpacked[3], 10)  # Y (swapped from Z, raw y=-20, scaled using y_neg=0.5 -> -10, spacenav maps y=-y=10)
         self.assertEqual(unpacked[4], -5)  # RX
         self.assertEqual(unpacked[5], 0)   # RZ (swapped from RY)
         self.assertEqual(unpacked[6], -2)  # RY (swapped from RZ)
+
 
     def test_friendly_key_combo_translation(self):
         # Test shift+7

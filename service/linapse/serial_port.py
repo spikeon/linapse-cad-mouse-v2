@@ -165,6 +165,15 @@ def serial_thread(actions_ref):
                             if not math.isfinite(ry): ry = 0.0
                             if not math.isfinite(rz): rz = 0.0
                             
+                            # Apply user-configured axis inversions
+                            inv = actions_ref[0].get("inversion", {}) if actions_ref[0] else {}
+                            if inv.get("x", False): x = -x
+                            if inv.get("y", False): y = -y
+                            if inv.get("z", False): z = -z
+                            if inv.get("rx", False): rx = -rx
+                            if inv.get("ry", False): ry = -ry
+                            if inv.get("rz", False): rz = -rz
+
                             # Load sensitivity from config
                             sens = actions_ref[0].get("sensitivity", {}) if actions_ref[0] else {}
                             
@@ -177,15 +186,7 @@ def serial_thread(actions_ref):
                             rx = rx * sens.get("rx_pos" if rx >= 0 else "rx_neg", 1.0)
                             ry = ry * sens.get("ry_pos" if ry >= 0 else "ry_neg", 1.0)
                             rz = rz * sens.get("rz_pos" if rz >= 0 else "rz_neg", 1.0)
-                            
-                            # Apply user-configured axis inversions
-                            inv = actions_ref[0].get("inversion", {}) if actions_ref[0] else {}
-                            if inv.get("x", False): x = -x
-                            if inv.get("y", False): y = -y
-                            if inv.get("z", False): z = -z
-                            if inv.get("rx", False): rx = -rx
-                            if inv.get("ry", False): ry = -ry
-                            if inv.get("rz", False): rz = -rz
+
 
                             if current_mode not in ("Browser", "Media"):
                                 state.broadcast_from_thread(f"MOTION:{x:.1f},{y:.1f},{z:.1f},{rx:.1f},{ry:.1f},{rz:.1f}")

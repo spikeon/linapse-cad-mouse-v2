@@ -27,10 +27,13 @@ class SensorController {
   const float* baseline() const {
     return baseline_;
   }
+  bool magnetsFlipped() const { return magnetsFlipped_; }
+  void setMagnetsFlipped(bool flipped) { magnetsFlipped_ = flipped; }
 
   // Helpers for testing
   bool calibrationActive_;
   bool calibrationDone_;
+  bool magnetsFlipped_ = false;
   float baseline_[9] = {0.0f};
   float mockRaw_[9] = {0.0f};
   bool readRawSuccess_ = true;

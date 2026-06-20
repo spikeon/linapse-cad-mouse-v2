@@ -22,6 +22,9 @@ bool g_debugAxes = false;
 int g_currentVolume = 50;
 int g_bassLevel = 0;
 int g_trebleLevel = 0;
+bool g_serviceHidMode = false;
+unsigned long g_lastServicePacketMs = 0;
+
 
 void setUp(void) {
     inputController.setButtonBits(0);
@@ -532,6 +535,33 @@ void test_config_management(void) {
     TEST_ASSERT_EQUAL_FLOAT(2.5f, sensConfig.sensitivityExp);
 }
 
+void test_motion_controller_flipped_magnets(void) {
+    sensorController.setMagnetsFlipped(false);
+    float raw_normal[9] = {1.0f, 2.0f, 3.0f, 4.0f, 5.0f, 6.0f, 7.0f, 8.0f, 9.0f};
+    float baseline_normal[9] = {0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f};
+    float out_normal[6] = {0.0f};
+    MotionController::geometricDecomp(raw_normal, baseline_normal, out_normal);
+
+    // Flipped magnets reverse the sign of raw and baseline values.
+    sensorController.setMagnetsFlipped(true);
+    float raw_flipped[9];
+    float baseline_flipped[9];
+    for (int i = 0; i < 9; i++) {
+        raw_flipped[i] = -raw_normal[i];
+        baseline_flipped[i] = -baseline_normal[i];
+    }
+    float out_flipped[6] = {0.0f};
+    MotionController::geometricDecomp(raw_flipped, baseline_flipped, out_flipped);
+
+    // Verify output is identical to normal!
+    for (int i = 0; i < 6; i++) {
+        TEST_ASSERT_FLOAT_WITHIN(1e-4f, out_normal[i], out_flipped[i]);
+    }
+
+    // Reset magnetsFlipped for other tests
+    sensorController.setMagnetsFlipped(false);
+}
+
 void test_config_layout_boundaries(void) {
     int ledConfigEnd = 9 + 1; // kAddrEffect + sizeof(uint8_t)
     int sensConfigStart = 16; // kBase
@@ -552,6 +582,7 @@ void setup() {
     RUN_TEST(test_motion_controller_kalman_convergence);
     RUN_TEST(test_motion_controller_deadzones);
     RUN_TEST(test_motion_controller_sensitivity_curve);
+    RUN_TEST(test_motion_controller_flipped_magnets);
 
     // TapDetector
     RUN_TEST(test_tap_detector_directions);
@@ -589,6 +620,7 @@ int main(int argc, char **argv) {
     RUN_TEST(test_motion_controller_kalman_convergence);
     RUN_TEST(test_motion_controller_deadzones);
     RUN_TEST(test_motion_controller_sensitivity_curve);
+    RUN_TEST(test_motion_controller_flipped_magnets);
 
     // TapDetector
     RUN_TEST(test_tap_detector_directions);

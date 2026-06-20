@@ -1285,6 +1285,16 @@ input[type=range]::-webkit-slider-thumb {
           </div>
         </div>
 
+        <div class="field-group">
+          <div class="field-label" style="color:var(--green);letter-spacing:2px;font-size:10px;font-family:'Barlow Condensed',sans-serif">BENCHY VIEWPORT</div>
+          <div style="display: flex; flex-direction: column; gap: 8px; margin-top: 8px;">
+            <div class="toggle-row" style="padding: 4px 0; border: none; margin-bottom: 0;">
+              <span class="toggle-label">Lock Translation during Rotation</span>
+              <div class="toggle on" id="lockTransRot" onclick="toggleLockTransRot()"></div>
+            </div>
+          </div>
+        </div>
+
         </div><!-- /sens-section-general -->
 
         <!-- AXES TAB SECTION -->
@@ -3260,6 +3270,13 @@ function toggleInversion(axis) {
   sendCmd('actions ' + JSON.stringify(actions));
 }
 
+function toggleLockTransRot() {
+  const el = document.getElementById('lockTransRot');
+  el.classList.toggle('on');
+  actions.lock_translation_rotate = el.classList.contains('on');
+  sendCmd('actions ' + JSON.stringify(actions));
+}
+
 function syncActionsUI() {
   if (!actions) return;
   
@@ -3283,6 +3300,13 @@ function syncActionsUI() {
   const overrideToggle = document.getElementById('overrideToggle');
   if (overrideToggle) {
     overrideToggle.classList.toggle('on', !!actions.button_override);
+  }
+
+  // Update Lock Translation during Rotation
+  if (actions.lock_translation_rotate === undefined) actions.lock_translation_rotate = true;
+  const lockToggle = document.getElementById('lockTransRot');
+  if (lockToggle) {
+    lockToggle.classList.toggle('on', !!actions.lock_translation_rotate);
   }
 
   // Ensure default structure
@@ -4194,7 +4218,7 @@ function handleFlashMessage(msg) {
   }
 }
 
-let serviceVersion = '2.14.18';
+let serviceVersion = '2.15.0';
 let firmwareVersion = 'unknown';
 
 function handleVersionInfo(info) {

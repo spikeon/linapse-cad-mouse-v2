@@ -202,7 +202,7 @@ void handleSerial() {
       else if (serialBuf.startsWith("config ")) handleConfigCommand(serialBuf.substring(7));
       else if (serialBuf.startsWith("sens "))   handleSensCommand(serialBuf.substring(5));
       else if (serialBuf.startsWith("debug "))  handleDebugCommand(serialBuf.substring(6));
-      else if (serialBuf == "version")          { Serial.println("version=2.14.18"); }
+      else if (serialBuf == "version")          { Serial.println("version=2.15.0"); }
       else if (serialBuf.startsWith("service_hid ")) {
         int val = atoi(serialBuf.c_str() + 12);
         g_serviceHidMode = (val != 0);

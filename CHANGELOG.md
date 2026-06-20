@@ -5,6 +5,11 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.15.0] - 2026-06-20
+
+### Added
+- **Lock Translation during Rotation Toggle**: Added a toggle under the Sensitivity tab of the configurator allowing users to choose whether to allow translation at the same time as rotation or lock translation while rotating (defaulting to locked, which prevents translational drift).
+
 ## [2.14.18] - 2026-06-20
 
 ### Added

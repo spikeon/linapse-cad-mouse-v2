@@ -1636,6 +1636,7 @@ const ACTION_TYPES = [
 
 const DEFAULT_ACTIONS = {
   button_override: false,
+  lock_translation_rotate: true,
   sensitivity: {
     "x_pos": 1.0, "x_neg": 1.0, "y_pos": 1.0, "y_neg": 1.0, "z_pos": 1.0, "z_neg": 1.0,
     "rx_pos": 1.0, "rx_neg": 1.0, "ry_pos": 1.0, "ry_neg": 1.0, "rz_pos": 1.0, "rz_neg": 1.0
@@ -3152,8 +3153,9 @@ function applyMotion(v, ignoreInversion = false) {
   const dry = (inv.rz ? -v[5] : v[5]) * R;
   const drz = (inv.ry ? -v[4] : v[4]) * R;
 
-  // Suppress translation while rotating to keep the model centered
-  if (Math.abs(drx) > 1e-5 || Math.abs(dry) > 1e-5 || Math.abs(drz) > 1e-5) {
+  // Suppress translation while rotating if lock_translation_rotate is enabled
+  const lockEnabled = (actions && actions.lock_translation_rotate !== false);
+  if (lockEnabled && (Math.abs(drx) > 1e-5 || Math.abs(dry) > 1e-5 || Math.abs(drz) > 1e-5)) {
     dx = 0;
     dy = 0;
   }
@@ -4218,7 +4220,7 @@ function handleFlashMessage(msg) {
   }
 }
 
-let serviceVersion = '2.15.1';
+let serviceVersion = '2.16.1';
 let firmwareVersion = 'unknown';
 
 function handleVersionInfo(info) {

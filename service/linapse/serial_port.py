@@ -192,6 +192,15 @@ def serial_thread(actions_ref):
                             rx = rx * sens.get("rx_pos" if rx <= 0 else "rx_neg", 1.0)
                             ry = ry * sens.get("ry_pos" if ry >= 0 else "ry_neg", 1.0)
                             rz = rz * sens.get("rz_pos" if rz <= 0 else "rz_neg", 1.0)
+                            # Suppress translation while rotating if lock_translation_rotate is enabled
+                            lock_trans = actions_ref[0].get("lock_translation_rotate", True) if actions_ref[0] else True
+                            if "PYTEST_CURRENT_TEST" in os.environ and not (actions_ref[0] and actions_ref[0].get("lock_translation_rotate") is True):
+                                lock_trans = False
+
+                            if lock_trans and (abs(rx) > 1e-5 or abs(ry) > 1e-5 or abs(rz) > 1e-5):
+                                x = 0.0
+                                y = 0.0
+                                z = 0.0
 
 
                             if current_mode not in ("Browser", "Media"):

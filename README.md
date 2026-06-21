@@ -7,8 +7,8 @@
 <!-- DISTRO_BADGES_START -->
 [![Ubuntu](https://img.shields.io/badge/Ubuntu-passing-success)](#) [![Debian](https://img.shields.io/badge/Debian-passing-success)](#) [![Fedora](https://img.shields.io/badge/Fedora-passing-success)](#) [![Windows](https://img.shields.io/badge/Windows-passing-success)](#) [![macOS](https://img.shields.io/badge/macOS-passing-success)](#)
 <!-- DISTRO_BADGES_END -->
-[![Windows Setup](https://img.shields.io/badge/Windows-v2.16.4-0078D6?logo=windows&logoColor=white)](https://github.com/spikeon/linapse-cad-mouse-v2/releases/latest/download/LinapseServiceSetup.exe)
-[![macOS Package](https://img.shields.io/badge/macOS-v2.16.4-000000?logo=apple&logoColor=white)](https://github.com/spikeon/linapse-cad-mouse-v2/releases/latest/download/linapse-service.pkg)
+[![Windows Setup](https://img.shields.io/badge/Windows-v2.16.5-0078D6?logo=windows&logoColor=white)](https://github.com/spikeon/linapse-cad-mouse-v2/releases/latest/download/LinapseServiceSetup.exe)
+[![macOS Package](https://img.shields.io/badge/macOS-v2.16.5-000000?logo=apple&logoColor=white)](https://github.com/spikeon/linapse-cad-mouse-v2/releases/latest/download/linapse-service.pkg)
 
 
 **Linapse** is a cross-platform software stack (supporting Linux, Windows, and macOS) for the [CAD Mouse MK2](https://github.com/sb-ocr/cad-mouse-mk2) — a DIY 6-degrees-of-freedom "space mouse" that senses motion with three magnetic field sensors instead of optics. Since the hardware has no official drivers from 3Dconnexion, this project supplies everything needed to make it a first-class input device on Linux, Windows, and macOS: device firmware, a host-side service, and an Electron configurator.
@@ -201,6 +201,10 @@ To run native unit tests locally on the host machine:
 The project also uses a cross-platform CI/CD pipeline in GitHub Actions, generating interactive test reports on every push and pull request via `dorny/test-reporter` (supporting Linux, Windows, and macOS test suites).
 
 For design details, architecture, mocking details, and CI/CD interactive reports explanation, see **[docs/TESTING.md](docs/TESTING.md)**.
+
+## Known Bugs
+
+- **OnShape roll (`ry`) direction mismatch**: OnShape requires roll (`ry`) to have the opposite direction compared to the Benchy 3D viewer in the configurator. Axis inversion settings are configured globally to align with OnShape's coordinate system.
 
 ## Credits & license
 

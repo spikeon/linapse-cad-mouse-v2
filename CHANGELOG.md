@@ -5,6 +5,11 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.16.5] - 2026-06-21
+
+### Added
+- **Known Bugs Documentation**: Added a section to the README detailing OnShape's opposite roll (`ry`) direction behavior compared to the Benchy 3D preview.
+
 ## [2.16.4] - 2026-06-21
 
 ### Fixed

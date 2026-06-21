@@ -202,7 +202,7 @@ void handleSerial() {
       else if (serialBuf.startsWith("config ")) handleConfigCommand(serialBuf.substring(7));
       else if (serialBuf.startsWith("sens "))   handleSensCommand(serialBuf.substring(5));
       else if (serialBuf.startsWith("debug "))  handleDebugCommand(serialBuf.substring(6));
-      else if (serialBuf == "version")          { Serial.println("version=2.16.2"); }
+      else if (serialBuf == "version")          { Serial.println("version=2.16.3"); }
       else if (serialBuf.startsWith("service_hid ")) {
         int val = atoi(serialBuf.c_str() + 12);
         g_serviceHidMode = (val != 0);
@@ -282,7 +282,11 @@ void handleSerial() {
       }
       serialBuf = "";
     } else {
-      serialBuf += c;
+      if (serialBuf.length() < 255) {
+        serialBuf += c;
+      } else {
+        serialBuf = "";
+      }
     }
   }
 }
@@ -299,6 +303,7 @@ void setup() {
 
   hidController.begin();
   Serial.begin(115200);
+  serialBuf.reserve(256);
   if (Config::ENABLE_TELEMETRY) { delay(200); }
 
   ledConfig.load();

@@ -2000,7 +2000,14 @@ function switchTab(name, el) {
   document.getElementById('tab-' + name).classList.add('active');
   closePanel();
   if (name === 'lighting')     requestAnimationFrame(() => requestAnimationFrame(fitLighting));
-  if (name === 'customize')    requestAnimationFrame(() => requestAnimationFrame(fitDiagram));
+  if (name === 'customize') {
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        fitDiagram();
+        updateAllLines();
+      });
+    });
+  }
   if (name === 'sensitivity') {
     setTimeout(initBenchy, 0);
     const firstTab = document.querySelector('.sens-tab');
@@ -2061,6 +2068,8 @@ function chordElbowPath(el, t, i) {
 }
 
 function updateAllLines() {
+  const tab = document.getElementById('tab-customize');
+  if (tab && !tab.classList.contains('active')) return;
   Object.entries(CALLOUT_LAYOUT).forEach(([id, pos]) => {
     const el = document.getElementById(id);
     if (!el) return;
@@ -4285,7 +4294,7 @@ function handleFlashMessage(msg) {
   }
 }
 
-let serviceVersion = '2.16.3';
+let serviceVersion = '2.16.4';
 let firmwareVersion = 'unknown';
 
 function handleVersionInfo(info) {
@@ -4340,7 +4349,7 @@ if (activeModeStartup) {
   updateLightingUI(activeModeStartup.led);
 }
 animateLedPreview();
-window.addEventListener('resize', () => { fitDiagram(); fitLighting(); });
+window.addEventListener('resize', () => { fitDiagram(); fitLighting(); updateAllLines(); });
 requestAnimationFrame(() => requestAnimationFrame(fitDiagram));
 
 connectWS();

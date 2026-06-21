@@ -5,6 +5,11 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.16.4] - 2026-06-21
+
+### Fixed
+- **Controls Tab Callout Rendering**: Fixed a bug where leaving the Controls tab and returning caused the button/tap target callout lines to collapse to the top-left corner `(0, 0)` due to hidden element layout offset recalculation.
+
 ## [2.16.3] - 2026-06-21
 
 ### Fixed

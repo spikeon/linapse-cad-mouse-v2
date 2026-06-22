@@ -5,6 +5,11 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.16.7] - 2026-06-22
+
+### Fixed
+- **Serial Auto-Discovery Fallback**: Added a second pass fallback in `serial_port.py` to match generic RP2040 (`0x2E8A`) and Adafruit (`0x239A`) serial device vendor IDs, fixing serial port auto-discovery on Windows.
+
 ## [2.16.6] - 2026-06-22
 
 ### Added

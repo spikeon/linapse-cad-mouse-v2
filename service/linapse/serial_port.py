@@ -27,7 +27,8 @@ def find_serial(actions_ref=None):
             return manual_port
 
     try:
-        for p in serial.tools.list_ports.comports():
+        ports = list(serial.tools.list_ports.comports())
+        for p in ports:
             vid = getattr(p, "vid", None)
             desc = getattr(p, "description", "") or ""
             prod = getattr(p, "product", "") or ""
@@ -45,6 +46,12 @@ def find_serial(actions_ref=None):
             for term in ("Seeed", "CAD Mouse", "CAD_Mouse"):
                 if term in desc or term in prod:
                     return p.device
+
+        # Fallback second pass: match generic RP2040 (0x2E8A) or Adafruit (0x239A) serial ports on Windows/all platforms
+        for p in ports:
+            vid = getattr(p, "vid", None)
+            if vid in (0x2E8A, 0x239A):
+                return p.device
     except Exception as e:
         print(f"[serial] error listing comports: {e}")
 

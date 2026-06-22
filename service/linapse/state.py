@@ -2,7 +2,7 @@ import asyncio
 import threading
 
 # Version information
-service_version = "2.16.6"
+service_version = "2.16.7"
 firmware_version = "unknown"
 
 # Shared state variables

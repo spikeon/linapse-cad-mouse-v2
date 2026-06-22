@@ -1635,6 +1635,7 @@ const MAX_COUNTS = { 'top': 3, 'left': 2, 'right': 2, 'front': 2, 'back': 2, 'bt
 
 const ACTION_TYPES = [
   { id: 'none',        label: 'None' },
+  { id: 'hid_button',  label: 'Native HID Button' },
   { id: 'key',         label: 'Key Combo' },
   { id: 'mouse_click', label: 'Mouse Click' },
   { id: 'mouse_scroll',label: 'Scroll' },
@@ -2181,7 +2182,7 @@ function renderBtnPanel(key, body) {
           if (currentCount === 1) {
             delete getActiveMode().buttons[btnKey];
           }
-        });
+        }, currentCount === 1);
       }
     };
     tabs.appendChild(t);
@@ -2225,7 +2226,7 @@ function renderBtnPanel(key, body) {
     if (currentCount === 1) {
       delete getActiveMode().buttons[btnKey];
     }
-  });
+  }, currentCount === 1);
 }
 
 function renderTapPanel(key, body) {
@@ -2284,7 +2285,7 @@ function renderTapPanel(key, body) {
   renderActionEditor(act, editorArea, (newAct) => { getActiveMode().taps[tapKey] = newAct; });
 }
 
-function renderActionEditor(act, container, onSave) {
+function renderActionEditor(act, container, onSave, allowHidButton = false) {
   container.innerHTML = '';
 
   const head = document.createElement('div');
@@ -2301,6 +2302,7 @@ function renderActionEditor(act, container, onSave) {
   subArea.id = 'subArea';
 
   ACTION_TYPES.forEach(({ id, label }) => {
+    if (id === 'hid_button' && !allowHidButton) return;
     const chip = document.createElement('div');
     chip.className = 'action-chip' + (id === selectedType ? ' active' : '');
     chip.textContent = label;
@@ -2334,6 +2336,17 @@ function renderSubFields(type, act, area, onChange) {
   area.innerHTML = '';
 
   if (type === 'none') {
+    return;
+  }
+
+  if (type === 'hid_button') {
+    area.innerHTML = `
+      <div class="field-group">
+        <div style="font-size: 11px; color: var(--text3); line-height: 1.4; font-family: sans-serif;">
+          Passes this button straight through to the device's native USB HID button
+          (for 3DxWare / Fusion native and other drivers). Only active in HID Emulation mode.
+        </div>
+      </div>`;
     return;
   }
 
@@ -2605,6 +2618,7 @@ function selectDir(el, dir) {
 
 function collectAction(type, area) {
   if (type === 'none')        return { action: 'none' };
+  if (type === 'hid_button')  return { action: 'hid_button' };
   if (type === 'mode') {
     return { action: 'mode', value: document.getElementById('sf-mode').value };
   }

@@ -211,7 +211,7 @@ exec {sys.executable} "$@"
         self.assertTrue(os.access(local_bin_proxy, os.X_OK), "linapse-ws-proxy should be executable")
 
         systemd_user_dir = self.mock_home / ".config" / "systemd" / "user"
-        for svc in ["ydotoold.service", "spacenav-ws.service", "linapse-service.service", "linapse-configurator.service"]:
+        for svc in ["ydotoold.service", "linapse-service.service", "linapse-configurator.service"]:
             self.assertTrue((systemd_user_dir / svc).exists(), f"systemd user service {svc} should exist")
 
         # Verify environment.d configuration

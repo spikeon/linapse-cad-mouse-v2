@@ -12,8 +12,8 @@ Guide on how to configure and verify 6DoF motion for various 3D, CAD, and game e
 | **OpenSCAD** | Native Linux | Fully Supported | UNIX Socket (`libspnav`) |
 | **Autodesk Maya** | Native Linux | Fully Supported | UNIX Socket (`libspnav`) + Plugin |
 | **Substance 3D Painter** | Native Linux | Fully Supported | UNIX Socket (`libspnav`) |
-| **OnShape** | Browser/Web | Fully Supported | Userscript + `spacenav-ws` proxy |
-| **SketchUp Web** | Browser/Web | Fully Supported | Userscript + `spacenav-ws` proxy |
+| **OnShape** | Browser/Web | Fully Supported | Linapse Browser Connector + built-in browser bridge |
+| **SketchUp Web** | Browser/Web | Fully Supported | Linapse Browser Connector + built-in browser bridge |
 | **Unreal Engine** | Game Engine | Community Plugin | `OpenUnrealSpaceMouse` plugin |
 | **Unity** | Game Engine | Custom Package | Raw HID / Custom input scripts |
 
@@ -74,10 +74,10 @@ Native Linux applications connect to the local SpaceMouse daemon via `libspnav`.
 
 ## Browser / Web Applications
 
-Web applications run in sandboxed browsers and cannot read the UNIX socket. They communicate via the `spacenav-ws` WebSocket proxy (port 8181).
+Web applications run in sandboxed browsers and cannot read the UNIX socket. They communicate via the browser bridge built into `linapse-service` (`wss://127.51.68.120:8181`).
 
 ### Setup Steps
-1. Make sure `spacenav-ws` is running: `systemctl --user status spacenav-ws`.
+1. Make sure `linapse-service` is running: `systemctl --user status linapse-service`.
 2. Install the **Linapse Browser Connector** extension from your browser's store. See **[docs/BROWSER_EXTENSION.md](BROWSER_EXTENSION.md)** for links and enterprise install options.
    - The extension spoofs `navigator.platform` to `'Win32'` on `cad.onshape.com` and `*.sketchup.com`.
 

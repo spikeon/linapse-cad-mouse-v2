@@ -18,7 +18,6 @@ section "Checking prerequisites"
 command -v python3 >/dev/null || err "python3 not found"
 
 command -v ydotool >/dev/null || err "ydotool not found. Install via your package manager."
-command -v uvx >/dev/null || err "uv not found. Install from https://docs.astral.sh/uv/"
 command -v systemctl >/dev/null || err "systemd not found"
 
 info "All prerequisites found."
@@ -67,13 +66,15 @@ fi
 # ── linapse-service script ────────────────────────────────────────────────────
 section "Installing linapse-service"
 
-pip3 install --break-system-packages websockets 2>/dev/null || true
-python3 -c "import websockets" || err "websockets install failed"
+pip3 install --break-system-packages -r "$SCRIPT_DIR/requirements.txt" 2>/dev/null || \
+    pip3 install --break-system-packages websockets fastapi "uvicorn[standard]" numpy scipy 2>/dev/null || true
+python3 -c "import websockets, fastapi, uvicorn, numpy, scipy" || err "Python browser-bridge dependencies install failed"
 
 mkdir -p "$USER_BIN"
 cp "$SCRIPT_DIR/linapse-service" "$USER_BIN/linapse-service"
 chmod +x "$USER_BIN/linapse-service"
 cp -r "$SCRIPT_DIR/linapse" "$USER_BIN/"
+cp -r "$SCRIPT_DIR/spacenav_ws" "$USER_BIN/"
 cp "$SCRIPT_DIR/linapse-ws-proxy" "$USER_BIN/linapse-ws-proxy"
 chmod +x "$USER_BIN/linapse-ws-proxy"
 info "Installed to $USER_BIN/linapse-service and $USER_BIN/linapse-ws-proxy"
@@ -85,14 +86,17 @@ systemctl --user disable --now spnav-buttons 2>/dev/null || true
 section "Installing systemd user services"
 
 mkdir -p "$SYSTEMD_USER"
-for svc in ydotoold spacenav-ws linapse-service; do
+for svc in ydotoold linapse-service; do
     cp "$SCRIPT_DIR/systemd/${svc}.service" "$SYSTEMD_USER/"
     info "Copied ${svc}.service"
 done
 
+# Disable legacy spacenav-ws service (browser bridge is built into linapse-service)
+systemctl --user disable --now spacenav-ws 2>/dev/null || true
+
 systemctl --user import-environment PATH || true
 systemctl --user daemon-reload
-systemctl --user enable --now ydotoold spacenav-ws linapse-service
+systemctl --user enable --now ydotoold linapse-service
 info "Services enabled and started."
 
 # ── Application Launcher Menu Shortcut ────────────────────────────────────────

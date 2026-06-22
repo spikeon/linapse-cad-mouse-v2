@@ -250,6 +250,11 @@ async def main():
 
     asyncio.create_task(serial_writer())
 
+    browser_bridge_task = None
+    if sys.platform not in ("win32", "darwin"):
+        from linapse import browser_bridge
+        browser_bridge_task = asyncio.create_task(browser_bridge.serve())
+
     unix_server = None
     socket_path = None
     if sys.platform not in ("win32", "darwin"):
@@ -277,6 +282,12 @@ async def main():
     except asyncio.CancelledError:
         pass
     finally:
+        if browser_bridge_task is not None:
+            browser_bridge_task.cancel()
+            try:
+                await browser_bridge_task
+            except asyncio.CancelledError:
+                pass
         print("[sock] server shutting down")
         for writer in list(state.socket_clients):
             try:

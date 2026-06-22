@@ -1,0 +1,8 @@
+websockets
+pyserial
+pyyaml
+pytest
+fastapi>=0.115.12
+uvicorn[standard]>=0.34.2
+numpy>=2.2.5
+scipy>=1.15.2

@@ -1,6 +1,7 @@
 #Requires -Version 5.1
 param(
-    [switch]$UsePolicy
+    [switch]$UsePolicy,
+    [switch]$OpenStorePages
 )
 
 $ErrorActionPreference = 'Stop'
@@ -46,11 +47,14 @@ if (($UsePolicy -or $env:LINAPSE_INSTALL_BROWSER_POLICY -eq '1') -and $ChromeId)
     Write-Info 'Restart Chrome and Edge to apply policies.'
 } elseif ($UsePolicy -or $env:LINAPSE_INSTALL_BROWSER_POLICY -eq '1') {
     Write-Info 'chrome_extension_id is not set in extension-id.json — skipping managed policy install.'
-} else {
+} elseif ($OpenStorePages -or $env:LINAPSE_OPEN_STORE_PAGES -eq '1') {
     Write-Info 'Opening official store pages for manual install...'
     Start-Process $ChromeUrl
     Start-Process $EdgeUrl
     Start-Process $FirefoxUrl
+} else {
+    Write-Info 'Install the extension from your browser''s store (links below).'
+    Write-Info "To open all store pages: `$env:LINAPSE_OPEN_STORE_PAGES=1; .\install-windows.ps1"
 }
 
 Write-Host ''

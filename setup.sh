@@ -2,7 +2,7 @@
 # Linapse — CAD Mouse MK2 full setup
 #
 # Front door for setting up the entire stack on a fresh machine:
-#   1. install distro packages (ydotool, uv)
+#   1. install distro packages (ydotool)
 #   2. (optional) flash the firmware            --flash
 #   3. install the host integration             service/install.sh
 #   4. install + enable the configurator service
@@ -76,8 +76,7 @@ if [ -n "$PM" ]; then
     fi
 fi
 
-# ydotool comes from the distro repos. uv is handled separately
-# because it is not packaged everywhere.
+# ydotool comes from the distro repos.
 missing=()
 command -v ydotool   >/dev/null || missing+=(ydotool)
 
@@ -96,23 +95,6 @@ install_pkgs() {
     esac
 }
 install_pkgs
-
-# uv: try the package manager, fall back to the official installer.
-if command -v uv >/dev/null || command -v uvx >/dev/null; then
-    info "uv already installed."
-else
-    info "Installing uv..."
-    case "$PM" in
-        pacman) sudo pacman -S --needed uv || true ;;
-        dnf)    sudo dnf install -y uv || true ;;
-    esac
-    if ! command -v uv >/dev/null; then
-        info "Falling back to the official uv installer (astral.sh)."
-        curl -LsSf https://astral.sh/uv/install.sh | sh
-        export PATH="$HOME/.local/bin:$HOME/.cargo/bin:$PATH"
-    fi
-fi
-command -v uvx >/dev/null || command -v uv >/dev/null || err "uv install failed. See https://docs.astral.sh/uv/"
 
 # ── 2. Firmware (optional) ─────────────────────────────────────────────────────
 if [ "$DO_FLASH" -eq 1 ]; then
@@ -139,11 +121,6 @@ sed -e "s|__CONFIGURATOR_DIR__|$CONFIGURATOR_DIR|g" \
 systemctl --user daemon-reload
 systemctl --user enable --now linapse-configurator
 info "Serving $CONFIGURATOR_DIR at http://localhost:$PORT"
-
-# ── 5. Browser extension ───────────────────────────────────────────────────────
-section "5. Browser extension"
-chmod +x "$REPO_DIR/extension/scripts/install-linux.sh"
-"$REPO_DIR/extension/scripts/install-linux.sh" || true
 
 cat <<EOF
 

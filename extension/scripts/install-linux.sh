@@ -88,6 +88,11 @@ open_store_pages() {
   done
 }
 
+print_store_links() {
+  info "Install the extension from your browser's store (links below)."
+  info "To open all store pages automatically: LINAPSE_OPEN_STORE_PAGES=1 $0"
+}
+
 section "Linapse Browser Connector"
 
 POLICY_INSTALLED=0
@@ -113,7 +118,11 @@ else
 fi
 
 if [ "$POLICY_INSTALLED" -eq 0 ]; then
-  open_store_pages
+  if [ "${LINAPSE_OPEN_STORE_PAGES:-0}" = "1" ]; then
+    open_store_pages
+  else
+    print_store_links
+  fi
 fi
 
 section "Browser connector setup"

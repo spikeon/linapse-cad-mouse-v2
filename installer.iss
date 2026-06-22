@@ -22,7 +22,7 @@ Name: "{group}\Uninstall Linapse"; Filename: "{uninstallexe}"
 
 [Run]
 Filename: "{app}\linapse-service.exe"; Flags: nowait postinstall skipifsilent
-Filename: "powershell.exe"; Parameters: "-ExecutionPolicy Bypass -File ""{app}\extension\scripts\install-windows.ps1"""; Description: "Open browser extension store pages for Linapse Browser Connector"; Flags: postinstall nowait skipifsilent
+Filename: "powershell.exe"; Parameters: "-ExecutionPolicy Bypass -File ""{app}\extension\scripts\install-windows.ps1"""; Description: "Show browser extension install links"; Flags: postinstall nowait skipifsilent unchecked
 
 [Registry]
 Root: HKCU; Subkey: "Software\Microsoft\Windows\CurrentVersion\Run"; ValueType: string; ValueName: "LinapseCADMouseService"; ValueData: """{app}\linapse-service.exe"""; Flags: uninsdeletevalue

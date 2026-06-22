@@ -13,7 +13,7 @@ macOS does not use UNIX sockets or `udev` rules. Instead:
 - **Motion Telemetry** is sent from the CAD Mouse MK2 over the USB Serial interface (COM port) to `linapse-service`.
 - **Physical Buttons** are sent over USB Serial to `linapse-service`, just like Cap-Tap gestures, so they can be custom-mapped. When HID Emulation is enabled, a button left as **Native HID Button** is echoed back to the device's hardware to emit the real USB HID button press, so drivers like 3DxWare pick it up; any other mapping runs the custom action instead.
 - **Cap-Tap Gestures** are detected by the firmware, sent over USB Serial, and simulated on the host OS by the service using the `pynput` library.
-- **Browser CAD Applications** (such as OnShape or SketchUp Web) connect via the `spacenav-ws` WebSocket bridge and the official Linapse Browser Connector extension.
+- **Browser CAD Applications** (such as OnShape or SketchUp Web) connect via the browser bridge built into `linapse-service` and the official Linapse Browser Connector extension.
 
 ---
 

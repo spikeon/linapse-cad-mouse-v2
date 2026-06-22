@@ -96,7 +96,7 @@ Compile and flash the firmware directly from the configurator. Automatically det
                                                 │                  ▲
                 ┌───────────────────────────────┤                  │ WebSocket
                 ▼                               ▼                  ▼
-        Native Linux Apps               spacenav-ws       Linapse configurator
+        Native Linux Apps               linapse-service   Linapse configurator
         (Blender, FreeCAD, etc.)        (ws :8181)        • profile/lighting/sens
         (reads spnav.sock)                      │         • live 3D Benchy viewport
                                                 ▼
@@ -131,7 +131,7 @@ How the data flows:
 
 ### One-step setup (Linux)
 
-The top-level [`setup.sh`](setup.sh) orchestrates the whole Linux stack: it installs the distro packages (`ydotool`, `uv`), disables and uninstalls `spacenavd` (since `linapse-service` replaces it), runs the host integration, and installs a systemd user service that serves the configurator.
+The top-level [`setup.sh`](setup.sh) orchestrates the whole Linux stack: it installs the distro packages (`ydotool`), disables and uninstalls `spacenavd` (since `linapse-service` replaces it), runs the host integration, and installs a systemd user service that serves the configurator.
 
 ```bash
 ./setup.sh                 # packages + host integration + configurator service
@@ -150,7 +150,7 @@ Pre-compiled service packages and installers are automatically generated via CI/
 - **Windows**: Download and run the `LinapseServiceSetup.exe` installer. It sets up `linapse-service` as a background startup daemon.
 - **macOS**: Download and run the `linapse-service.pkg` installer package. It configures a `launchd` service at `/Library/LaunchAgents` to run the daemon on startup.
 
-It still leaves one inherently hands-on step: flashing the firmware (the RP2040 must be physically put into BOOTSEL mode — `--flash` walks you through it). The installer opens your browser's extension store pages for the Linapse Browser Connector automatically.
+It still leaves one inherently hands-on step: flashing the firmware (the RP2040 must be physically put into BOOTSEL mode — `--flash` walks you through it). The installer prints browser extension store links; set `LINAPSE_OPEN_STORE_PAGES=1` if you want those opened automatically.
 
 ### 1. Flash the firmware
 
@@ -173,7 +173,7 @@ chmod +x install.sh
 ./install.sh
 ```
 
-This installs `linapse-service`, enables the systemd user services (`ydotoold`, `spacenav-ws`, `linapse-service`), writes udev rules, and patches `spacenav-ws`. Full details, prerequisites, and troubleshooting are in **[service/README.md](service/README.md)**.
+This installs `linapse-service` (including the browser CAD bridge on port 8181), enables the systemd user services (`ydotoold`, `linapse-service`), and writes udev rules. Full details, prerequisites, and troubleshooting are in **[service/README.md](service/README.md)**.
 
 Then install the [Linapse Browser Connector](docs/BROWSER_EXTENSION.md) browser extension and open OnShape or SketchUp Web. For setup instructions for native applications (Blender, FreeCAD, Maya, etc.) and game engines (Unreal, Unity), see **[docs/INTEGRATIONS.md](docs/INTEGRATIONS.md)**.
 

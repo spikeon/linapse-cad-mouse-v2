@@ -62,7 +62,7 @@ jobs:
 
       - name: Install Python dependencies
         run: |
-          docker exec systemd-container sh -c "python3 -m pip install pytest websockets pyserial pyyaml --break-system-packages || python3 -m pip install pytest websockets pyserial pyyaml || pip3 install pytest websockets pyserial pyyaml"
+          docker exec systemd-container sh -c "python3 -m pip install pytest websockets pyserial pyyaml fastapi 'uvicorn[standard]' numpy scipy --break-system-packages || python3 -m pip install pytest websockets pyserial pyyaml fastapi 'uvicorn[standard]' numpy scipy || pip3 install pytest websockets pyserial pyyaml fastapi 'uvicorn[standard]' numpy scipy"
 
       - name: Sync version strings from VERSION file
         run: python3 scripts/sync_version.py
@@ -179,7 +179,7 @@ jobs:
 
       - name: Install dependencies
         run: |
-          pip install pyinstaller websockets pyserial pynput hidapi pytest playwright pyyaml pycaw
+          pip install pyinstaller websockets pyserial pynput hidapi pytest playwright pyyaml pycaw fastapi "uvicorn[standard]" numpy scipy
 
       - name: Install Playwright Browsers
         run: |
@@ -274,7 +274,7 @@ jobs:
 
       - name: Install dependencies
         run: |
-          pip install pyinstaller websockets pyserial pynput hidapi pytest playwright pyyaml
+          pip install pyinstaller websockets pyserial pynput hidapi pytest playwright pyyaml fastapi "uvicorn[standard]" numpy scipy
 
       - name: Install Playwright Browsers
         run: |

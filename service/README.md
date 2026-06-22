@@ -15,7 +15,7 @@ linapse-service    — bridges serial/HID inputs, translates buttons/taps via yd
     │
     ├─► Native Linux Apps (Blender, FreeCAD, etc.) — read spnav.sock via libspnav
     │
-    └─► spacenav-ws — WebSocket bridge to browser apps (port 8181)
+    └─► linapse-service — WebSocket bridge to browser apps (wss://127.51.68.120:8181)
             ▲
         Linapse Browser Connector (official extension)
             ▲
@@ -27,8 +27,7 @@ linapse-service    — bridges serial/HID inputs, translates buttons/taps via yd
 | Package | Notes |
 |---------|-------|
 | `ydotool` | Arch: `sudo pacman -S ydotool` |
-| `uv` | `curl -LsSf https://astral.sh/uv/install.sh \| sh` |
-| `python3` | Usually pre-installed |
+| `python3` + pip | Browser bridge deps installed by `install.sh` (`fastapi`, `uvicorn`, `numpy`, `scipy`, `websockets`) |
 | Browser | Install the [Linapse Browser Connector](../docs/BROWSER_EXTENSION.md) (Chrome, Edge, Firefox, Safari) |
 
 ## Firmware
@@ -48,16 +47,15 @@ chmod +x install.sh
 The installer:
 - Adds your user to the `input` group (needed for hidraw button access)
 - Installs `linapse-service` to `~/.local/bin/`
-- Installs and enables three systemd user services: `ydotoold`, `spacenav-ws`, `linapse-service`
+- Installs and enables two systemd user services: `ydotoold`, `linapse-service` (includes the browser CAD bridge on port 8181)
 - Configures `~/.config/environment.d/99-spnav.conf` so native apps find the user socket path automatically
 - Installs udev rules so services restart automatically on plug/unplug
-- Patches `spacenav-ws` to disable its built-in button-snap behaviour
+- Vendors the OnShape/SketchUp WebSocket protocol stack in `service/spacenav_ws/` (no external `spacenav-ws` PyPI package)
 
 After the installer finishes, install the Linapse Browser Connector browser extension:
 
-1. The installer opens the official Chrome, Edge, and Firefox store pages automatically.
-2. Click **Add** / **Install** in your browser.
-3. Open OnShape or SketchUp Web and open any document — motion should work immediately.
+1. Install the Linapse Browser Connector from your browser's extension store (links printed at the end of install).
+2. Open OnShape or SketchUp Web and open any document — motion should work immediately.
 
 See **[docs/BROWSER_EXTENSION.md](../docs/BROWSER_EXTENSION.md)** for store links, enterprise policy install, and Safari build instructions.
 
@@ -81,9 +79,8 @@ systemctl --user restart linapse-service
 
 **Motion not working in Browser (OnShape / SketchUp)**
 - Check the Linapse Browser Connector extension is enabled
-- Refresh the browser tab after any service restart
-- Check spacenav-ws is running: `systemctl --user status spacenav-ws`
-- Check linapse-service is running: `systemctl --user status linapse-service`
+- Check `linapse-service` is running: `systemctl --user status linapse-service`
+- The browser bridge runs inside `linapse-service` at `wss://127.51.68.120:8181`
 
 **Buttons not working**
 - Ensure you're in the `input` group: `groups | grep input` (reboot if you just added yourself)
@@ -93,12 +90,12 @@ systemctl --user restart linapse-service
 **Device not recognised after plugging in**
 ```bash
 # Manually restart services
-systemctl --user restart spacenav-ws linapse-service
+systemctl --user restart linapse-service
 ```
 
 **Services hitting start-limit**
 ```bash
-systemctl --user reset-failed spacenav-ws linapse-service
-systemctl --user restart spacenav-ws linapse-service
+systemctl --user reset-failed linapse-service
+systemctl --user restart linapse-service
 ```
 

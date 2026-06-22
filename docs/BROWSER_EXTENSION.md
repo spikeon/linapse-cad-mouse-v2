@@ -1,6 +1,6 @@
 # Linapse Browser Connector
 
-Official browser extension for connecting OnShape and SketchUp Web to the Linapse CAD Mouse `spacenav-ws` bridge.
+Official browser extension for connecting OnShape and SketchUp Web to the Linapse browser bridge built into `linapse-service`.
 
 This replaces the old Tampermonkey userscript workflow with a first-party extension published to the Chrome Web Store, Microsoft Edge Add-ons, and Firefox Add-ons.
 
@@ -44,8 +44,10 @@ Artifacts land in `extension/dist/`:
 
 Linux (`service/install.sh`, `setup.sh`) and Windows (`LinapseServiceSetup.exe`) run helper scripts that:
 
-1. Open the official store pages for one-click install, or
+1. Print official store links for manual install, or
 2. With admin rights / `LINAPSE_INSTALL_BROWSER_POLICY=1`, write managed browser policies to force-install the published extension.
+
+Set `LINAPSE_OPEN_STORE_PAGES=1` to open all store pages in your browser automatically.
 
 Linux helper:
 

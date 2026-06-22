@@ -31,7 +31,7 @@ class TestInstallerConfig(unittest.TestCase):
         self.assertTrue(any("Python" in name for name in step_names), "Setup Python step missing in build-windows")
         self.assertTrue(any("Install" in name for name in step_names), "Install dependencies step missing in build-windows")
         self.assertTrue(any("Compile" in name for name in step_names), "Compile step missing in build-windows")
-        self.assertTrue(any("Update" in name for name in step_names), "Update AppVersion step missing in build-windows")
+        self.assertTrue(any("Sync version" in name or "Update" in name for name in step_names), "Version sync step missing in build-windows")
         self.assertTrue(any("iscc" in step.get("run", "") for step in win_steps), "ISCC compile step missing in build-windows")
         self.assertTrue(any("upload-artifact" in step.get("uses", "") for step in win_steps), "Upload artifact step missing in build-windows")
 

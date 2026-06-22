@@ -23,6 +23,6 @@ def test_browser_bridge_imports():
 
 
 def test_controller_ignores_button_events():
-    source = (SERVICE / "spacenav_ws" / "controller.py").read_text()
+    source = (SERVICE / "spacenav_ws" / "controller.py").read_text(encoding="utf-8")
     assert "isinstance(event, ButtonEvent)" in source
     assert "continue" in source

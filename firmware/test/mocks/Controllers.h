@@ -19,5 +19,6 @@ extern TapDetector         tapDetector;
 extern EffectEngine        effectEngine;
 
 extern bool g_serviceHidMode;
+extern bool g_serviceButtonMode;
 extern unsigned long g_lastServicePacketMs;
 

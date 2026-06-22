@@ -22,6 +22,7 @@ bool g_debugAxes = false;
 int g_currentVolume = 50;
 int g_eqLevels[8] = {0};
 bool g_serviceHidMode = false;
+bool g_serviceButtonMode = false;
 unsigned long g_lastServicePacketMs = 0;
 
 

@@ -29,6 +29,7 @@ bool g_debugAxes = false;  // accessed by IdleState
 int g_currentVolume = 50;  // accessed by EffectEngine
 int g_eqLevels[8] = {0};   // accessed by EffectEngine
 bool g_serviceHidMode = false;
+bool g_serviceButtonMode = false;
 unsigned long g_lastServicePacketMs = 0;
 
 namespace {

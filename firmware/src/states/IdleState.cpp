@@ -68,7 +68,11 @@ void IdleState::runMotionPipeline(float dt, unsigned long now) {
 
   bool hidReportSent = false;
   if (g_serviceHidMode) {
-    hidReportSent = hidController.sendButtonsReport(buttonBits);
+    // In emulation mode the service drives buttons via hid_button; suppress the
+    // local native button report to avoid double-firing.
+    if (!g_serviceButtonMode) {
+      hidReportSent = hidController.sendButtonsReport(buttonBits);
+    }
   } else {
     hidReportSent = hidController.sendReports(motion, buttonBits);
   }

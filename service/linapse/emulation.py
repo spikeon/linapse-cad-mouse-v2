@@ -170,6 +170,10 @@ def dispatch(action_obj):
     print(f"[dispatch] action: {act} obj: {action_obj}")
     if act == "none":
         pass
+    elif act == "hid_button":
+        # Native HID passthrough is handled in serial_port.route_button; it must
+        # never reach OS-level dispatch.
+        pass
     elif act == "mode":
         val = action_obj.get("value", "")
         if val:

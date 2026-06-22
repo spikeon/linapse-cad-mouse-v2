@@ -291,7 +291,30 @@ After all four exist, the **Repository secrets** list should show:
 
 ---
 
+### Part I-b — Enable CI publish after Chrome Web Store review
+
+CI **skips** `publish-browser-extension` until you explicitly opt in. This avoids failed publish jobs while Google is still reviewing your first listing (or any time you want uploads paused).
+
+1. In the repo on GitHub, open **Settings** → **Secrets and variables** → **Actions**.
+2. Open the **Variables** tab (not Secrets).
+3. Click **New repository variable**.
+4. Set **Name** to `CHROME_STORE_PUBLISH_ENABLED` and **Value** to `true`.
+5. Save.
+
+Leave this variable unset (or set to anything other than `true`) until:
+
+- You have completed the **first manual upload** in the Developer Dashboard (Part H), and
+- Google has **approved** the listing (or you are ready for CI to push new zips on every `main` push).
+
+When review is still pending, the workflow still builds extension artifacts in `build-browser-extension`; only the publish job is skipped.
+
+To pause auto-publish later, delete the variable or change its value to `false`.
+
+---
+
 ### Part J — Verify CI publish works
+
+**Prerequisite:** `CHROME_STORE_PUBLISH_ENABLED` repository variable set to `true` (Part I-b). If it is not set, `publish-browser-extension` appears as **Skipped** in Actions — that is expected while review is pending.
 
 1. Make any small commit on `main` (or merge a PR to `main`).
 2. Open the repo on GitHub.

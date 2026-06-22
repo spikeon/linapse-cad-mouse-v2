@@ -416,7 +416,10 @@ jobs:
   publish-browser-extension:
     needs: [build-browser-extension, test]
     runs-on: ubuntu-latest
-    if: (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master') && github.event_name == 'push'
+    if: >-
+      (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master') &&
+      github.event_name == 'push' &&
+      vars.CHROME_STORE_PUBLISH_ENABLED == 'true'
     permissions:
       contents: read
     steps:

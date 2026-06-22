@@ -20,6 +20,46 @@ _rx_scroll_accumulator = 0.0
 _rz_scrub_accumulator = 0.0
 _rx_volume_accumulator = 0.0
 
+_hid_button_bits = 0
+
+def route_button(btn, val, actions, ser):
+    """Handle a physical button event in HID emulation mode.
+
+    Returns True if handled here (emulation path). Returns False when emulation
+    is off, so the caller can fall back to the legacy per-platform dispatch.
+    """
+    global _hid_button_bits
+    emulation = bool((actions or {}).get("custom_usb", {}).get("enabled", False))
+    if not emulation:
+        return False
+
+    mode_buttons = get_active_mode_config(actions, "buttons")
+    act = mode_buttons.get(f"{btn}:1") or mode_buttons.get(str(btn)) or {}
+    is_native = act.get("action") == "hid_button"
+    mask = 1 << btn
+
+    if val == 0:
+        # Always clear the bit on release to avoid a stuck native button if the
+        # mapping changed mid-hold.
+        if _hid_button_bits & mask:
+            _hid_button_bits &= ~mask
+            if ser:
+                ser.write(f"hid_button {_hid_button_bits}\n".encode())
+        if is_native:
+            state.broadcast_from_thread(f"BUTTON:{btn}:0")
+        else:
+            _on_release(btn, actions)
+        return True
+
+    if is_native:
+        _hid_button_bits |= mask
+        if ser:
+            ser.write(f"hid_button {_hid_button_bits}\n".encode())
+        state.broadcast_from_thread(f"BUTTON:{btn}:1")
+    else:
+        _on_press(btn, actions)
+    return True
+
 def find_serial(actions_ref=None):
     if actions_ref and actions_ref[0] and isinstance(actions_ref[0], dict):
         manual_port = actions_ref[0].get("serial_port") or actions_ref[0].get("port")

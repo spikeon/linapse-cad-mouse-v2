@@ -120,3 +120,49 @@ def test_suppress_hid_report(monkeypatch):
         should_send = actions_ref[0].get("custom_usb", {}).get("enabled", False)
         assert should_send
 
+def _emu_actions(btn0_action):
+    return {
+        "custom_usb": {"enabled": True},
+        "current_mode": "Default",
+        "modes": {"Default": {"buttons": {"0": btn0_action, "1": {"action": "hid_button"}}, "taps": {}}},
+    }
+
+def test_route_button_native_sets_and_clears_bit(monkeypatch):
+    import linapse.serial_port as sp
+    sp._hid_button_bits = 0
+    actions = _emu_actions({"action": "hid_button"})
+    ser = MagicMock()
+
+    assert sp.route_button(0, 1, actions, ser) is True
+    ser.write.assert_called_with(b"hid_button 1\n")
+
+    assert sp.route_button(1, 1, actions, ser) is True
+    ser.write.assert_called_with(b"hid_button 3\n")
+
+    assert sp.route_button(0, 0, actions, ser) is True
+    ser.write.assert_called_with(b"hid_button 2\n")
+
+def test_route_button_custom_dispatches_no_hid(monkeypatch):
+    import linapse.serial_port as sp
+    sp._hid_button_bits = 0
+    actions = _emu_actions({"action": "key", "value": "ctrl+z"})
+    ser = MagicMock()
+    mock_press = MagicMock(); mock_release = MagicMock()
+    with patch("linapse.serial_port._on_press", mock_press), \
+         patch("linapse.serial_port._on_release", mock_release):
+        assert sp.route_button(0, 1, actions, ser) is True
+        mock_press.assert_called_once_with(0, actions)
+        assert sp.route_button(0, 0, actions, ser) is True
+        mock_release.assert_called_once_with(0, actions)
+    for c in ser.write.call_args_list:
+        assert b"hid_button" not in c.args[0]
+
+def test_route_button_emulation_off_falls_through(monkeypatch):
+    import linapse.serial_port as sp
+    sp._hid_button_bits = 0
+    actions = {"custom_usb": {"enabled": False}, "current_mode": "Default",
+               "modes": {"Default": {"buttons": {}, "taps": {}}}}
+    ser = MagicMock()
+    assert sp.route_button(0, 1, actions, ser) is False
+    ser.write.assert_not_called()
+

@@ -2,95 +2,111 @@
 platform linux -- Python 3.14.6, pytest-9.1.1, pluggy-1.6.0
 rootdir: /workspace
 plugins: anyio-4.14.0
-collected 112 items
+collected 113 items
 
 service/test_browser_bridge.py ...                                       [  2%]
 service/test_browser_extension.py ....                                   [  6%]
 service/test_cross_platform.py .....                                     [ 10%]
 service/test_installer_adversarial.py ss..                               [ 14%]
-service/test_installer_config.py ..                                      [ 16%]
+service/test_installer_config.py ..                                      [ 15%]
 service/test_installer_mock.py ..                                        [ 17%]
 service/test_linapse_socket.py ....                                      [ 21%]
 service/test_linapse_socket_stress.py .....                              [ 25%]
 service/test_m1_adversarial_bugfix.py ..                                 [ 27%]
-service/test_m3_adversarial.py F...                                      [ 31%]
+service/test_m3_adversarial.py F...                                      [ 30%]
 service/test_m3_challenger_verification.py F..                           [ 33%]
 service/test_m5_adversarial.py ....                                      [ 37%]
-service/test_multi_click.py ...                                          [ 40%]
-service/test_playwright_benchy.py ssssssssssssssssssssssssssssssssssssss [ 74%]
-                                                                         [ 74%]
+service/test_multi_click.py ...                                          [ 39%]
+service/test_playwright_benchy.py ...................................... [ 73%]
+.                                                                        [ 74%]
 service/test_serial_buttons.py .......                                   [ 80%]
-service/test_signal_integration.py ..........                            [ 89%]
-service/test_signal_integration_stress.py .F.                            [ 91%]
+service/test_signal_integration.py .F........                            [ 89%]
+service/test_signal_integration_stress.py .F.                            [ 92%]
 service/test_stress.py ......                                            [ 97%]
 service/test_updater.py ...                                              [100%]
 
 =================================== FAILURES ===================================
 ______________________ test_m3_browser_media_suppression _______________________
-service/test_m3_adversarial.py:93: in test_m3_browser_media_suppression
-    loop.run_until_complete(run_media_test())
+service/test_m3_adversarial.py:63: in test_m3_browser_media_suppression
+    loop.run_until_complete(run_browser_test())
 /usr/lib64/python3.14/asyncio/base_events.py:719: in run_until_complete
     return future.result()
            ^^^^^^^^^^^^^^^
-service/test_m3_adversarial.py:83: in run_media_test
-    assert first_msg == "TAP:right:1"
-E   AssertionError: assert 'SOFTWARE_UPDATE:idle' == 'TAP:right:1'
+service/test_m3_adversarial.py:53: in run_browser_test
+    assert first_msg == "TAP:top:1"
+E   AssertionError: assert 'version=2.21.2' == 'TAP:top:1'
 E     
-E     - TAP:right:1
-E     + SOFTWARE_UPDATE:idle
+E     - TAP:top:1
+E     + version=2.21.2
 ---------------------------- Captured stdout setup -----------------------------
-[actions] migrated and saved to <test_signal_integration.MockPathObj object at 0x7f7baacf97f0>
+[actions] migrated and saved to <test_signal_integration.MockPathObj object at 0x7f17df6b0050>
 [hid] watching 12
-[config] reloaded <test_signal_integration.MockPathObj object at 0x7f7baacf97f0>
+[config] reloaded <test_signal_integration.MockPathObj object at 0x7f17df6b0050>
 [sock] server starting on /tmp/pytest-of-root/pytest-0/test_m3_browser_media_suppress0/spnav.sock
-[ws] server starting on ws://localhost:36795
+[ws] server starting on ws://localhost:35517
 [serial] connected to /dev/ttyACM0
 ----------------------------- Captured stdout call -----------------------------
 [mode] switched to 'Browser' and saved configuration
 [ws] client connected (1 total)
 [sock] client connected (1 total)
-[config] reloaded <test_signal_integration.MockPathObj object at 0x7f7baacf97f0>
-[sock] client disconnected (0 total)
-[ws] client disconnected (0 total)
-[mode] switched to 'Media' and saved configuration
-[ws] client connected (1 total)
-[sock] client connected (1 total)
-[config] reloaded <test_signal_integration.MockPathObj object at 0x7f7baacf97f0>
+[config] reloaded <test_signal_integration.MockPathObj object at 0x7f17df6b0050>
 [sock] client disconnected (0 total)
 [ws] client disconnected (0 total)
 --------------------------- Captured stdout teardown ---------------------------
 [sock] server shutting down
 [hid] error/disconnect: [Errno 9] Bad file descriptor — retrying in 3s
 _______________________ test_challenger_6dof_suppression _______________________
-service/test_m3_challenger_verification.py:100: in test_challenger_6dof_suppression
-    loop.run_until_complete(run_media_suppression_test())
+service/test_m3_challenger_verification.py:70: in test_challenger_6dof_suppression
+    loop.run_until_complete(run_browser_suppression_test())
 /usr/lib64/python3.14/asyncio/base_events.py:719: in run_until_complete
     return future.result()
            ^^^^^^^^^^^^^^^
-service/test_m3_challenger_verification.py:90: in run_media_suppression_test
+service/test_m3_challenger_verification.py:60: in run_browser_suppression_test
     assert "TAP" in first_msg
-E   AssertionError: assert 'TAP' in 'SOFTWARE_UPDATE:idle'
+E   AssertionError: assert 'TAP' in 'version=2.21.2'
 ---------------------------- Captured stdout setup -----------------------------
-[actions] migrated and saved to <test_signal_integration.MockPathObj object at 0x7f7baadd2780>
+[actions] migrated and saved to <test_signal_integration.MockPathObj object at 0x7f17dd5c36f0>
 [hid] watching 12
-[config] reloaded <test_signal_integration.MockPathObj object at 0x7f7baadd2780>
+[config] reloaded <test_signal_integration.MockPathObj object at 0x7f17dd5c36f0>
 [sock] server starting on /tmp/pytest-of-root/pytest-0/test_challenger_6dof_suppressi0/spnav.sock
-[ws] server starting on ws://localhost:46719
+[ws] server starting on ws://localhost:51937
 [serial] connected to /dev/ttyACM0
 ----------------------------- Captured stdout call -----------------------------
 [mode] switched to 'Browser' and saved configuration
 [ws] client connected (1 total)
 [sock] client connected (1 total)
-[config] reloaded <test_signal_integration.MockPathObj object at 0x7f7baadd2780>
-[sock] client disconnected (0 total)
-[ws] client disconnected (0 total)
-[mode] switched to 'Media' and saved configuration
-[ws] client connected (1 total)
-[sock] client connected (1 total)
-[config] reloaded <test_signal_integration.MockPathObj object at 0x7f7baadd2780>
+[config] reloaded <test_signal_integration.MockPathObj object at 0x7f17dd5c36f0>
 [sock] client disconnected (0 total)
 [ws] client disconnected (0 total)
 --------------------------- Captured stdout teardown ---------------------------
+[sock] server shutting down
+[hid] error/disconnect: [Errno 9] Bad file descriptor — retrying in 3s
+______________________ test_websocket_server_integration _______________________
+service/test_signal_integration.py:463: in test_websocket_server_integration
+    loop.run_until_complete(run())
+/usr/lib64/python3.14/asyncio/base_events.py:719: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+service/test_signal_integration.py:448: in run
+    assert response == "TAP:top:1"
+E   AssertionError: assert 'version=2.21.2' == 'TAP:top:1'
+E     
+E     - TAP:top:1
+E     + version=2.21.2
+---------------------------- Captured stdout setup -----------------------------
+[actions] migrated and saved to <test_signal_integration.MockPathObj object at 0x7f17cc7caa50>
+[hid] watching 30
+[config] reloaded <test_signal_integration.MockPathObj object at 0x7f17cc7caa50>
+[sock] server starting on /tmp/pytest-of-root/pytest-0/test_websocket_server_integrat0/spnav.sock
+[ws] server starting on ws://localhost:49023
+[serial] connected to /dev/ttyACM0
+----------------------------- Captured stdout call -----------------------------
+[ws] client connected (1 total)
+[config] saved <test_signal_integration.MockPathObj object at 0x7f17cc7caa50>
+[ws] client disconnected (0 total)
+--------------------------- Captured stdout teardown ---------------------------
+[actions] migrated and saved to <test_signal_integration.MockPathObj object at 0x7f17cc7caa50>
+[config] reloaded <test_signal_integration.MockPathObj object at 0x7f17cc7caa50>
 [sock] server shutting down
 [hid] error/disconnect: [Errno 9] Bad file descriptor — retrying in 3s
 _______________________ test_high_frequency_packet_load ________________________
@@ -105,15 +121,15 @@ E   AssertionError: WS received only 1001/1000
 E   assert 1001 == 1000
 E    +  where 1001 = len(['MOTION:0.0,0.0,0.0,4.0,5.0,6.0', 'MOTION:0.0,0.0,0.0,4.0,5.0,6.0', 'MOTION:0.0,0.0,0.0,4.0,5.0,6.0', 'MOTION:0.0,0.0,0.0,4.0,5.0,6.0', 'MOTION:0.0,0.0,0.0,4.0,5.0,6.0', 'MOTION:0.0,0.0,0.0,4.0,5.0,6.0', ...])
 ----------------------------- Captured stdout call -----------------------------
-[actions] migrated and saved to <test_signal_integration.MockPathObj object at 0x7f7baabb23f0>
+[actions] migrated and saved to <test_signal_integration.MockPathObj object at 0x7f17ee135860>
 [hid] watching 12
-[config] reloaded <test_signal_integration.MockPathObj object at 0x7f7baabb23f0>
+[config] reloaded <test_signal_integration.MockPathObj object at 0x7f17ee135860>
 [sock] server starting on /tmp/pytest-of-root/pytest-0/test_high_frequency_packet_loa0/spnav.sock
-[ws] server starting on ws://localhost:60795
+[ws] server starting on ws://localhost:44079
 [serial] connected to /dev/ttyACM0
 [ws] client connected (1 total)
 [sock] client connected (1 total)
-Processed 1001 WS packets and 1000 socket packets in 0.081s
+Processed 1001 WS packets and 1000 socket packets in 0.092s
 [ws] client disconnected (0 total)
 [sock] client disconnected (0 total)
 [sock] server shutting down
@@ -132,5 +148,6 @@ service/test_m3_adversarial.py::test_m3_websocket_origin_check
 =========================== short test summary info ============================
 FAILED service/test_m3_adversarial.py::test_m3_browser_media_suppression - As...
 FAILED service/test_m3_challenger_verification.py::test_challenger_6dof_suppression
+FAILED service/test_signal_integration.py::test_websocket_server_integration
 FAILED service/test_signal_integration_stress.py::test_high_frequency_packet_load
-============ 3 failed, 69 passed, 40 skipped, 2 warnings in 52.55s =============
+======= 4 failed, 107 passed, 2 skipped, 2 warnings in 246.16s (0:04:06) =======

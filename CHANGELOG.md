@@ -5,6 +5,11 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.21.12] - 2026-06-23
+
+### Fixed
+- **Release Automation**: Fixed Ubuntu PPA signing by using a GPG wrapper script that pipes empty passphrase to stdin.
+
 ## [2.21.11] - 2026-06-23
 
 ### Fixed

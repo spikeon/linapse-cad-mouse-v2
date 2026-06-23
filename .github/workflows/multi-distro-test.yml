@@ -600,7 +600,7 @@ jobs:
           
           # Create GPG wrapper script to avoid stdin exhaustion and shell escaping issues in debsign
           echo '#!/bin/sh' > ~/.gnupg/gpg-wrapper.sh
-          echo 'exec gpg --batch --no-tty --pinentry-mode loopback --passphrase "" "$@"' >> ~/.gnupg/gpg-wrapper.sh
+          echo 'echo "" | gpg --batch --no-tty --pinentry-mode loopback --passphrase-fd 0 "$@"' >> ~/.gnupg/gpg-wrapper.sh
           chmod +x ~/.gnupg/gpg-wrapper.sh
           
           VERSION=$(cat VERSION | tr -d '\r\n[:space:]')

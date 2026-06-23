@@ -1,0 +1,5 @@
+long key IDs are discouraged; please use key fingerprints instead
+ signfile dsc ../linapse-cad-mouse_2.21.19-1.dsc EDE347571BD7FBFD
+gpg: signing failed: No passphrase given
+gpg: /tmp/debsign.CEgohBuh/linapse-cad-mouse_2.21.19-1.dsc: clear-sign failed: No passphrase given
+debsign: /home/runner/gpg-wrapper.sh error occurred!  Aborting....

@@ -5,23 +5,21 @@ USER=runner
 HOME=/home/runner
 === Files in GPG_DIR ===
 total 32
-drwx------  3 runner runner 4096 Jun 23 13:25 .
-drwxr-x--- 12 runner runner 4096 Jun 23 13:25 ..
--rw-r--r--  1 runner runner   94 Jun 23 13:25 gpg-agent.conf
--rw-r--r--  1 runner runner   23 Jun 23 13:25 gpg.conf
-drwx------  2 runner runner 4096 Jun 23 13:25 private-keys-v1.d
--rw-r--r--  1 runner runner  648 Jun 23 13:25 pubring.kbx
--rw-------  1 runner runner   32 Jun 23 13:25 pubring.kbx~
--rw-------  1 runner runner 1200 Jun 23 13:25 trustdb.gpg
+drwx------  3 runner runner 4096 Jun 23 13:39 .
+drwxr-x--- 12 runner runner 4096 Jun 23 13:39 ..
+-rw-r--r--  1 runner runner   95 Jun 23 13:39 gpg-agent.conf
+-rw-r--r--  1 runner runner   23 Jun 23 13:39 gpg.conf
+drwx------  2 runner runner 4096 Jun 23 13:39 private-keys-v1.d
+-rw-r--r--  1 runner runner  648 Jun 23 13:39 pubring.kbx
+-rw-------  1 runner runner   32 Jun 23 13:39 pubring.kbx~
+-rw-------  1 runner runner 1200 Jun 23 13:39 trustdb.gpg
 === gpg-agent.conf ===
 default-cache-ttl 21600
 max-cache-ttl 31536000
-allow-preset-passphraseallow-loopback-pinentry
+allow-preset-passphrase
+allow-loopback-pinentry
 === gpg.conf ===
 pinentry-mode loopback
 === GPG Agent Status ===
-gpg-connect-agent: no running gpg-agent - starting '/usr/bin/gpg-agent'
-gpg-connect-agent: error running '/usr/bin/gpg-agent': exit status 2
-gpg-connect-agent: failed to start gpg-agent '/usr/bin/gpg-agent': General error
-gpg-connect-agent: can't connect to the gpg-agent: General error
-gpg-connect-agent: error sending standard options: No agent running
+D 2.4.4
+OK

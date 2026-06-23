@@ -1,4 +1,4 @@
- signfile dsc ../linapse-cad-mouse_2.21.23-1.dsc -p/home/runner/gpg-wrapper.sh
-gpg: skipped "-p/home/runner/gpg-wrapper.sh": No secret key
-gpg: /tmp/debsign.I16nYDh1/linapse-cad-mouse_2.21.23-1.dsc: clear-sign failed: No secret key
+long key IDs are discouraged; please use key fingerprints instead
+ signfile dsc ../linapse-cad-mouse_2.21.24-1.dsc EDE347571BD7FBFD
+gpg: cannot open '/dev/tty': No such device or address
 debsign: gpg error occurred!  Aborting....

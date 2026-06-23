@@ -265,7 +265,7 @@ jobs:
         if: ${{ contains(github.event.head_commit.message, '[skip tests]') }}
         shell: bash
         run: |
-          touch LinapseServiceSetup.exe
+          echo "dummy" > LinapseServiceSetup.exe
 
       - name: Upload installer artifact
         uses: actions/upload-artifact@v4
@@ -386,9 +386,9 @@ jobs:
           pkgbuild --root payload --identifier com.linapse.cadmouse --version "$VERSION" --install-location / linapse-service.pkg
 
       - name: Create dummy package for skipped tests
-        if: contains(github.event.head_commit.message, '[skip tests]')
+        if: ${{ contains(github.event.head_commit.message, '[skip tests]') }}
         run: |
-          touch linapse-service.pkg
+          echo "dummy" > linapse-service.pkg
 
       - name: Upload macOS Package
         uses: actions/upload-artifact@v4
@@ -434,11 +434,11 @@ jobs:
           npm run build
 
       - name: Create dummy extension for skipped tests
-        if: contains(github.event.head_commit.message, '[skip tests]')
+        if: ${{ contains(github.event.head_commit.message, '[skip tests]') }}
         run: |
           mkdir -p extension/dist/chrome
-          touch extension/dist/dummy.zip
-          touch extension/dist/chrome/dummy
+          echo "dummy" > extension/dist/dummy.zip
+          echo "dummy" > extension/dist/chrome/dummy
 
       - name: Upload browser extension artifacts
         uses: actions/upload-artifact@v4

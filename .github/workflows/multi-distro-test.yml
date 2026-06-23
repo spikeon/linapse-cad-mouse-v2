@@ -735,7 +735,7 @@ jobs:
             }
             
             # Upload
-            dput linapse-ppa ../linapse-cad-mouse_${VERSION}*_source.changes > dput.log 2>&1 || {
+            dput -u linapse-ppa ../linapse-cad-mouse_${VERSION}*_source.changes > dput.log 2>&1 || {
               cat dput.log
               mkdir -p ci_logs
               cp dput.log ci_logs/dput_${dist}.log

@@ -3,7 +3,7 @@
 %{!?_udevrulesdir: %global _udevrulesdir %{_prefix}/lib/udev/rules.d}
 
 Name:           linapse-cad-mouse
-Version:        2.21.29
+Version:        2.21.30
 Release:        1%{?dist}
 Summary:        CAD Mouse MK2 Linapse driver service and configurator
 
@@ -141,6 +141,9 @@ install -Dm644 service/udev/99-spacemouse.rules %{buildroot}%{_udevrulesdir}/99-
 %{_udevrulesdir}/99-spacemouse.rules
 
 %changelog
+* Tue Jun 23 2026 spikeon <spikeon@example.com> - 2.21.30-1
+- Add -u flag to dput to bypass local GPG verification issues in CI and bump version to 2.21.30
+
 * Tue Jun 23 2026 spikeon <spikeon@example.com> - 2.21.29-1
 - Add support for skipping test/build steps in CI using commit message and bump version to 2.21.29
 

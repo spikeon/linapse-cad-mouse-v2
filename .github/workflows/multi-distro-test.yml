@@ -624,8 +624,11 @@ jobs:
             # Extract key ID dynamically from imported secret key
             KEY_ID=$(gpg --list-secret-keys --with-colons | grep "^sec" | cut -d: -f5 | head -n 1)
 
-            # Build source package (ignore missing build dependencies on CI runner, exclude VCS files, sign with key using loopback)
-            debuild -S -sa -d -i -I -k"$KEY_ID"
+            # Build source package unsigned (debuild + debsign)
+            debuild -S -sa -d -i -I -us -uc
+            
+            # Sign manually using debsign with loopback GPG options
+            debsign -k"$KEY_ID" -p"gpg --batch --no-tty --pinentry-mode loopback" ../linapse-cad-mouse_${VERSION}*_source.changes
             
             # Upload
             dput linapse-ppa ../linapse-cad-mouse_${VERSION}*_source.changes
@@ -674,11 +677,12 @@ jobs:
           
           VERSION=$(cat VERSION | tr -d '\r\n[:space:]')
           
-          # Trigger COPR build from GitHub SCM repository
+          # Trigger COPR build from GitHub SCM repository for compatible chroots
           copr-cli buildscm ${COPR_PROJECT} \
             --clone-url https://github.com/spikeon/linapse-cad-mouse-v2.git \
             --commit v${VERSION} \
-            --spec fedora/linapse-cad-mouse.spec
+            --spec fedora/linapse-cad-mouse.spec \
+            -r fedora-44-x86_64 -r rhel-9-x86_64 -r rhel-10-x86_64 -r rhel+epel-10-x86_64
 
 
 

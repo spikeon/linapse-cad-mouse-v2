@@ -3,7 +3,7 @@
 %{!?_udevrulesdir: %global _udevrulesdir %{_prefix}/lib/udev/rules.d}
 
 Name:           linapse-cad-mouse
-Version:        2.21.8
+Version:        2.21.9
 Release:        1%{?dist}
 Summary:        CAD Mouse MK2 Linapse driver service and configurator
 
@@ -141,6 +141,9 @@ install -Dm644 service/udev/99-spacemouse.rules %{buildroot}%{_udevrulesdir}/99-
 %{_udevrulesdir}/99-spacemouse.rules
 
 %changelog
+* Tue Jun 23 2026 spikeon <spikeon@example.com> - 2.21.9-1
+- Limit COPR builds to Python 3.8+ compatible chroots and bump version to 2.21.9
+
 * Tue Jun 23 2026 spikeon <spikeon@example.com> - 2.21.8-1
 - Fix Ubuntu PPA signing command and bump version to 2.21.8
 

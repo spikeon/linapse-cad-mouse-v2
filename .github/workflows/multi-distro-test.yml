@@ -560,7 +560,7 @@ jobs:
           git push
 
   release-ubuntu-ppa:
-    needs: [test]
+    needs: [release]
     runs-on: ubuntu-latest
     if: (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master') && github.event_name == 'push' && vars.UBUNTU_PPA_PUBLISH_ENABLED == 'true'
     steps:
@@ -613,8 +613,8 @@ jobs:
             # Create orig source tarball
             tar -czf ../linapse-cad-mouse_${VERSION}.orig.tar.gz --exclude=.git --exclude=debian .
             
-            # Build source package (ignore missing build dependencies on CI runner)
-            debuild -S -sa -d
+            # Build source package (ignore missing build dependencies on CI runner, exclude VCS files)
+            debuild -S -sa -d -i -I
             
             # Upload
             dput linapse-ppa ../linapse-cad-mouse_${VERSION}*_source.changes
@@ -624,7 +624,7 @@ jobs:
           done
 
   release-fedora-copr:
-    needs: [test]
+    needs: [release]
     runs-on: ubuntu-latest
     if: (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master') && github.event_name == 'push' && vars.FEDORA_COPR_PUBLISH_ENABLED == 'true'
     steps:

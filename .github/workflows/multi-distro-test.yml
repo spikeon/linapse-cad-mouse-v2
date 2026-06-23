@@ -603,8 +603,30 @@ jobs:
           mkdir -p "$GPG_DIR"
           echo "allow-loopback-pinentry" >> "$GPG_DIR/gpg-agent.conf"
           echo "pinentry-mode loopback" >> "$GPG_DIR/gpg.conf"
-          gpgconf --kill gpg-agent || true
+          
+          # Diagnostics
+          mkdir -p ci_logs
+          {
+            echo "=== GPG Environment ==="
+            echo "GNUPGHOME=$GNUPGHOME"
+            echo "GPG_DIR=$GPG_DIR"
+            echo "USER=$(whoami)"
+            echo "HOME=$HOME"
+            echo "=== Files in GPG_DIR ==="
+            ls -la "$GPG_DIR"
+            echo "=== gpg-agent.conf ==="
+            cat "$GPG_DIR/gpg-agent.conf" || true
+            echo "=== gpg.conf ==="
+            cat "$GPG_DIR/gpg.conf" || true
+          } > ci_logs/gpg_debug.log 2>&1
+          
+          gpgconf --kill all || true
           gpg-connect-agent reloadagent /bye || true
+          
+          {
+            echo "=== GPG Agent Status ==="
+            gpg-connect-agent 'GETINFO version' /bye || true
+          } >> ci_logs/gpg_debug.log 2>&1
           
           # Create GPG wrapper script to inject loopback pinentry and empty passphrase non-interactively
           echo '#!/bin/sh' > ~/gpg-wrapper.sh

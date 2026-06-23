@@ -596,11 +596,10 @@ jobs:
             exit 0
           fi
           
-          # Force GPG to use loopback mode non-interactively
-          mkdir -p ~/.gnupg
-          echo "pinentry-mode loopback" >> ~/.gnupg/gpg.conf
-          echo "allow-loopback-pinentry" >> ~/.gnupg/gpg-agent.conf
-          gpgconf --kill gpg-agent
+          # Create GPG wrapper script to inject loopback pinentry and empty passphrase non-interactively
+          echo '#!/bin/sh' > ~/gpg-wrapper.sh
+          echo 'exec gpg --batch --no-tty --pinentry-mode loopback --passphrase "" "$@"' >> ~/gpg-wrapper.sh
+          chmod +x ~/gpg-wrapper.sh
           
           VERSION=$(cat VERSION | tr -d '\r\n[:space:]')
           
@@ -631,8 +630,8 @@ jobs:
             # Build source package unsigned (debuild + debsign)
             debuild -S -sa -d -i -I -us -uc
             
-            # Sign manually using debsign with loopback GPG options to prevent TTY prompt
-            debsign -k"$KEY_ID" -p"gpg --batch --no-tty --pinentry-mode loopback" ../linapse-cad-mouse_${VERSION}*_source.changes
+            # Sign manually using debsign with loopback GPG wrapper script to prevent TTY prompt
+            debsign -k"$KEY_ID" -p"$HOME/gpg-wrapper.sh" ../linapse-cad-mouse_${VERSION}*_source.changes
             
             # Upload
             dput linapse-ppa ../linapse-cad-mouse_${VERSION}*_source.changes

@@ -2,41 +2,243 @@
 platform linux -- Python 3.14.4, pytest-9.1.1, pluggy-1.6.0
 rootdir: /workspace
 plugins: anyio-4.14.0
-collected 72 items
+collected 112 items
 
-service/test_browser_bridge.py ...                                       [  4%]
-service/test_browser_extension.py ....                                   [  9%]
-service/test_cross_platform.py .....                                     [ 16%]
-service/test_installer_adversarial.py ss..                               [ 22%]
-service/test_installer_config.py ..                                      [ 25%]
-service/test_installer_mock.py FF                                        [ 27%]
-service/test_linapse_socket.py ....                                      [ 33%]
-service/test_linapse_socket_stress.py .....                              [ 40%]
-service/test_m1_adversarial_bugfix.py ..                                 [ 43%]
-service/test_m3_adversarial.py ....                                      [ 48%]
-service/test_m3_challenger_verification.py ...                           [ 52%]
-service/test_m5_adversarial.py ....                                      [ 58%]
-service/test_multi_click.py ...                                          [ 62%]
-service/test_playwright_benchy.py ss                                     [ 65%]
-service/test_serial_buttons.py .......                                   [ 75%]
-service/test_signal_integration.py .........                             [ 87%]
-service/test_signal_integration_stress.py ...                            [ 91%]
-service/test_stress.py ......                                            [100%]
+service/test_browser_bridge.py ...                                       [  2%]
+service/test_browser_extension.py ....                                   [  6%]
+service/test_cross_platform.py .....                                     [ 10%]
+service/test_installer_adversarial.py ss..                               [ 14%]
+service/test_installer_config.py ..                                      [ 16%]
+service/test_installer_mock.py ..                                        [ 17%]
+service/test_linapse_socket.py ....                                      [ 21%]
+service/test_linapse_socket_stress.py .....                              [ 25%]
+service/test_m1_adversarial_bugfix.py ..                                 [ 27%]
+service/test_m3_adversarial.py ....                                      [ 31%]
+service/test_m3_challenger_verification.py ...                           [ 33%]
+service/test_m5_adversarial.py ....                                      [ 37%]
+service/test_multi_click.py ...                                          [ 40%]
+service/test_playwright_benchy.py ssssssssssssssssssssssssssssssssssssss [ 74%]
+                                                                         [ 74%]
+service/test_serial_buttons.py .......                                   [ 80%]
+service/test_signal_integration.py ..........                            [ 89%]
+service/test_signal_integration_stress.py F..                            [ 91%]
+service/test_stress.py ......                                            [ 97%]
+service/test_updater.py ...                                              [100%]
 
 =================================== FAILURES ===================================
-____________ TestInstallerMock.test_installer_with_spacenavd_absent ____________
-service/test_installer_mock.py:169: in test_installer_with_spacenavd_absent
-    self.assertTrue(has_udev_copy, "Should copy 99-spacemouse.rules to /etc/udev")
-E   AssertionError: False is not true : Should copy 99-spacemouse.rules to /etc/udev
+_________________________ test_fixture_rapid_restarts __________________________
+service/test_signal_integration_stress.py:225: in test_fixture_rapid_restarts
+    assert thread_diff <= 0, f"Thread leak detected! Leaked {thread_diff} threads: {final_threads}"
+E   AssertionError: Thread leak detected! Leaked 20 threads: [<Thread(Thread-9 (updater_loop), started daemon 139877286934208)>, <Thread(Thread-15 (updater_loop), started daemon 139877588915904)>, <Thread(Thread-25 (updater_loop), started daemon 139877605697216)>, <Thread(Thread-31 (updater_loop), started daemon 139877018498752)>, <Thread(Thread-37 (updater_loop), started daemon 139877253371584)>, <Thread(Thread-43 (updater_loop), started daemon 139877001717440)>, <Thread(Thread-49 (updater_loop), started daemon 139876984936128)>, <Thread(Thread-65 (updater_loop), started daemon 139877270152896)>, <Thread(Thread-71 (updater_loop), started daemon 139876716500672)>, <Thread(Thread-78 (updater_loop), started daemon 139876750063296)>, <Thread(Thread-84 (updater_loop), started daemon 139876464846528)>, <Thread(Thread-95 (updater_loop), started daemon 139876733281984)>, <Thread(Thread-101 (updater_loop), started daemon 139876213192384)>, <Thread(Thread-107 (updater_loop), started daemon 139876448065216)>, <Thread(Thread-115 (updater_loop), started daemon 139876481627840)>, <Thread(Thread-121 (updater_loop), started daemon 139876078974656)>, <Thread(Thread-127 (updater_loop), started daemon 139876179629760)>, <Thread(Thread-143 (updater_loop), started daemon 139876196411072)>, <Thread(Thread-149 (updater_loop), started daemon 139875743430336)>, <Thread(Thread-155 (updater_loop), started daemon 139876045412032)>, <Thread(Thread-161 (updater_loop), started daemon 139875726649024)>, <Thread(Thread-167 (updater_loop), started daemon 139875709867712)>, <Thread(Thread-173 (updater_loop), started daemon 139875407886016)>, <Thread(Thread-179 (updater_loop), started daemon 139875391104704)>, <Thread(Thread-185 (updater_loop), started daemon 139875374323392)>, <Thread(Thread-191 (updater_loop), started daemon 139875139450560)>, <Thread(Thread-197 (updater_loop), started daemon 139875122669248)>, <Thread(Thread-203 (updater_loop), started daemon 139875105887936)>, <Thread(Thread-209 (updater_loop), started daemon 139875005232832)>, <Thread(Thread-215 (updater_loop), started daemon 139874988451520)>, <Thread(Thread-221 (updater_loop), started daemon 139874971670208)>, <Thread(Thread-227 (updater_loop), started daemon 139874871015104)>, <Thread(Thread-233 (updater_loop), started daemon 139874854233792)>, <Thread(Thread-239 (updater_loop), started daemon 139874837452480)>, <Thread(Thread-245 (updater_loop), started daemon 139874820671168)>, <Thread(Thread-251 (updater_loop), started daemon 139874803889856)>, <Thread(Thread-257 (updater_loop), started daemon 139874787108544)>]
+E   assert 20 <= 0
 ----------------------------- Captured stdout call -----------------------------
-LOGGED COMMANDS (absent): ['SYSTEMCTL: is-active --quiet spacenavd', 'SYSTEMCTL: is-enabled --quiet spacenavd', 'PACMAN: -Qi spacenavd', 'SUDO: usermod -aG input root', 'USERMOD: -aG input root', 'PIP3: install --break-system-packages -r /workspace/service/requirements.txt', 'SYSTEMCTL: --user disable --now spnav-buttons', 'SYSTEMCTL: --user disable --now spacenav-ws', 'SYSTEMCTL: --user import-environment PATH', 'SYSTEMCTL: --user daemon-reload', 'SYSTEMCTL: --user enable --now ydotoold linapse-service']
-___________ TestInstallerMock.test_installer_with_spacenavd_present ____________
-service/test_installer_mock.py:196: in test_installer_with_spacenavd_present
-    self.assertTrue(has_udev_copy, "Should copy 99-spacemouse.rules to /etc/udev")
-E   AssertionError: False is not true : Should copy 99-spacemouse.rules to /etc/udev
+
+--- Starting rapid fixture restart stress test ---
+[actions] migrated and saved to <test_signal_integration.MockPathObj object at 0x7f37d0a25230>
+[hid] watching 12
+[config] reloaded <test_signal_integration.MockPathObj object at 0x7f37d0a25230>
+[sock] server starting on /tmp/pytest-of-root/pytest-0/test_fixture_rapid_restarts0/spnav.sock
+[ws] server starting on ws://localhost:59581
+[serial] connected to /dev/ttyACM0
+[sock] client connected (1 total)
+[sock] client disconnected (0 total)
+[sock] server shutting down
+[hid] error/disconnect: [Errno 9] Bad file descriptor — retrying in 3s
+[actions] migrated and saved to <test_signal_integration.MockPathObj object at 0x7f37d0a71ff0>
+[hid] watching 12
+[config] reloaded <test_signal_integration.MockPathObj object at 0x7f37d0a71ff0>
+[sock] server starting on /tmp/pytest-of-root/pytest-0/test_fixture_rapid_restarts0/spnav.sock
+[ws] server starting on ws://localhost:59645
+[serial] connected to /dev/ttyACM0
+[sock] client connected (1 total)
+[sock] client disconnected (0 total)
+[sock] server shutting down
+[hid] error/disconnect: [Errno 9] Bad file descriptor — retrying in 3s
+[actions] migrated and saved to <test_signal_integration.MockPathObj object at 0x7f37d0a79ef0>
+[hid] watching 12
+[config] reloaded <test_signal_integration.MockPathObj object at 0x7f37d0a79ef0>
+[sock] server starting on /tmp/pytest-of-root/pytest-0/test_fixture_rapid_restarts0/spnav.sock
+[ws] server starting on ws://localhost:33315
+[serial] connected to /dev/ttyACM0
+[sock] client connected (1 total)
+[sock] client disconnected (0 total)
+[sock] server shutting down
+[hid] error/disconnect: [Errno 9] Bad file descriptor — retrying in 3s
+[actions] migrated and saved to <test_signal_integration.MockPathObj object at 0x7f37d0a7a670>
+[hid] watching 12
+[config] reloaded <test_signal_integration.MockPathObj object at 0x7f37d0a7a670>
+[sock] server starting on /tmp/pytest-of-root/pytest-0/test_fixture_rapid_restarts0/spnav.sock
+[ws] server starting on ws://localhost:58453
+[serial] connected to /dev/ttyACM0
+[sock] client connected (1 total)
+[sock] client disconnected (0 total)
+[sock] server shutting down
+[hid] error/disconnect: [Errno 9] Bad file descriptor — retrying in 3s
+[actions] migrated and saved to <test_signal_integration.MockPathObj object at 0x7f37d2d569f0>
+[hid] watching 12
+[config] reloaded <test_signal_integration.MockPathObj object at 0x7f37d2d569f0>
+[sock] server starting on /tmp/pytest-of-root/pytest-0/test_fixture_rapid_restarts0/spnav.sock
+[ws] server starting on ws://localhost:54139
+[serial] connected to /dev/ttyACM0
+[sock] client connected (1 total)
+[sock] client disconnected (0 total)
+[sock] server shutting down
+[hid] error/disconnect: [Errno 9] Bad file descriptor — retrying in 3s
+[actions] migrated and saved to <test_signal_integration.MockPathObj object at 0x7f37d0a760d0>
+[hid] watching 12
+[config] reloaded <test_signal_integration.MockPathObj object at 0x7f37d0a760d0>
+[sock] server starting on /tmp/pytest-of-root/pytest-0/test_fixture_rapid_restarts0/spnav.sock
+[ws] server starting on ws://localhost:40235
+[serial] connected to /dev/ttyACM0
+[sock] client connected (1 total)
+[sock] client disconnected (0 total)
+[sock] server shutting down
+[hid] error/disconnect: [Errno 9] Bad file descriptor — retrying in 3s
+[actions] migrated and saved to <test_signal_integration.MockPathObj object at 0x7f37d0a76750>
+[hid] watching 12
+[config] reloaded <test_signal_integration.MockPathObj object at 0x7f37d0a76750>
+[sock] server starting on /tmp/pytest-of-root/pytest-0/test_fixture_rapid_restarts0/spnav.sock
+[ws] server starting on ws://localhost:40891
+[serial] connected to /dev/ttyACM0
+[sock] client connected (1 total)
+[sock] client disconnected (0 total)
+[sock] server shutting down
+[hid] error/disconnect: [Errno 9] Bad file descriptor — retrying in 3s
+[actions] migrated and saved to <test_signal_integration.MockPathObj object at 0x7f37f132bcb0>
+[hid] watching 12
+[config] reloaded <test_signal_integration.MockPathObj object at 0x7f37f132bcb0>
+[sock] server starting on /tmp/pytest-of-root/pytest-0/test_fixture_rapid_restarts0/spnav.sock
+[ws] server starting on ws://localhost:46893
+[serial] connected to /dev/ttyACM0
+[sock] client connected (1 total)
+[sock] client disconnected (0 total)
+[sock] server shutting down
+[hid] error/disconnect: [Errno 9] Bad file descriptor — retrying in 3s
+[actions] migrated and saved to <test_signal_integration.MockPathObj object at 0x7f37f1285a20>
+[hid] watching 12
+[config] reloaded <test_signal_integration.MockPathObj object at 0x7f37f1285a20>
+[sock] server starting on /tmp/pytest-of-root/pytest-0/test_fixture_rapid_restarts0/spnav.sock
+[ws] server starting on ws://localhost:51199
+[serial] connected to /dev/ttyACM0
+[sock] client connected (1 total)
+[sock] client disconnected (0 total)
+[sock] server shutting down
+[hid] error/disconnect: [Errno 9] Bad file descriptor — retrying in 3s
+[actions] migrated and saved to <test_signal_integration.MockPathObj object at 0x7f37d0a64e90>
+[hid] watching 12
+[config] reloaded <test_signal_integration.MockPathObj object at 0x7f37d0a64e90>
+[sock] server starting on /tmp/pytest-of-root/pytest-0/test_fixture_rapid_restarts0/spnav.sock
+[ws] server starting on ws://localhost:37689
+[serial] connected to /dev/ttyACM0
+[sock] client connected (1 total)
+[sock] client disconnected (0 total)
+[sock] server shutting down
+[hid] error/disconnect: [Errno 9] Bad file descriptor — retrying in 3s
+[actions] migrated and saved to <test_signal_integration.MockPathObj object at 0x7f37d0a7fbf0>
+[hid] watching 12
+[config] reloaded <test_signal_integration.MockPathObj object at 0x7f37d0a7fbf0>
+[sock] server starting on /tmp/pytest-of-root/pytest-0/test_fixture_rapid_restarts0/spnav.sock
+[ws] server starting on ws://localhost:49913
+[serial] connected to /dev/ttyACM0
+[sock] client connected (1 total)
+[sock] client disconnected (0 total)
+[sock] server shutting down
+[hid] error/disconnect: [Errno 9] Bad file descriptor — retrying in 3s
+[actions] migrated and saved to <test_signal_integration.MockPathObj object at 0x7f37d0c5fc50>
+[hid] watching 12
+[config] reloaded <test_signal_integration.MockPathObj object at 0x7f37d0c5fc50>
+[sock] server starting on /tmp/pytest-of-root/pytest-0/test_fixture_rapid_restarts0/spnav.sock
+[ws] server starting on ws://localhost:45275
+[serial] connected to /dev/ttyACM0
+[sock] client connected (1 total)
+[sock] client disconnected (0 total)
+[sock] server shutting down
+[hid] error/disconnect: [Errno 9] Bad file descriptor — retrying in 3s
+[actions] migrated and saved to <test_signal_integration.MockPathObj object at 0x7f37d0c940f0>
+[hid] watching 12
+[config] reloaded <test_signal_integration.MockPathObj object at 0x7f37d0c940f0>
+[sock] server starting on /tmp/pytest-of-root/pytest-0/test_fixture_rapid_restarts0/spnav.sock
+[ws] server starting on ws://localhost:59835
+[serial] connected to /dev/ttyACM0
+[sock] client connected (1 total)
+[sock] client disconnected (0 total)
+[sock] server shutting down
+[hid] error/disconnect: [Errno 9] Bad file descriptor — retrying in 3s
+[actions] migrated and saved to <test_signal_integration.MockPathObj object at 0x7f37d0c5e030>
+[hid] watching 12
+[config] reloaded <test_signal_integration.MockPathObj object at 0x7f37d0c5e030>
+[sock] server starting on /tmp/pytest-of-root/pytest-0/test_fixture_rapid_restarts0/spnav.sock
+[ws] server starting on ws://localhost:52941
+[serial] connected to /dev/ttyACM0
+[sock] client connected (1 total)
+[sock] client disconnected (0 total)
+[sock] server shutting down
+[hid] error/disconnect: [Errno 9] Bad file descriptor — retrying in 3s
+[actions] migrated and saved to <test_signal_integration.MockPathObj object at 0x7f37d0c940f0>
+[hid] watching 12
+[config] reloaded <test_signal_integration.MockPathObj object at 0x7f37d0c940f0>
+[sock] server starting on /tmp/pytest-of-root/pytest-0/test_fixture_rapid_restarts0/spnav.sock
+[ws] server starting on ws://localhost:56787
+[serial] connected to /dev/ttyACM0
+[sock] client connected (1 total)
+[sock] client disconnected (0 total)
+[sock] server shutting down
+[hid] error/disconnect: [Errno 9] Bad file descriptor — retrying in 3s
+[actions] migrated and saved to <test_signal_integration.MockPathObj object at 0x7f37d0c97390>
+[hid] watching 12
+[config] reloaded <test_signal_integration.MockPathObj object at 0x7f37d0c97390>
+[sock] server starting on /tmp/pytest-of-root/pytest-0/test_fixture_rapid_restarts0/spnav.sock
+[ws] server starting on ws://localhost:40095
+[serial] connected to /dev/ttyACM0
+[sock] client connected (1 total)
+[sock] client disconnected (0 total)
+[sock] server shutting down
+[hid] error/disconnect: [Errno 9] Bad file descriptor — retrying in 3s
+[actions] migrated and saved to <test_signal_integration.MockPathObj object at 0x7f37d0c971b0>
+[hid] watching 12
+[config] reloaded <test_signal_integration.MockPathObj object at 0x7f37d0c971b0>
+[sock] server starting on /tmp/pytest-of-root/pytest-0/test_fixture_rapid_restarts0/spnav.sock
+[ws] server starting on ws://localhost:58491
+[serial] connected to /dev/ttyACM0
+[sock] client connected (1 total)
+[sock] client disconnected (0 total)
+[sock] server shutting down
+[hid] error/disconnect: [Errno 9] Bad file descriptor — retrying in 3s
+[actions] migrated and saved to <test_signal_integration.MockPathObj object at 0x7f37d0c5f7f0>
+[hid] watching 12
+[config] reloaded <test_signal_integration.MockPathObj object at 0x7f37d0c5f7f0>
+[sock] server starting on /tmp/pytest-of-root/pytest-0/test_fixture_rapid_restarts0/spnav.sock
+[ws] server starting on ws://localhost:34851
+[serial] connected to /dev/ttyACM0
+[sock] client connected (1 total)
+[sock] client disconnected (0 total)
+[sock] server shutting down
+[hid] error/disconnect: [Errno 9] Bad file descriptor — retrying in 3s
+[actions] migrated and saved to <test_signal_integration.MockPathObj object at 0x7f37d0c5f160>
+[hid] watching 12
+[config] reloaded <test_signal_integration.MockPathObj object at 0x7f37d0c5f160>
+[sock] server starting on /tmp/pytest-of-root/pytest-0/test_fixture_rapid_restarts0/spnav.sock
+[ws] server starting on ws://localhost:40521
+[serial] connected to /dev/ttyACM0
+[sock] client connected (1 total)
+[sock] client disconnected (0 total)
+[sock] server shutting down
+[hid] error/disconnect: [Errno 9] Bad file descriptor — retrying in 3s
+[actions] migrated and saved to <test_signal_integration.MockPathObj object at 0x7f37d0c5dc20>
+[hid] watching 12
+[config] reloaded <test_signal_integration.MockPathObj object at 0x7f37d0c5dc20>
+[sock] server starting on /tmp/pytest-of-root/pytest-0/test_fixture_rapid_restarts0/spnav.sock
+[ws] server starting on ws://localhost:55221
+[serial] connected to /dev/ttyACM0
+[sock] client connected (1 total)
+[sock] client disconnected (0 total)
+[sock] server shutting down
+[hid] error/disconnect: [Errno 9] Bad file descriptor — retrying in 3s
+Initial threads: 17, Final threads: 37
+Initial FDs: 16, Final FDs: 16
 =============================== warnings summary ===============================
 service/test_m3_adversarial.py::test_m3_websocket_origin_check
-  /workspace/service/test_m3_adversarial.py:284: DeprecationWarning: websockets.exceptions.InvalidStatusCode is deprecated
+  /workspace/service/test_m3_adversarial.py:289: DeprecationWarning: websockets.exceptions.InvalidStatusCode is deprecated
     from websockets.exceptions import InvalidStatusCode, ConnectionClosed
 
 service/test_m3_adversarial.py::test_m3_websocket_origin_check
@@ -46,6 +248,5 @@ service/test_m3_adversarial.py::test_m3_websocket_origin_check
 -- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
 ----------- generated xml file: /workspace/pytest_ubuntu_results.xml -----------
 =========================== short test summary info ============================
-FAILED service/test_installer_mock.py::TestInstallerMock::test_installer_with_spacenavd_absent
-FAILED service/test_installer_mock.py::TestInstallerMock::test_installer_with_spacenavd_present
-============= 2 failed, 66 passed, 4 skipped, 2 warnings in 53.70s =============
+FAILED service/test_signal_integration_stress.py::test_fixture_rapid_restarts
+============ 1 failed, 71 passed, 40 skipped, 2 warnings in 54.69s =============

@@ -2,169 +2,58 @@
 platform win32 -- Python 3.11.9, pytest-9.1.1, pluggy-1.6.0
 rootdir: D:\a\linapse-cad-mouse-v2\linapse-cad-mouse-v2
 plugins: anyio-4.14.0
-collected 73 items
+collected 115 items
 
-service\test_browser_bridge.py ...                                       [  4%]
-service\test_browser_extension.py ....                                   [  9%]
-service\test_cross_platform.py .....                                     [ 16%]
-service\test_installer_adversarial.py ssss                               [ 21%]
-service\test_installer_config.py ..                                      [ 24%]
-service\test_installer_mock.py ss                                        [ 27%]
-service\test_linapse_socket.py ssss                                      [ 32%]
-service\test_linapse_socket_stress.py sssss                              [ 39%]
-service\test_m1_adversarial_bugfix.py ss                                 [ 42%]
-service\test_m3_adversarial.py ssss                                      [ 47%]
-service\test_m3_challenger_verification.py sss                           [ 52%]
-service\test_m5_adversarial.py ssss                                      [ 57%]
-service\test_multi_click.py ...                                          [ 61%]
-service\test_playwright_benchy.py .F                                     [ 64%]
-service\test_serial_buttons.py .......                                   [ 73%]
+service\test_browser_bridge.py ...                                       [  2%]
+service\test_browser_extension.py ....                                   [  6%]
+service\test_cross_platform.py .....                                     [ 10%]
+service\test_installer_adversarial.py ssss                               [ 13%]
+service\test_installer_config.py ..                                      [ 15%]
+service\test_installer_mock.py ss                                        [ 17%]
+service\test_linapse_socket.py ssss                                      [ 20%]
+service\test_linapse_socket_stress.py sssss                              [ 25%]
+service\test_m1_adversarial_bugfix.py ss                                 [ 26%]
+service\test_m3_adversarial.py ssss                                      [ 30%]
+service\test_m3_challenger_verification.py sss                           [ 33%]
+service\test_m5_adversarial.py ssss                                      [ 36%]
+service\test_multi_click.py ...                                          [ 39%]
+service\test_playwright_benchy.py ..........F........................... [ 72%]
+.                                                                        [ 73%]
+service\test_serial_buttons.py .......                                   [ 79%]
 service\test_signal_integration.py ssssssssss                            [ 87%]
-service\test_signal_integration_stress.py sss                            [ 91%]
-service\test_stress.py ssssss                                            [100%]
+service\test_signal_integration_stress.py sss                            [ 90%]
+service\test_stress.py ssssss                                            [ 95%]
+service\test_updater.py sssss                                            [100%]
 
 ================================== FAILURES ===================================
-___________________ test_benchy_sensitivity_and_dead_zones ____________________
-service\test_playwright_benchy.py:787: in test_benchy_sensitivity_and_dead_zones
-    assert abs(vals[axis_idx] - expected_val) < 0.1, f"Inversion of {name} failed: expected {expected_val}, got {vals[axis_idx]}"
-E   AssertionError: Inversion of z failed: expected 20.0, got -20.0
-E   assert 40.0 < 0.1
-E    +  where 40.0 = abs((-20.0 - 20.0))
+______________________ test_viewport_motion_y_inversion _______________________
+service\test_playwright_benchy.py:675: in test_viewport_motion_y_inversion
+    reset_test_state(page, mock_serial, temp_actions_path, target_tab="General")
+service\test_playwright_benchy.py:397: in reset_test_state
+    page.reload()
+C:\hostedtoolcache\windows\Python\3.11.9\x64\Lib\site-packages\playwright\sync_api\_generated.py:9658: in reload
+    self._sync(
+C:\hostedtoolcache\windows\Python\3.11.9\x64\Lib\site-packages\playwright\_impl\_page.py:565: in reload
+    await self._channel.send(
+C:\hostedtoolcache\windows\Python\3.11.9\x64\Lib\site-packages\playwright\_impl\_connection.py:69: in send
+    return await self._connection.wrap_api_call(
+C:\hostedtoolcache\windows\Python\3.11.9\x64\Lib\site-packages\playwright\_impl\_connection.py:559: in wrap_api_call
+    raise rewrite_error(error, f"{parsed_st['apiName']}: {error}") from None
+E   playwright._impl._errors.TimeoutError: Page.reload: Timeout 30000ms exceeded.
+E   Call log:
+E     - waiting for navigation until "load"
+E       - navigated to "http://localhost:55241/index.html"
 ---------------------------- Captured stdout call -----------------------------
-[actions] migrated and saved to C:\Users\runneradmin\AppData\Local\Temp\pytest-of-runneradmin\pytest-0\test_benchy_sensitivity_and_de0\actions.json
-[serial] connected to MOCK_COM
-[hid] disabled on Windows/macOS
-[config] reloaded C:\Users\runneradmin\AppData\Local\Temp\pytest-of-runneradmin\pytest-0\test_benchy_sensitivity_and_de0\actions.json
-[ws] server starting on ws://localhost:52765
-[ws] client connected (1 total)
-[config] saved C:\Users\runneradmin\AppData\Local\Temp\pytest-of-runneradmin\pytest-0\test_benchy_sensitivity_and_de0\actions.json
-[config] reloaded C:\Users\runneradmin\AppData\Local\Temp\pytest-of-runneradmin\pytest-0\test_benchy_sensitivity_and_de0\actions.json
-[config] saved C:\Users\runneradmin\AppData\Local\Temp\pytest-of-runneradmin\pytest-0\test_benchy_sensitivity_and_de0\actions.json
-[config] reloaded C:\Users\runneradmin\AppData\Local\Temp\pytest-of-runneradmin\pytest-0\test_benchy_sensitivity_and_de0\actions.json
+[actions] migrated and saved to C:\Users\runneradmin\AppData\Local\Temp\pytest-of-runneradmin\pytest-0\playwright_benchy0\actions.json
+[config] reloaded C:\Users\runneradmin\AppData\Local\Temp\pytest-of-runneradmin\pytest-0\playwright_benchy0\actions.json
+[config] reloaded C:\Users\runneradmin\AppData\Local\Temp\pytest-of-runneradmin\pytest-0\playwright_benchy0\actions.json
 [ws] client disconnected (0 total)
 [ws] client connected (1 total)
-[config] saved C:\Users\runneradmin\AppData\Local\Temp\pytest-of-runneradmin\pytest-0\test_benchy_sensitivity_and_de0\actions.json
-[config] reloaded C:\Users\runneradmin\AppData\Local\Temp\pytest-of-runneradmin\pytest-0\test_benchy_sensitivity_and_de0\actions.json
-[config] saved C:\Users\runneradmin\AppData\Local\Temp\pytest-of-runneradmin\pytest-0\test_benchy_sensitivity_and_de0\actions.json
-[config] reloaded C:\Users\runneradmin\AppData\Local\Temp\pytest-of-runneradmin\pytest-0\test_benchy_sensitivity_and_de0\actions.json
-[ws] client disconnected (0 total)
-[ws] client connected (1 total)
-[config] saved C:\Users\runneradmin\AppData\Local\Temp\pytest-of-runneradmin\pytest-0\test_benchy_sensitivity_and_de0\actions.json
-[config] reloaded C:\Users\runneradmin\AppData\Local\Temp\pytest-of-runneradmin\pytest-0\test_benchy_sensitivity_and_de0\actions.json
-[config] saved C:\Users\runneradmin\AppData\Local\Temp\pytest-of-runneradmin\pytest-0\test_benchy_sensitivity_and_de0\actions.json
-[config] reloaded C:\Users\runneradmin\AppData\Local\Temp\pytest-of-runneradmin\pytest-0\test_benchy_sensitivity_and_de0\actions.json
-[config] saved C:\Users\runneradmin\AppData\Local\Temp\pytest-of-runneradmin\pytest-0\test_benchy_sensitivity_and_de0\actions.json
-[config] saved C:\Users\runneradmin\AppData\Local\Temp\pytest-of-runneradmin\pytest-0\test_benchy_sensitivity_and_de0\actions.json
-[config] reloaded C:\Users\runneradmin\AppData\Local\Temp\pytest-of-runneradmin\pytest-0\test_benchy_sensitivity_and_de0\actions.json
-[config] saved C:\Users\runneradmin\AppData\Local\Temp\pytest-of-runneradmin\pytest-0\test_benchy_sensitivity_and_de0\actions.json
-[config] reloaded C:\Users\runneradmin\AppData\Local\Temp\pytest-of-runneradmin\pytest-0\test_benchy_sensitivity_and_de0\actions.json
-[config] saved C:\Users\runneradmin\AppData\Local\Temp\pytest-of-runneradmin\pytest-0\test_benchy_sensitivity_and_de0\actions.json
-[config] reloaded C:\Users\runneradmin\AppData\Local\Temp\pytest-of-runneradmin\pytest-0\test_benchy_sensitivity_and_de0\actions.json
-[config] saved C:\Users\runneradmin\AppData\Local\Temp\pytest-of-runneradmin\pytest-0\test_benchy_sensitivity_and_de0\actions.json
-[config] reloaded C:\Users\runneradmin\AppData\Local\Temp\pytest-of-runneradmin\pytest-0\test_benchy_sensitivity_and_de0\actions.json
-[config] saved C:\Users\runneradmin\AppData\Local\Temp\pytest-of-runneradmin\pytest-0\test_benchy_sensitivity_and_de0\actions.json
-[config] reloaded C:\Users\runneradmin\AppData\Local\Temp\pytest-of-runneradmin\pytest-0\test_benchy_sensitivity_and_de0\actions.json
-[config] saved C:\Users\runneradmin\AppData\Local\Temp\pytest-of-runneradmin\pytest-0\test_benchy_sensitivity_and_de0\actions.json
-[config] reloaded C:\Users\runneradmin\AppData\Local\Temp\pytest-of-runneradmin\pytest-0\test_benchy_sensitivity_and_de0\actions.json
-[config] saved C:\Users\runneradmin\AppData\Local\Temp\pytest-of-runneradmin\pytest-0\test_benchy_sensitivity_and_de0\actions.json
-[config] reloaded C:\Users\runneradmin\AppData\Local\Temp\pytest-of-runneradmin\pytest-0\test_benchy_sensitivity_and_de0\actions.json
-[config] saved C:\Users\runneradmin\AppData\Local\Temp\pytest-of-runneradmin\pytest-0\test_benchy_sensitivity_and_de0\actions.json
-[config] reloaded C:\Users\runneradmin\AppData\Local\Temp\pytest-of-runneradmin\pytest-0\test_benchy_sensitivity_and_de0\actions.json
-[config] saved C:\Users\runneradmin\AppData\Local\Temp\pytest-of-runneradmin\pytest-0\test_benchy_sensitivity_and_de0\actions.json
-[config] reloaded C:\Users\runneradmin\AppData\Local\Temp\pytest-of-runneradmin\pytest-0\test_benchy_sensitivity_and_de0\actions.json
-[config] saved C:\Users\runneradmin\AppData\Local\Temp\pytest-of-runneradmin\pytest-0\test_benchy_sensitivity_and_de0\actions.json
-[config] reloaded C:\Users\runneradmin\AppData\Local\Temp\pytest-of-runneradmin\pytest-0\test_benchy_sensitivity_and_de0\actions.json
-[config] saved C:\Users\runneradmin\AppData\Local\Temp\pytest-of-runneradmin\pytest-0\test_benchy_sensitivity_and_de0\actions.json
-[config] reloaded C:\Users\runneradmin\AppData\Local\Temp\pytest-of-runneradmin\pytest-0\test_benchy_sensitivity_and_de0\actions.json
-[config] saved C:\Users\runneradmin\AppData\Local\Temp\pytest-of-runneradmin\pytest-0\test_benchy_sensitivity_and_de0\actions.json
-[config] reloaded C:\Users\runneradmin\AppData\Local\Temp\pytest-of-runneradmin\pytest-0\test_benchy_sensitivity_and_de0\actions.json
-[config] saved C:\Users\runneradmin\AppData\Local\Temp\pytest-of-runneradmin\pytest-0\test_benchy_sensitivity_and_de0\actions.json
-[config] reloaded C:\Users\runneradmin\AppData\Local\Temp\pytest-of-runneradmin\pytest-0\test_benchy_sensitivity_and_de0\actions.json
-[config] saved C:\Users\runneradmin\AppData\Local\Temp\pytest-of-runneradmin\pytest-0\test_benchy_sensitivity_and_de0\actions.json
-[config] reloaded C:\Users\runneradmin\AppData\Local\Temp\pytest-of-runneradmin\pytest-0\test_benchy_sensitivity_and_de0\actions.json
-[config] saved C:\Users\runneradmin\AppData\Local\Temp\pytest-of-runneradmin\pytest-0\test_benchy_sensitivity_and_de0\actions.json
-[config] reloaded C:\Users\runneradmin\AppData\Local\Temp\pytest-of-runneradmin\pytest-0\test_benchy_sensitivity_and_de0\actions.json
-[config] saved C:\Users\runneradmin\AppData\Local\Temp\pytest-of-runneradmin\pytest-0\test_benchy_sensitivity_and_de0\actions.json
-[config] reloaded C:\Users\runneradmin\AppData\Local\Temp\pytest-of-runneradmin\pytest-0\test_benchy_sensitivity_and_de0\actions.json
-[config] saved C:\Users\runneradmin\AppData\Local\Temp\pytest-of-runneradmin\pytest-0\test_benchy_sensitivity_and_de0\actions.json
-[config] reloaded C:\Users\runneradmin\AppData\Local\Temp\pytest-of-runneradmin\pytest-0\test_benchy_sensitivity_and_de0\actions.json
-[config] saved C:\Users\runneradmin\AppData\Local\Temp\pytest-of-runneradmin\pytest-0\test_benchy_sensitivity_and_de0\actions.json
-[config] reloaded C:\Users\runneradmin\AppData\Local\Temp\pytest-of-runneradmin\pytest-0\test_benchy_sensitivity_and_de0\actions.json
-[config] saved C:\Users\runneradmin\AppData\Local\Temp\pytest-of-runneradmin\pytest-0\test_benchy_sensitivity_and_de0\actions.json
-[config] reloaded C:\Users\runneradmin\AppData\Local\Temp\pytest-of-runneradmin\pytest-0\test_benchy_sensitivity_and_de0\actions.json
-[config] saved C:\Users\runneradmin\AppData\Local\Temp\pytest-of-runneradmin\pytest-0\test_benchy_sensitivity_and_de0\actions.json
-[config] reloaded C:\Users\runneradmin\AppData\Local\Temp\pytest-of-runneradmin\pytest-0\test_benchy_sensitivity_and_de0\actions.json
-[config] saved C:\Users\runneradmin\AppData\Local\Temp\pytest-of-runneradmin\pytest-0\test_benchy_sensitivity_and_de0\actions.json
-[config] reloaded C:\Users\runneradmin\AppData\Local\Temp\pytest-of-runneradmin\pytest-0\test_benchy_sensitivity_and_de0\actions.json
-[config] saved C:\Users\runneradmin\AppData\Local\Temp\pytest-of-runneradmin\pytest-0\test_benchy_sensitivity_and_de0\actions.json
-[config] reloaded C:\Users\runneradmin\AppData\Local\Temp\pytest-of-runneradmin\pytest-0\test_benchy_sensitivity_and_de0\actions.json
-[config] saved C:\Users\runneradmin\AppData\Local\Temp\pytest-of-runneradmin\pytest-0\test_benchy_sensitivity_and_de0\actions.json
-[config] reloaded C:\Users\runneradmin\AppData\Local\Temp\pytest-of-runneradmin\pytest-0\test_benchy_sensitivity_and_de0\actions.json
-[config] saved C:\Users\runneradmin\AppData\Local\Temp\pytest-of-runneradmin\pytest-0\test_benchy_sensitivity_and_de0\actions.json
-[config] reloaded C:\Users\runneradmin\AppData\Local\Temp\pytest-of-runneradmin\pytest-0\test_benchy_sensitivity_and_de0\actions.json
-[config] saved C:\Users\runneradmin\AppData\Local\Temp\pytest-of-runneradmin\pytest-0\test_benchy_sensitivity_and_de0\actions.json
-[config] reloaded C:\Users\runneradmin\AppData\Local\Temp\pytest-of-runneradmin\pytest-0\test_benchy_sensitivity_and_de0\actions.json
-[config] saved C:\Users\runneradmin\AppData\Local\Temp\pytest-of-runneradmin\pytest-0\test_benchy_sensitivity_and_de0\actions.json
-[config] reloaded C:\Users\runneradmin\AppData\Local\Temp\pytest-of-runneradmin\pytest-0\test_benchy_sensitivity_and_de0\actions.json
-[config] saved C:\Users\runneradmin\AppData\Local\Temp\pytest-of-runneradmin\pytest-0\test_benchy_sensitivity_and_de0\actions.json
-[config] reloaded C:\Users\runneradmin\AppData\Local\Temp\pytest-of-runneradmin\pytest-0\test_benchy_sensitivity_and_de0\actions.json
-[config] saved C:\Users\runneradmin\AppData\Local\Temp\pytest-of-runneradmin\pytest-0\test_benchy_sensitivity_and_de0\actions.json
-[config] reloaded C:\Users\runneradmin\AppData\Local\Temp\pytest-of-runneradmin\pytest-0\test_benchy_sensitivity_and_de0\actions.json
-[config] saved C:\Users\runneradmin\AppData\Local\Temp\pytest-of-runneradmin\pytest-0\test_benchy_sensitivity_and_de0\actions.json
-[config] reloaded C:\Users\runneradmin\AppData\Local\Temp\pytest-of-runneradmin\pytest-0\test_benchy_sensitivity_and_de0\actions.json
-[config] saved C:\Users\runneradmin\AppData\Local\Temp\pytest-of-runneradmin\pytest-0\test_benchy_sensitivity_and_de0\actions.json
-[config] reloaded C:\Users\runneradmin\AppData\Local\Temp\pytest-of-runneradmin\pytest-0\test_benchy_sensitivity_and_de0\actions.json
-[config] saved C:\Users\runneradmin\AppData\Local\Temp\pytest-of-runneradmin\pytest-0\test_benchy_sensitivity_and_de0\actions.json
-[config] reloaded C:\Users\runneradmin\AppData\Local\Temp\pytest-of-runneradmin\pytest-0\test_benchy_sensitivity_and_de0\actions.json
-[config] saved C:\Users\runneradmin\AppData\Local\Temp\pytest-of-runneradmin\pytest-0\test_benchy_sensitivity_and_de0\actions.json
-[config] reloaded C:\Users\runneradmin\AppData\Local\Temp\pytest-of-runneradmin\pytest-0\test_benchy_sensitivity_and_de0\actions.json
-[config] saved C:\Users\runneradmin\AppData\Local\Temp\pytest-of-runneradmin\pytest-0\test_benchy_sensitivity_and_de0\actions.json
-[config] reloaded C:\Users\runneradmin\AppData\Local\Temp\pytest-of-runneradmin\pytest-0\test_benchy_sensitivity_and_de0\actions.json
-[config] saved C:\Users\runneradmin\AppData\Local\Temp\pytest-of-runneradmin\pytest-0\test_benchy_sensitivity_and_de0\actions.json
-[config] reloaded C:\Users\runneradmin\AppData\Local\Temp\pytest-of-runneradmin\pytest-0\test_benchy_sensitivity_and_de0\actions.json
-[config] saved C:\Users\runneradmin\AppData\Local\Temp\pytest-of-runneradmin\pytest-0\test_benchy_sensitivity_and_de0\actions.json
-[config] reloaded C:\Users\runneradmin\AppData\Local\Temp\pytest-of-runneradmin\pytest-0\test_benchy_sensitivity_and_de0\actions.json
-[config] saved C:\Users\runneradmin\AppData\Local\Temp\pytest-of-runneradmin\pytest-0\test_benchy_sensitivity_and_de0\actions.json
-[config] reloaded C:\Users\runneradmin\AppData\Local\Temp\pytest-of-runneradmin\pytest-0\test_benchy_sensitivity_and_de0\actions.json
-[config] saved C:\Users\runneradmin\AppData\Local\Temp\pytest-of-runneradmin\pytest-0\test_benchy_sensitivity_and_de0\actions.json
-[config] reloaded C:\Users\runneradmin\AppData\Local\Temp\pytest-of-runneradmin\pytest-0\test_benchy_sensitivity_and_de0\actions.json
-[config] saved C:\Users\runneradmin\AppData\Local\Temp\pytest-of-runneradmin\pytest-0\test_benchy_sensitivity_and_de0\actions.json
-[config] reloaded C:\Users\runneradmin\AppData\Local\Temp\pytest-of-runneradmin\pytest-0\test_benchy_sensitivity_and_de0\actions.json
-[config] saved C:\Users\runneradmin\AppData\Local\Temp\pytest-of-runneradmin\pytest-0\test_benchy_sensitivity_and_de0\actions.json
-[config] reloaded C:\Users\runneradmin\AppData\Local\Temp\pytest-of-runneradmin\pytest-0\test_benchy_sensitivity_and_de0\actions.json
-[config] saved C:\Users\runneradmin\AppData\Local\Temp\pytest-of-runneradmin\pytest-0\test_benchy_sensitivity_and_de0\actions.json
-[config] reloaded C:\Users\runneradmin\AppData\Local\Temp\pytest-of-runneradmin\pytest-0\test_benchy_sensitivity_and_de0\actions.json
-[config] saved C:\Users\runneradmin\AppData\Local\Temp\pytest-of-runneradmin\pytest-0\test_benchy_sensitivity_and_de0\actions.json
-[config] reloaded C:\Users\runneradmin\AppData\Local\Temp\pytest-of-runneradmin\pytest-0\test_benchy_sensitivity_and_de0\actions.json
-[config] saved C:\Users\runneradmin\AppData\Local\Temp\pytest-of-runneradmin\pytest-0\test_benchy_sensitivity_and_de0\actions.json
-[config] reloaded C:\Users\runneradmin\AppData\Local\Temp\pytest-of-runneradmin\pytest-0\test_benchy_sensitivity_and_de0\actions.json
-[config] saved C:\Users\runneradmin\AppData\Local\Temp\pytest-of-runneradmin\pytest-0\test_benchy_sensitivity_and_de0\actions.json
-[config] reloaded C:\Users\runneradmin\AppData\Local\Temp\pytest-of-runneradmin\pytest-0\test_benchy_sensitivity_and_de0\actions.json
-[config] saved C:\Users\runneradmin\AppData\Local\Temp\pytest-of-runneradmin\pytest-0\test_benchy_sensitivity_and_de0\actions.json
-[config] reloaded C:\Users\runneradmin\AppData\Local\Temp\pytest-of-runneradmin\pytest-0\test_benchy_sensitivity_and_de0\actions.json
-[config] saved C:\Users\runneradmin\AppData\Local\Temp\pytest-of-runneradmin\pytest-0\test_benchy_sensitivity_and_de0\actions.json
-[config] saved C:\Users\runneradmin\AppData\Local\Temp\pytest-of-runneradmin\pytest-0\test_benchy_sensitivity_and_de0\actions.json
-[config] reloaded C:\Users\runneradmin\AppData\Local\Temp\pytest-of-runneradmin\pytest-0\test_benchy_sensitivity_and_de0\actions.json
-[config] reloaded C:\Users\runneradmin\AppData\Local\Temp\pytest-of-runneradmin\pytest-0\test_benchy_sensitivity_and_de0\actions.json
-[config] saved C:\Users\runneradmin\AppData\Local\Temp\pytest-of-runneradmin\pytest-0\test_benchy_sensitivity_and_de0\actions.json
-[config] reloaded C:\Users\runneradmin\AppData\Local\Temp\pytest-of-runneradmin\pytest-0\test_benchy_sensitivity_and_de0\actions.json
-[config] saved C:\Users\runneradmin\AppData\Local\Temp\pytest-of-runneradmin\pytest-0\test_benchy_sensitivity_and_de0\actions.json
-[config] reloaded C:\Users\runneradmin\AppData\Local\Temp\pytest-of-runneradmin\pytest-0\test_benchy_sensitivity_and_de0\actions.json
-[config] saved C:\Users\runneradmin\AppData\Local\Temp\pytest-of-runneradmin\pytest-0\test_benchy_sensitivity_and_de0\actions.json
-[config] reloaded C:\Users\runneradmin\AppData\Local\Temp\pytest-of-runneradmin\pytest-0\test_benchy_sensitivity_and_de0\actions.json
-[config] saved C:\Users\runneradmin\AppData\Local\Temp\pytest-of-runneradmin\pytest-0\test_benchy_sensitivity_and_de0\actions.json
-[config] reloaded C:\Users\runneradmin\AppData\Local\Temp\pytest-of-runneradmin\pytest-0\test_benchy_sensitivity_and_de0\actions.json
-[config] saved C:\Users\runneradmin\AppData\Local\Temp\pytest-of-runneradmin\pytest-0\test_benchy_sensitivity_and_de0\actions.json
-[config] reloaded C:\Users\runneradmin\AppData\Local\Temp\pytest-of-runneradmin\pytest-0\test_benchy_sensitivity_and_de0\actions.json
-[config] saved C:\Users\runneradmin\AppData\Local\Temp\pytest-of-runneradmin\pytest-0\test_benchy_sensitivity_and_de0\actions.json
-[config] reloaded C:\Users\runneradmin\AppData\Local\Temp\pytest-of-runneradmin\pytest-0\test_benchy_sensitivity_and_de0\actions.json
-[config] saved C:\Users\runneradmin\AppData\Local\Temp\pytest-of-runneradmin\pytest-0\test_benchy_sensitivity_and_de0\actions.json
-[ws] client disconnected (0 total)
-[config] reloaded C:\Users\runneradmin\AppData\Local\Temp\pytest-of-runneradmin\pytest-0\test_benchy_sensitivity_and_de0\actions.json
-[sock] server shutting down
+[updater] Service is up to date.
 - generated xml file: D:\a\linapse-cad-mouse-v2\linapse-cad-mouse-v2\pytest_windows_results.xml -
 =========================== short test summary info ===========================
-FAILED service/test_playwright_benchy.py::test_benchy_sensitivity_and_dead_zones - AssertionError: Inversion of z failed: expected 20.0, got -20.0
-assert 40.0 < 0.1
- +  where 40.0 = abs((-20.0 - 20.0))
-============= 1 failed, 25 passed, 47 skipped in 69.28s (0:01:09) =============
+FAILED service/test_playwright_benchy.py::test_viewport_motion_y_inversion - playwright._impl._errors.TimeoutError: Page.reload: Timeout 30000ms exceeded.
+Call log:
+  - waiting for navigation until "load"
+    - navigated to "http://localhost:55241/index.html"
+============ 1 failed, 62 passed, 52 skipped in 315.93s (0:05:15) =============

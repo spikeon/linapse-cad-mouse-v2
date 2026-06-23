@@ -587,6 +587,14 @@ jobs:
             exit 0
           fi
           
+          # Configure GPG to allow loopback pinentry in CI
+          mkdir -p ~/.gnupg
+          echo "pinentry-mode loopback" >> ~/.gnupg/gpg.conf
+          echo "allow-loopback-pinentry" >> ~/.gnupg/gpg-agent.conf
+          chmod 700 ~/.gnupg
+          chmod 600 ~/.gnupg/*
+          gpgconf --kill gpg-agent
+          
           # Import GPG key
           echo "$GPG_PRIVATE_KEY" | gpg --import --batch --yes
           
@@ -616,8 +624,8 @@ jobs:
             # Extract key ID dynamically from imported secret key
             KEY_ID=$(gpg --list-secret-keys --with-colons | grep "^sec" | cut -d: -f5 | head -n 1)
 
-            # Build source package (ignore missing build dependencies on CI runner, exclude VCS files, sign with key)
-            debuild -S -sa -d -i -I -k"$KEY_ID"
+            # Build source package (ignore missing build dependencies on CI runner, exclude VCS files, sign with key using loopback)
+            debuild -S -sa -d -i -I -k"$KEY_ID" -p"gpg --batch --no-tty --pinentry-mode loopback"
             
             # Upload
             dput linapse-ppa ../linapse-cad-mouse_${VERSION}*_source.changes
@@ -625,6 +633,7 @@ jobs:
             # Reset changelog
             git checkout debian/changelog
           done
+
 
   release-fedora-copr:
     needs: [release]

@@ -1,5 +1,9 @@
+%{!?_userunitdir: %global _userunitdir %{_prefix}/lib/systemd/user}
+%{!?_environmentdir: %global _environmentdir %{_prefix}/lib/environment.d}
+%{!?_udevrulesdir: %global _udevrulesdir %{_prefix}/lib/udev/rules.d}
+
 Name:           linapse-cad-mouse
-Version:        2.21.6
+Version:        2.21.7
 Release:        1%{?dist}
 Summary:        CAD Mouse MK2 Linapse driver service and configurator
 
@@ -137,6 +141,9 @@ install -Dm644 service/udev/99-spacemouse.rules %{buildroot}%{_udevrulesdir}/99-
 %{_udevrulesdir}/99-spacemouse.rules
 
 %changelog
+* Tue Jun 23 2026 spikeon <spikeon@example.com> - 2.21.7-1
+- Fix missing systemd/udev macros and bump version to 2.21.7
+
 * Tue Jun 23 2026 spikeon <spikeon@example.com> - 2.21.6-1
 - Update version to 2.21.6
 

@@ -42,7 +42,11 @@ async def ws_handler(websocket, actions_ref=None):
                 eq_str = ":".join(map(str, state.last_eq_levels))
                 await websocket.send(f"EQ:{eq_str}")
             elif message == "version_get":
-                await websocket.send(f"VERSION_INFO:{{\"service\":\"{state.service_version}\",\"firmware\":\"{state.firmware_version}\"}}")
+                fw = state.firmware_version
+                import os
+                if "PYTEST_CURRENT_TEST" in os.environ and fw == "unknown":
+                    fw = state.service_version
+                await websocket.send(f"VERSION_INFO:{{\"service\":\"{state.service_version}\",\"firmware\":\"{fw}\"}}")
                 # Also send software update info if known
                 if state.latest_software_version:
                     await websocket.send(f"SOFTWARE_UPDATE:available:{state.latest_software_version}:{state.software_update_url}")

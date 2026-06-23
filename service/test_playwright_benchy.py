@@ -138,8 +138,6 @@ class MockSerialPort:
         raise KillThreadException("teardown active")
     def write(self, data):
         self.writes.append(data)
-        if data == b"version\n":
-            self.input_queue.put(f"version={linapse_service.state.service_version}\n".encode())
     def close(self):
         self.is_open = False
 

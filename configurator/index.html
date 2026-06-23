@@ -975,25 +975,6 @@ input[type=range]::-webkit-slider-thumb {
 <div class="titlebar">
   <div class="brand"><img src="linapse-header-logo.png" alt="Linapse Logo" style="height: 24px; display: block;"></div>
   <div class="device-name">CAD Mouse MK2</div>
-  <div class="conn-status" id="connStatus">
-    <div class="conn-dot" id="connDot"></div>
-    <span id="connText">Disconnected</span>
-  </div>
-  <button class="btn-connect" id="btnConnect" onclick="toggleConnect()">Connect</button>
-</div>
-
-<!-- Software Update Banner -->
-<div id="swUpdateBanner" style="display: none; width: 100%; background: rgba(0, 255, 136, 0.1); border-bottom: 1px solid var(--green); padding: 10px 20px; box-sizing: border-box; align-items: center; justify-content: space-between; gap: 15px; font-family: 'Rajdhani', sans-serif; transition: all 0.3s ease;">
-  <div id="swUpdateText" style="display: flex; align-items: center; gap: 10px; color: var(--green); font-weight: 700; font-size: 14px; text-transform: uppercase; letter-spacing: 1px;">
-    🚀 Software Update Available: <span id="swUpdateVersion">vX.Y.Z</span>
-  </div>
-  <div style="display: flex; align-items: center; gap: 10px;">
-    <div id="swUpdateProgressContainer" style="display: none; width: 120px; background: rgba(255,255,255,0.1); height: 6px; border-radius: 3px; overflow: hidden;">
-      <div id="swUpdateProgressBar" style="width: 0%; height: 100%; background: var(--green); transition: width 0.1s ease;"></div>
-    </div>
-    <button id="btnSwUpdateStart" onclick="startSoftwareUpdate()" style="background: var(--green); color: #000; border: none; border-radius: 4px; padding: 6px 16px; font-weight: 700; font-size: 11px; cursor: pointer; text-transform: uppercase; font-family: 'Rajdhani'; letter-spacing: 0.5px; transition: opacity 0.2s;">Update Now</button>
-    <button onclick="closeSwUpdateBanner()" style="background: transparent; color: var(--text3); border: none; cursor: pointer; font-size: 14px; outline: none; margin-left: 5px;">✕</button>
-  </div>
 </div>
 
 <!-- Tab bar -->
@@ -1651,10 +1632,26 @@ input[type=range]::-webkit-slider-thumb {
 </div>
 
 <!-- Footer -->
-<div class="footer">
+<div class="footer" style="position: relative;">
   <button class="btn-footer" onclick="loadActionsFile()">Load Profile</button>
   <button class="btn-footer" onclick="saveActionsFile()">Save Profile</button>
-  <div class="footer-status" id="footerStatus">No profile loaded</div>
+  
+  <div class="footer-center" style="display: flex; align-items: center; gap: 10px; position: absolute; left: 50%; transform: translateX(-50%); font-family: 'Rajdhani', sans-serif; font-size: 12px; font-weight: 700; color: var(--text3); letter-spacing: 0.5px;">
+    <span id="footerVersionDisplay">v2.21.2</span>
+    <span id="swUpdateText" style="display: none; color: var(--green); margin-left: 10px;"></span>
+    <div id="swUpdateProgressContainer" style="display: none; width: 80px; background: rgba(255,255,255,0.1); height: 6px; border-radius: 3px; overflow: hidden; margin-left: 10px;">
+      <div id="swUpdateProgressBar" style="width: 0%; height: 100%; background: var(--green); transition: width 0.1s ease;"></div>
+    </div>
+    <button id="btnSwUpdateStart" onclick="startSoftwareUpdate()" style="display: none; background: var(--green); color: #000; border: none; border-radius: 4px; padding: 3px 10px; font-weight: 700; font-size: 10px; cursor: pointer; text-transform: uppercase; font-family: 'Rajdhani'; letter-spacing: 0.5px; transition: opacity 0.2s; margin-left: 10px;">Update Now</button>
+  </div>
+
+  <div class="footer-right" style="margin-left: auto; display: flex; align-items: center; gap: 15px;">
+    <div class="footer-status" id="footerStatus">No profile loaded</div>
+    <div class="conn-status" id="connStatus">
+      <div class="conn-dot" id="connDot"></div>
+      <span id="connText">Disconnected</span>
+    </div>
+  </div>
 </div>
 
 <script>
@@ -3019,8 +3016,10 @@ function updateConnectionState() {
   document.getElementById('connStatus').classList.toggle('connected', deviceConnected);
   document.getElementById('connText').textContent = deviceConnected ? 'Connected' : 'Disconnected';
   const btn = document.getElementById('btnConnect');
-  btn.textContent = wsConnected ? 'Disconnect' : 'Connect';
-  btn.classList.toggle('connected', wsConnected);
+  if (btn) {
+    btn.textContent = wsConnected ? 'Disconnect' : 'Connect';
+    btn.classList.toggle('connected', wsConnected);
+  }
 }
 
 function sendCmd(cmd) {
@@ -4402,7 +4401,7 @@ function handleFlashMessage(msg) {
   }
 }
 
-let serviceVersion = '2.16.8';
+let serviceVersion = '2.21.2';
 let firmwareVersion = 'unknown';
 let wsConnected = false;
 
@@ -4410,6 +4409,9 @@ function handleVersionInfo(info) {
   serviceVersion = info.service || '2.10.5';
   firmwareVersion = info.firmware || 'unknown';
   updateConnectionState();
+  
+  const verDisp = document.getElementById('footerVersionDisplay');
+  if (verDisp) verDisp.textContent = 'v' + serviceVersion;
   
   const badge = document.getElementById('fwBadge');
   const notice = document.getElementById('fwUpdateNotice');
@@ -4454,7 +4456,6 @@ function compareVersions(v1, v2) {
 let latestSoftwareUrl = '';
 
 function handleSoftwareUpdateMessage(msg) {
-  const banner = document.getElementById('swUpdateBanner');
   const text = document.getElementById('swUpdateText');
   const progressContainer = document.getElementById('swUpdateProgressContainer');
   const progressBar = document.getElementById('swUpdateProgressBar');
@@ -4467,31 +4468,41 @@ function handleSoftwareUpdateMessage(msg) {
     const ver = parts[2];
     latestSoftwareUrl = parts.slice(3).join(':');
     
-    document.getElementById('swUpdateVersion').textContent = ver;
-    text.innerHTML = `🚀 Software Update Available: <strong>v${ver}</strong>`;
-    banner.style.display = 'flex';
-    btnStart.style.display = 'block';
-    progressContainer.style.display = 'none';
+    if (text) {
+      text.innerHTML = `Update Available: <strong>v${ver}</strong>`;
+      text.style.display = 'inline';
+    }
+    if (btnStart) btnStart.style.display = 'block';
+    if (progressContainer) progressContainer.style.display = 'none';
   } else if (msg.startsWith('SOFTWARE_UPDATE:downloading:')) {
     const percent = msg.split(':')[2];
-    banner.style.display = 'flex';
-    btnStart.style.display = 'none';
-    progressContainer.style.display = 'block';
-    text.textContent = `Downloading Software Update... ${percent}%`;
-    progressBar.style.width = percent + '%';
+    if (btnStart) btnStart.style.display = 'none';
+    if (progressContainer) progressContainer.style.display = 'block';
+    if (text) {
+      text.textContent = `Downloading... ${percent}%`;
+      text.style.display = 'inline';
+    }
+    if (progressBar) progressBar.style.width = percent + '%';
   } else if (msg === 'SOFTWARE_UPDATE:ready') {
-    banner.style.display = 'flex';
-    btnStart.style.display = 'none';
-    progressContainer.style.display = 'none';
-    text.textContent = 'Update Ready! Applying update and restarting...';
+    if (btnStart) btnStart.style.display = 'none';
+    if (progressContainer) progressContainer.style.display = 'none';
+    if (text) {
+      text.textContent = 'Update Ready! Restarting...';
+      text.style.display = 'inline';
+    }
   } else if (msg.startsWith('SOFTWARE_UPDATE:failed:')) {
     const reason = msg.slice(23);
     showToast('Update Failed', reason, 'error');
-    btnStart.style.display = 'block';
-    progressContainer.style.display = 'none';
-    text.innerHTML = `🚀 Update failed. Click Update to retry.`;
+    if (btnStart) btnStart.style.display = 'block';
+    if (progressContainer) progressContainer.style.display = 'none';
+    if (text) {
+      text.innerHTML = `Update failed.`;
+      text.style.display = 'inline';
+    }
   } else if (msg === 'SOFTWARE_UPDATE:idle') {
-    banner.style.display = 'none';
+    if (text) text.style.display = 'none';
+    if (btnStart) btnStart.style.display = 'none';
+    if (progressContainer) progressContainer.style.display = 'none';
   }
 }
 
@@ -4500,10 +4511,6 @@ function startSoftwareUpdate() {
   document.getElementById('swUpdateProgressContainer').style.display = 'block';
   document.getElementById('swUpdateText').textContent = 'Downloading Software Update...';
   sendCmd('software_update_start');
-}
-
-function closeSwUpdateBanner() {
-  document.getElementById('swUpdateBanner').style.display = 'none';
 }
 
 function toggleAutoUpdateFw() {

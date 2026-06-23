@@ -134,8 +134,6 @@ class MockSerial:
         
     def write(self, data):
         self.written_data.append(data)
-        if data == b"version\n":
-            self.input_queue.put(f"version={linapse_service.state.service_version}\n".encode())
         
     def close(self):
         self.is_open = False

@@ -10,6 +10,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 - **Motion Kalman Anti-Windup**: Added anti-windup clamping to the Kalman filter state in the firmware, reducing response latency when reversing/releasing maximum deflections.
 
+### Changed
+- **Configurator Footer Revamp**: Removed the manual connect/disconnect button in favor of transparent background auto-connection. Moved connection status (dot and text) to the footer bottom-right, and added running version number and software update button to the footer center.
+
 ## [2.21.1] - 2026-06-23
 
 ### Changed

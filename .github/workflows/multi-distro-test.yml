@@ -596,6 +596,12 @@ jobs:
             exit 0
           fi
           
+          # Configure GPG agent to allow loopback pinentry
+          mkdir -p ~/.gnupg
+          echo "allow-loopback-pinentry" >> ~/.gnupg/gpg-agent.conf
+          gpgconf --kill gpg-agent || true
+          gpg-connect-agent reloadagent /bye || true
+          
           # Create GPG wrapper script to inject loopback pinentry and empty passphrase non-interactively
           echo '#!/bin/sh' > ~/gpg-wrapper.sh
           echo 'exec gpg --batch --no-tty --pinentry-mode loopback --passphrase "" "$@"' >> ~/gpg-wrapper.sh

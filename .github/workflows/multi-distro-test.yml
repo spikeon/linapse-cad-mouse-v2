@@ -598,6 +598,11 @@ jobs:
           # Import GPG key
           echo "$GPG_PRIVATE_KEY" | gpg --import --batch --yes
           
+          # Create GPG wrapper script to avoid stdin exhaustion and shell escaping issues in debsign
+          echo '#!/bin/sh' > ~/.gnupg/gpg-wrapper.sh
+          echo 'exec gpg --batch --no-tty --pinentry-mode loopback --passphrase "" "$@"' >> ~/.gnupg/gpg-wrapper.sh
+          chmod +x ~/.gnupg/gpg-wrapper.sh
+          
           VERSION=$(cat VERSION | tr -d '\r\n[:space:]')
           
           # Configure dput
@@ -627,8 +632,8 @@ jobs:
             # Build source package unsigned (debuild + debsign)
             debuild -S -sa -d -i -I -us -uc
             
-            # Sign manually using debsign with loopback GPG options and empty passphrase from stdin
-            echo "" | debsign -k"$KEY_ID" -p"gpg --batch --no-tty --pinentry-mode loopback --passphrase-fd 0" ../linapse-cad-mouse_${VERSION}*_source.changes
+            # Sign manually using debsign with loopback GPG options via wrapper script
+            debsign -k"$KEY_ID" -p"$HOME/.gnupg/gpg-wrapper.sh" ../linapse-cad-mouse_${VERSION}*_source.changes
             
             # Upload
             dput linapse-ppa ../linapse-cad-mouse_${VERSION}*_source.changes

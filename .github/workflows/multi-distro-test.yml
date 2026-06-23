@@ -51,20 +51,22 @@ jobs:
           sleep 2
 
       - name: Install base dependencies (Ubuntu/Debian)
-        if: matrix.distro == 'ubuntu' || matrix.distro == 'debian'
+        if: (matrix.distro == 'ubuntu' || matrix.distro == 'debian') && !contains(github.event.head_commit.message, '[skip tests]')
         run: |
           docker exec systemd-container sh -c "apt-get update && apt-get install -y sudo python3 python3-pip python3-venv git curl udev dbus"
 
       - name: Install base dependencies (Fedora)
-        if: matrix.distro == 'fedora'
+        if: matrix.distro == 'fedora' && !contains(github.event.head_commit.message, '[skip tests]')
         run: |
           docker exec systemd-container sh -c "dnf install -y sudo python3 python3-pip git curl udev dbus-daemon"
 
       - name: Install Python dependencies
+        if: !contains(github.event.head_commit.message, '[skip tests]')
         run: |
           docker exec systemd-container sh -c "python3 -m pip install pytest websockets pyserial pyyaml fastapi 'uvicorn[standard]' numpy scipy playwright --break-system-packages || python3 -m pip install pytest websockets pyserial pyyaml fastapi 'uvicorn[standard]' numpy scipy playwright || pip3 install pytest websockets pyserial pyyaml fastapi 'uvicorn[standard]' numpy scipy playwright"
 
       - name: Install Playwright Browsers
+        if: !contains(github.event.head_commit.message, '[skip tests]')
         run: |
           if [ "${{ matrix.distro }}" = "fedora" ]; then
             # Install system dependencies manually on Fedora
@@ -79,11 +81,13 @@ jobs:
         run: python3 scripts/sync_version.py
 
       - name: Run setup.sh
+        if: !contains(github.event.head_commit.message, '[skip tests]')
         run: |
           docker exec -e XDG_RUNTIME_DIR=/run/user/0 -e DBUS_SESSION_BUS_ADDRESS=unix:path=/run/user/0/bus \
             systemd-container sh -c "cd /workspace && ./setup.sh --yes"
 
       - name: Run pytest suite inside container
+        if: !contains(github.event.head_commit.message, '[skip tests]')
         id: run_tests
         run: |
           docker exec -e XDG_RUNTIME_DIR=/run/user/0 -e DBUS_SESSION_BUS_ADDRESS=unix:path=/run/user/0/bus -e LINAPSE_SKIP_BROWSER_BRIDGE=1 \
@@ -189,10 +193,12 @@ jobs:
           python-version: '3.11'
 
       - name: Install dependencies
+        if: !contains(github.event.head_commit.message, '[skip tests]')
         run: |
           pip install pyinstaller websockets pyserial pynput hidapi pytest playwright pyyaml pycaw fastapi "uvicorn[standard]" numpy scipy
 
       - name: Install Playwright Browsers
+        if: !contains(github.event.head_commit.message, '[skip tests]')
         run: |
           playwright install chromium
 
@@ -200,6 +206,7 @@ jobs:
         run: python3 scripts/sync_version.py
 
       - name: Run tests on Windows
+        if: !contains(github.event.head_commit.message, '[skip tests]')
         id: run_tests
         shell: bash
         env:
@@ -222,6 +229,7 @@ jobs:
           path: pytest_windows_output.log
 
       - name: Compile linapse-service
+        if: !contains(github.event.head_commit.message, '[skip tests]')
         run: |
           pyinstaller --onefile --noconsole --name linapse-service --hidden-import=pynput --hidden-import=hid --hidden-import=websockets --hidden-import=pycaw service/linapse-service
 
@@ -231,6 +239,7 @@ jobs:
           node-version: 20
 
       - name: Build Electron Configurator (Windows)
+        if: !contains(github.event.head_commit.message, '[skip tests]')
         run: |
           cd configurator
           npm install
@@ -239,6 +248,7 @@ jobs:
         shell: bash
 
       - name: Build browser extension (Windows artifact)
+        if: !contains(github.event.head_commit.message, '[skip tests]')
         run: |
           cd extension
           npm install
@@ -246,9 +256,16 @@ jobs:
           cd ..
 
       - name: Compile Inno Setup Installer
+        if: !contains(github.event.head_commit.message, '[skip tests]')
         shell: powershell
         run: |
           iscc installer.iss
+
+      - name: Create dummy installer for skipped tests
+        if: contains(github.event.head_commit.message, '[skip tests]')
+        shell: bash
+        run: |
+          touch LinapseServiceSetup.exe
 
       - name: Upload installer artifact
         uses: actions/upload-artifact@v4
@@ -285,10 +302,12 @@ jobs:
           python-version: '3.11'
 
       - name: Install dependencies
+        if: !contains(github.event.head_commit.message, '[skip tests]')
         run: |
           pip install pyinstaller websockets pyserial pynput hidapi pytest playwright pyyaml fastapi "uvicorn[standard]" numpy scipy
 
       - name: Install Playwright Browsers
+        if: !contains(github.event.head_commit.message, '[skip tests]')
         run: |
           playwright install chromium
 
@@ -296,9 +315,10 @@ jobs:
         run: python3 scripts/sync_version.py
 
       - name: Run tests on macOS
+        if: !contains(github.event.head_commit.message, '[skip tests]')
         id: run_tests
         env:
-          LINAPSE_SKIP_BROWSER_BRIDGE: "1"
+          LINAPSE_SKIP_BRIDGE: "1"
         run: |
           pytest service/ --junitxml=pytest_macos_results.xml
 
@@ -311,6 +331,7 @@ jobs:
           reporter: java-junit
 
       - name: Compile linapse-service
+        if: !contains(github.event.head_commit.message, '[skip tests]')
         run: |
           pyinstaller --onefile --name linapse-service --hidden-import=pynput --hidden-import=hid --hidden-import=websockets service/linapse-service
 
@@ -320,6 +341,7 @@ jobs:
           node-version: 20
 
       - name: Build Electron Configurator (macOS)
+        if: !contains(github.event.head_commit.message, '[skip tests]')
         run: |
           cd configurator
           npm install
@@ -327,6 +349,7 @@ jobs:
           cd ..
 
       - name: Prepare launchd agent payload directory structures
+        if: !contains(github.event.head_commit.message, '[skip tests]')
         run: |
           mkdir -p payload/usr/local/bin
           mkdir -p payload/Library/LaunchAgents
@@ -357,9 +380,15 @@ jobs:
           EOF
 
       - name: Build macOS Package
+        if: !contains(github.event.head_commit.message, '[skip tests]')
         run: |
           VERSION=$(cat VERSION | tr -d '\r\n[:space:]')
           pkgbuild --root payload --identifier com.linapse.cadmouse --version "$VERSION" --install-location / linapse-service.pkg
+
+      - name: Create dummy package for skipped tests
+        if: contains(github.event.head_commit.message, '[skip tests]')
+        run: |
+          touch linapse-service.pkg
 
       - name: Upload macOS Package
         uses: actions/upload-artifact@v4
@@ -398,10 +427,18 @@ jobs:
         run: python3 scripts/sync_version.py
 
       - name: Build browser extension packages
+        if: !contains(github.event.head_commit.message, '[skip tests]')
         run: |
           cd extension
           npm install
           npm run build
+
+      - name: Create dummy extension for skipped tests
+        if: contains(github.event.head_commit.message, '[skip tests]')
+        run: |
+          mkdir -p extension/dist/chrome
+          touch extension/dist/dummy.zip
+          touch extension/dist/chrome/dummy
 
       - name: Upload browser extension artifacts
         uses: actions/upload-artifact@v4

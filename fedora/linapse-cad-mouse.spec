@@ -3,7 +3,7 @@
 %{!?_udevrulesdir: %global _udevrulesdir %{_prefix}/lib/udev/rules.d}
 
 Name:           linapse-cad-mouse
-Version:        2.21.27
+Version:        2.21.28
 Release:        1%{?dist}
 Summary:        CAD Mouse MK2 Linapse driver service and configurator
 
@@ -141,6 +141,9 @@ install -Dm644 service/udev/99-spacemouse.rules %{buildroot}%{_udevrulesdir}/99-
 %{_udevrulesdir}/99-spacemouse.rules
 
 %changelog
+* Tue Jun 23 2026 spikeon <spikeon@example.com> - 2.21.28-1
+- Correct Launchpad PPA dput directory path format to username/ppa-name/ubuntu/ and bump version to 2.21.28
+
 * Tue Jun 23 2026 spikeon <spikeon@example.com> - 2.21.27-1
 - Fix dput incoming path trailing slash and set passive_ftp, and bump version to 2.21.27
 

@@ -23,7 +23,7 @@
 
 ## Features
 
-- **Profiles & Configurable Modes** (Default, Browser, Media, and custom modes)
+- **Profiles & Configurable Modes** (Default, Browser, Media, Mouse, and custom modes)
 - Tap Gestures
 - On-The-Fly Configuration Changes
 - Web GUI
@@ -42,7 +42,7 @@
 
 - **6DoF motion in OnShape, SketchUp Web, and Native apps.** Motion coordinates are decoded in firmware and sent via USB serial to `linapse-service`. On Linux, the service processes the motion and exposes it through a user-space UNIX socket, eliminating the need for system-wide `spacenavd`, allowing native apps (Blender, FreeCAD, OrcaSlicer, etc.) to connect directly. On Windows and macOS, the service translates 6DoF motion and injects it as standard OS mouse/keyboard inputs via the `pynput` library. On all platforms, a WebSocket bridge plus the official Linapse Browser Connector extension carry motion into browser apps (OnShape, SketchUp Web).
 - **Physical buttons, taps, and gestures.** The host service maps physical button clicks (including single click, double click, and multi-click actions), button chords, and cap-tap gestures to keystrokes, mouse events, custom shell commands, macros, or profile/mode switches.
-- **Configurable modes & input suppression.** In specialized modes like **Browser** and **Media**, standard 6DoF translation/rotation reports are suppressed. Browser Mode maps the puck's pitch rotation to web page scrolling and physical buttons to browser tab navigation. Media Mode maps puck pitch to system volume control, puck twist to scrubbing, and buttons to track navigation.
+- **Configurable modes & input suppression.** In specialized modes like **Browser**, **Media**, and **Mouse**, standard 6DoF translation/rotation reports are suppressed. Browser Mode maps the puck's pitch rotation to web page scrolling and physical buttons to browser tab navigation. Media Mode maps puck pitch to system volume control, puck twist to scrubbing, and buttons to track navigation. Mouse Mode maps translation and rotation directly to OS mouse cursor movements, buttons to left/right clicks, and top tap to left/right clicks.
 - **Addressable RGB lighting.** SK6812 LEDs with multiple effects (solid, breathing, motion-reactive, swirls) configured live per-mode.
 - **Linapse Electron configurator.** An Electron UI to manage modes, remap buttons/taps, design lighting, and tune the motion filter — with a live 3D Benchy viewport you can push around with the puck to feel sensitivity changes in real time.
 

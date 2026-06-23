@@ -20,6 +20,8 @@ DIR_MAP = {
 _rx_scroll_accumulator = 0.0
 _rz_scrub_accumulator = 0.0
 _rx_volume_accumulator = 0.0
+_mouse_x_accumulator = 0.0
+_mouse_y_accumulator = 0.0
 
 _hid_button_bits = 0
 
@@ -281,7 +283,7 @@ def serial_thread(actions_ref):
                                     z = 0.0
 
 
-                            if current_mode not in ("Browser", "Media"):
+                            if current_mode not in ("Browser", "Media", "Mouse"):
                                 state.broadcast_from_thread(f"MOTION:{x:.1f},{y:.1f},{z:.1f},{rx:.1f},{ry:.1f},{rz:.1f}")
 
                             if current_mode == "Browser":
@@ -335,11 +337,22 @@ def serial_thread(actions_ref):
                                         dispatch({"action": "key", "value": "voldown"})
                                     _rx_volume_accumulator += presses * 250.0
 
+                            elif current_mode == "Mouse":
+                                global _mouse_x_accumulator, _mouse_y_accumulator
+                                _mouse_x_accumulator += x + ry
+                                _mouse_y_accumulator += y + rx
+                                ix = int(_mouse_x_accumulator)
+                                iy = int(_mouse_y_accumulator)
+                                _mouse_x_accumulator -= ix
+                                _mouse_y_accumulator -= iy
+                                if ix != 0 or iy != 0:
+                                    dispatch({"action": "mouse_move", "x": ix, "y": iy})
+
                             # Send processed coordinates back to the device to emit via USB HID
                             try:
                                 custom_usb = actions_ref[0].get("custom_usb", {}) if actions_ref[0] else {}
                                 if custom_usb.get("enabled", False):
-                                    if current_mode not in ("Browser", "Media"):
+                                    if current_mode not in ("Browser", "Media", "Mouse"):
                                         ser.write(f"hid_report {x:.1f},{y:.1f},{z:.1f},{rx:.1f},{ry:.1f},{rz:.1f}\n".encode())
                                     else:
                                         ser.write(b"hid_report 0,0,0,0,0,0\n")
@@ -352,7 +365,7 @@ def serial_thread(actions_ref):
                             except Exception as e:
                                 print(f"[serial] failed to write hid_report back: {e}")
 
-                            if current_mode not in ("Browser", "Media"):
+                            if current_mode not in ("Browser", "Media", "Mouse"):
                                 # Apply direction inversions for spacenav mapping
                                 z = -z
                                 y = -y

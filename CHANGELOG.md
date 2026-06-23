@@ -4,6 +4,16 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+## [2.19.0] - 2026-06-22
+
+### Added
+- **Mouse Mode**: Added a new `"Mouse"` mode. Translation and rotation deflections move the mouse cursor. Physical buttons map to left and right click. Single tap on top maps to left click, and double tap on top maps to right click.
+- **Double Chord Mode Switch**: Added support for double click of the both-buttons chord (`chord:2`) to cycle between modes.
+
+### Changed
+- **Mode Switching Mechanism**: Moved the default mode switches from double tap on top (`top:2`) to double click of both buttons (`chord:2`).
+- **Configuration Migration**: Added migration logic to automatically update existing profiles' mode switches from tap to chord.
+
 ## [2.18.5] - 2026-06-22
 
 ### Changed

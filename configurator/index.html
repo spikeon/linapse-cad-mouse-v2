@@ -1662,11 +1662,12 @@ const DEFAULT_ACTIONS = {
       buttons: {
         "0": {"action": "mouse_scroll", "direction": "down", "amount": 1},
         "1": {"action": "mouse_scroll", "direction": "up", "amount": 1},
-        "chord": {"action": "key", "value": "shift+7"}
+        "chord": {"action": "key", "value": "shift+7"},
+        "chord:2": {"action": "mode", "value": "Browser"}
       },
       taps: {
         "top:1": {"action": "mouse_click", "button": "left"},
-        "top:2": {"action": "mode", "value": "Browser"},
+        "top:2": {"action": "none"},
         "top:3": {"action": "none"},
         "left:1": {"action": "none"}, "left:2": {"action": "none"},
         "right:1": {"action": "none"}, "right:2": {"action": "none"},
@@ -1683,7 +1684,8 @@ const DEFAULT_ACTIONS = {
       buttons: {
         "0": {"action": "mouse_scroll", "direction": "down", "amount": 1},
         "1": {"action": "mouse_scroll", "direction": "up", "amount": 1},
-        "chord": {"action": "key", "value": "shift+7"}
+        "chord": {"action": "key", "value": "shift+7"},
+        "chord:2": {"action": "mode", "value": "Browser"}
       },
       taps: {
         "top:1": {"action": "mouse_click", "button": "left"},
@@ -1703,10 +1705,11 @@ const DEFAULT_ACTIONS = {
     "Browser": {
       buttons: {
         "0": {"action": "key", "value": "ctrl+pageup"},
-        "1": {"action": "key", "value": "ctrl+pagedown"}
+        "1": {"action": "key", "value": "ctrl+pagedown"},
+        "chord:2": {"action": "mode", "value": "Media"}
       },
       taps: {
-        "top:2": {"action": "mode", "value": "Media"}
+        "top:2": {"action": "none"}
       },
       led: {
         effect: "solid",
@@ -1717,14 +1720,36 @@ const DEFAULT_ACTIONS = {
     "Media": {
       buttons: {
         "0": {"action": "key", "value": "prev"},
-        "1": {"action": "key", "value": "next"}
+        "1": {"action": "key", "value": "next"},
+        "chord:2": {"action": "mode", "value": "Mouse"}
       },
       taps: {
-        "top:2": {"action": "mode", "value": "Default"}
+        "top:2": {"action": "none"}
       },
       led: {
         effect: "volume",
         color: "00FF00",
+        brightness: 128
+      }
+    },
+    "Mouse": {
+      buttons: {
+        "0": {"action": "mouse_click", "button": "left"},
+        "1": {"action": "mouse_click", "button": "right"},
+        "chord:2": {"action": "mode", "value": "Default"}
+      },
+      taps: {
+        "top:1": {"action": "mouse_click", "button": "left"},
+        "top:2": {"action": "mouse_click", "button": "right"},
+        "top:3": {"action": "none"},
+        "left:1": {"action": "none"}, "left:2": {"action": "none"},
+        "right:1": {"action": "none"}, "right:2": {"action": "none"},
+        "front:1": {"action": "none"}, "front:2": {"action": "none"},
+        "back:1": {"action": "none"}, "back:2": {"action": "none"}
+      },
+      led: {
+        effect: "solid",
+        color: "00FFFF",
         brightness: 128
       }
     }

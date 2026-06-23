@@ -25,13 +25,29 @@ _chord_fired = False
 _timers = {}
 _scroll_threads = {}
 
+class ChordClickState:
+    def __init__(self):
+        self.click_count = 0
+        self.timer = None
+        self.released = False
+
+_chord_state = ChordClickState()
+_chord_held = False
+
 def reset_click_states():
+    global _chord_held
     for state_obj in _click_states.values():
         if state_obj.timer:
             state_obj.timer.cancel()
             state_obj.timer = None
         state_obj.click_count = 0
         state_obj.released = False
+    if _chord_state.timer:
+        _chord_state.timer.cancel()
+        _chord_state.timer = None
+    _chord_state.click_count = 0
+    _chord_state.released = False
+    _chord_held = False
 
 def _scroll_loop(btn, stop_event, actions):
     while not stop_event.is_set():
@@ -61,11 +77,26 @@ def _on_single(btn, actions):
     else:
         dispatch(act)
 
-def _on_chord(actions):
-    state.broadcast_from_thread("BUTTON:chord:1")
+def _fire_multi_chord(count, actions):
+    state.broadcast_from_thread(f"BUTTON:chord:{count}")
+    if actions.get("button_override", False):
+        return
     mode_buttons = get_active_mode_config(actions, "buttons")
-    act = mode_buttons.get("chord", {"action": "key", "value": "shift+7"})
-    dispatch(act)
+    act = None
+    if count == 2:
+        act = mode_buttons.get("chord:2")
+        if not act:
+            # Fallback mode cycle: Default -> Browser -> Media -> Mouse -> Default
+            current_mode = actions.get("current_mode", "Default")
+            mode_cycle = ["Default", "Browser", "Media", "Mouse"]
+            if current_mode in mode_cycle:
+                idx = mode_cycle.index(current_mode)
+                next_mode = mode_cycle[(idx + 1) % len(mode_cycle)]
+                act = {"action": "mode", "value": next_mode}
+    else:
+        act = mode_buttons.get("chord:1") or mode_buttons.get("chord")
+    if act:
+        dispatch(act)
 
 def _fire_multi_click(btn, count, actions):
     global _chord_fired
@@ -82,10 +113,11 @@ def _fire_multi_click(btn, count, actions):
         dispatch(act)
 
 def _on_press(btn, actions):
-    global _chord_fired
+    global _chord_fired, _chord_held
     _held.add(btn)
     if len(_held) == 2:
         _chord_fired = True
+        _chord_held = True
         for t in _timers.values():
             t.cancel()
         _timers.clear()
@@ -94,7 +126,25 @@ def _on_press(btn, actions):
                 state_obj.timer.cancel()
                 state_obj.timer = None
             state_obj.click_count = 0
-        _on_chord(actions)
+        
+        # Chord pressed: manage chord multi-click detection if double chord is configured
+        mode_buttons = get_active_mode_config(actions, "buttons")
+        has_double_chord = "chord:2" in mode_buttons
+        
+        if has_double_chord:
+            if _chord_state.timer:
+                _chord_state.timer.cancel()
+                _chord_state.timer = None
+                _chord_state.click_count += 1
+            else:
+                _chord_state.click_count = 1
+            _chord_state.released = False
+        else:
+            # No double chord, fire single chord immediately
+            _fire_multi_chord(1, actions)
+        return
+
+    if _chord_held:
         return
 
     mode_buttons = get_active_mode_config(actions, "buttons")
@@ -115,28 +165,44 @@ def _on_press(btn, actions):
         t.start()
 
 def _on_release(btn, actions=None):
-    global _chord_fired
+    global _chord_fired, _chord_held
     _held.discard(btn)
     if btn in _timers:
         _timers.pop(btn).cancel()
     if btn in _scroll_threads:
         _, stop_event = _scroll_threads.pop(btn)
         stop_event.set()
-    if not _held:
-        _chord_fired = False
 
     if actions is None:
         actions = state.actions_ref[0] or {}
 
-    state_obj = _click_states.get(btn)
-    if state_obj and state_obj.click_count > 0 and not state_obj.released:
-        state_obj.released = True
-        def fire():
-            _fire_multi_click(btn, state_obj.click_count, actions)
-            state_obj.click_count = 0
-            state_obj.timer = None
-        state_obj.timer = threading.Timer(0.25, fire)
-        state_obj.timer.start()
+    # If chord was active and now released (len(_held) < 2)
+    if _chord_held and len(_held) < 2:
+        _chord_held = False
+        if _chord_state.click_count > 0:
+            if not _chord_state.released:
+                _chord_state.released = True
+                def fire_chord():
+                    _fire_multi_chord(_chord_state.click_count, actions)
+                    _chord_state.click_count = 0
+                    _chord_state.timer = None
+                _chord_state.timer = threading.Timer(0.25, fire_chord)
+                _chord_state.timer.start()
+
+    if not _held:
+        _chord_fired = False
+
+    # Handle single button click count release only if chord is not active
+    if not _chord_fired:
+        state_obj = _click_states.get(btn)
+        if state_obj and state_obj.click_count > 0 and not state_obj.released:
+            state_obj.released = True
+            def fire():
+                _fire_multi_click(btn, state_obj.click_count, actions)
+                state_obj.click_count = 0
+                state_obj.timer = None
+            state_obj.timer = threading.Timer(0.25, fire)
+            state_obj.timer.start()
 
     state.broadcast_from_thread(f"BUTTON:{btn}:0")
 

@@ -936,3 +936,139 @@ def test_dominant_mode(running_service):
         running_service_actions["dominant_mode"] = True
         running_service_actions["dominant_mode_bias"] = 4.8
 
+
+def test_mouse_mode_and_double_chord_switch(running_service):
+    """Verify Mouse mode, its movement logic, and double chord mode switching."""
+    loop = running_service["loop"]
+    mock_serial = running_service["mock_serial"]
+    
+    global ydotool_calls
+    
+    # Write a clean configuration with the new modes and chord:2 switches
+    import json
+    initial_actions = {
+        "button_override": False,
+        "dominant_mode": True,
+        "dominant_mode_bias": 4.8,
+        "sensitivity": {},
+        "inversion": {},
+        "modes": {
+            "Default": {
+                "buttons": {
+                    "0": {"action": "mouse_scroll", "direction": "down", "amount": 1},
+                    "1": {"action": "mouse_scroll", "direction": "up", "amount": 1},
+                    "chord": {"action": "key", "value": "shift+7"},
+                    "chord:2": {"action": "mode", "value": "Browser"}
+                },
+                "taps": {
+                    "top:1": {"action": "mouse_click", "button": "left"},
+                    "top:2": {"action": "none"}
+                },
+                "led": {"effect": "rainbow_swirl", "color": "FFFFFF", "brightness": 128}
+            },
+            "Browser": {
+                "buttons": {
+                    "0": {"action": "key", "value": "ctrl+pageup"},
+                    "1": {"action": "key", "value": "ctrl+pagedown"},
+                    "chord:2": {"action": "mode", "value": "Media"}
+                },
+                "taps": {
+                    "top:2": {"action": "none"}
+                },
+                "led": {"effect": "solid", "color": "0000FF", "brightness": 128}
+            },
+            "Media": {
+                "buttons": {
+                    "0": {"action": "key", "value": "prev"},
+                    "1": {"action": "key", "value": "next"},
+                    "chord:2": {"action": "mode", "value": "Mouse"}
+                },
+                "taps": {
+                    "top:2": {"action": "none"}
+                },
+                "led": {"effect": "volume", "color": "00FF00", "brightness": 128}
+            },
+            "Mouse": {
+                "buttons": {
+                    "0": {"action": "mouse_click", "button": "left"},
+                    "1": {"action": "mouse_click", "button": "right"},
+                    "chord:2": {"action": "mode", "value": "Default"}
+                },
+                "taps": {
+                    "top:1": {"action": "mouse_click", "button": "left"},
+                    "top:2": {"action": "mouse_click", "button": "right"}
+                },
+                "led": {"effect": "solid", "color": "00FFFF", "brightness": 128}
+            }
+        },
+        "current_mode": "Default"
+    }
+    with open(running_service["actions_path"], "w") as f:
+        json.dump(initial_actions, f)
+        
+    # Force reload config in memory
+    future_time = time.time() + 10.0
+    os.utime(running_service["actions_path"], (future_time, future_time))
+    time.sleep(0.1)
+
+    # 1. Verify we are in Default mode
+    assert linapse_service._actions_ref[0]["current_mode"] == "Default"
+    
+    # Verify top:2 double tap mode switch is gone (action is none)
+    actions = linapse_service._actions_ref[0]
+    default_mode = actions["modes"]["Default"]
+    assert default_mode["taps"]["top:2"] == {"action": "none"}
+    
+    # 2. Simulate double chord press to cycle: Default -> Browser
+    ydotool_calls.clear()
+    
+    # Press chord 1
+    linapse_service._on_press(0, actions)
+    linapse_service._on_press(1, actions)
+    # Release chord 1
+    linapse_service._on_release(0)
+    linapse_service._on_release(1)
+    
+    # Press chord 2 within window
+    linapse_service._on_press(0, actions)
+    linapse_service._on_press(1, actions)
+    # Release chord 2
+    linapse_service._on_release(0)
+    linapse_service._on_release(1)
+    
+    # Wait for double click timer (0.25s) to fire mode switch
+    time.sleep(0.3)
+    
+    assert linapse_service._actions_ref[0]["current_mode"] == "Browser"
+    
+    # 3. Manually switch to Mouse mode to test its logic
+    linapse_service.switch_mode("Mouse")
+    assert linapse_service._actions_ref[0]["current_mode"] == "Mouse"
+    
+    # Reset mouse accumulators
+    linapse_service._mouse_x_accumulator = 0.0
+    linapse_service._mouse_y_accumulator = 0.0
+    
+    ydotool_calls.clear()
+    
+    # Send pure translation (X=10, Y=-5)
+    # x = 10.0 (right), y = -5.0 (up)
+    # Should result in mouse movement to right and up (dx=10, dy=-5)
+    mock_serial.input_queue.put(b">MOTION:10.0,-5.0,0,0,0,0\n")
+    time.sleep(0.05)
+    
+    # Check ydotool calls
+    assert len(ydotool_calls) == 1
+    assert ydotool_calls[0] == ["ydotool", "mousemove", "--", "10", "-5"]
+    ydotool_calls.clear()
+    
+    # Send pure rotation (ry=8.0, rx=4.0)
+    # rx = 4.0 (down), ry = 8.0 (right)
+    # Should result in mouse movement to right and down (dx=8, dy=4)
+    mock_serial.input_queue.put(b">MOTION:0,0,0,4.0,8.0,0\n")
+    time.sleep(0.05)
+    
+    assert len(ydotool_calls) == 1
+    assert ydotool_calls[0] == ["ydotool", "mousemove", "--", "8", "4"]
+    ydotool_calls.clear()
+

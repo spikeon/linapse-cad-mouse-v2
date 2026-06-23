@@ -104,11 +104,12 @@ def load_actions():
                         "buttons": {
                             "0": {"action": "mouse_scroll", "direction": "down", "amount": 1},
                             "1": {"action": "mouse_scroll", "direction": "up", "amount": 1},
-                            "chord": {"action": "key", "value": "shift+7"}
+                            "chord": {"action": "key", "value": "shift+7"},
+                            "chord:2": {"action": "mode", "value": "Browser"}
                         },
                         "taps": {
                             "top:1": {"action": "mouse_click", "button": "left"},
-                            "top:2": {"action": "mode", "value": "Browser"},
+                            "top:2": {"action": "none"},
                             "top:3": {"action": "none"},
                             "left:1": {"action": "none"}, "left:2": {"action": "none"},
                             "right:1": {"action": "none"}, "right:2": {"action": "none"},
@@ -125,7 +126,8 @@ def load_actions():
                         "buttons": {
                             "0": {"action": "mouse_scroll", "direction": "down", "amount": 1},
                             "1": {"action": "mouse_scroll", "direction": "up", "amount": 1},
-                            "chord": {"action": "key", "value": "shift+7"}
+                            "chord": {"action": "key", "value": "shift+7"},
+                            "chord:2": {"action": "mode", "value": "Browser"}
                         },
                         "taps": {
                             "top:1": {"action": "mouse_click", "button": "left"},
@@ -145,10 +147,11 @@ def load_actions():
                     "Browser": {
                         "buttons": {
                             "0": {"action": "key", "value": "ctrl+pageup"},
-                            "1": {"action": "key", "value": "ctrl+pagedown"}
+                            "1": {"action": "key", "value": "ctrl+pagedown"},
+                            "chord:2": {"action": "mode", "value": "Media"}
                         },
                         "taps": {
-                            "top:2": {"action": "mode", "value": "Media"}
+                            "top:2": {"action": "none"}
                         },
                         "led": {
                             "effect": "solid",
@@ -159,14 +162,36 @@ def load_actions():
                     "Media": {
                         "buttons": {
                             "0": {"action": "key", "value": "prev"},
-                            "1": {"action": "key", "value": "next"}
+                            "1": {"action": "key", "value": "next"},
+                            "chord:2": {"action": "mode", "value": "Mouse"}
                         },
                         "taps": {
-                            "top:2": {"action": "mode", "value": "Default"}
+                            "top:2": {"action": "none"}
                         },
                         "led": {
                             "effect": "volume",
                             "color": "00FF00",
+                            "brightness": 128
+                        }
+                    },
+                    "Mouse": {
+                        "buttons": {
+                            "0": {"action": "mouse_click", "button": "left"},
+                            "1": {"action": "mouse_click", "button": "right"},
+                            "chord:2": {"action": "mode", "value": "Default"}
+                        },
+                        "taps": {
+                            "top:1": {"action": "mouse_click", "button": "left"},
+                            "top:2": {"action": "mouse_click", "button": "right"},
+                            "top:3": {"action": "none"},
+                            "left:1": {"action": "none"}, "left:2": {"action": "none"},
+                            "right:1": {"action": "none"}, "right:2": {"action": "none"},
+                            "front:1": {"action": "none"}, "front:2": {"action": "none"},
+                            "back:1": {"action": "none"}, "back:2": {"action": "none"}
+                        },
+                        "led": {
+                            "effect": "solid",
+                            "color": "00FFFF",
                             "brightness": 128
                         }
                     }
@@ -197,10 +222,11 @@ def load_actions():
             actions["modes"]["Browser"] = {
                 "buttons": {
                     "0": {"action": "key", "value": "ctrl+pageup"},
-                    "1": {"action": "key", "value": "ctrl+pagedown"}
+                    "1": {"action": "key", "value": "ctrl+pagedown"},
+                    "chord:2": {"action": "mode", "value": "Media"}
                 },
                 "taps": {
-                    "top:2": {"action": "mode", "value": "Media"}
+                    "top:2": {"action": "none"}
                 },
                 "led": {"effect": "solid", "color": "0000FF", "brightness": 128}
             }
@@ -210,10 +236,11 @@ def load_actions():
             actions["modes"]["Media"] = {
                 "buttons": {
                     "0": {"action": "key", "value": "prev"},
-                    "1": {"action": "key", "value": "next"}
+                    "1": {"action": "key", "value": "next"},
+                    "chord:2": {"action": "mode", "value": "Mouse"}
                 },
                 "taps": {
-                    "top:2": {"action": "mode", "value": "Default"}
+                    "top:2": {"action": "none"}
                 },
                 "led": {"effect": "volume", "color": "00FF00", "brightness": 128}
             }
@@ -225,6 +252,53 @@ def load_actions():
                     media_mode["led"] = {}
                 media_mode["led"]["effect"] = "volume"
                 migrated = True
+
+        if "Mouse" not in actions["modes"]:
+            actions["modes"]["Mouse"] = {
+                "buttons": {
+                    "0": {"action": "mouse_click", "button": "left"},
+                    "1": {"action": "mouse_click", "button": "right"},
+                    "chord:2": {"action": "mode", "value": "Default"}
+                },
+                "taps": {
+                    "top:1": {"action": "mouse_click", "button": "left"},
+                    "top:2": {"action": "mouse_click", "button": "right"}
+                },
+                "led": {"effect": "solid", "color": "00FFFF", "brightness": 128}
+            }
+            migrated = True
+
+        # Ensure all existing modes have their double chord (chord:2) and old top:2 cleaned up
+        mode_cycle_mapping = {
+            "Default": "Browser",
+            "Browser": "Media",
+            "Media": "Mouse",
+            "Mouse": "Default"
+        }
+        for mname, target in mode_cycle_mapping.items():
+            if mname in actions["modes"]:
+                mode_cfg = actions["modes"][mname]
+                
+                # We only migrate to chord:2 if we actually detect the legacy mode switch in taps
+                has_old_switch = False
+                if "taps" in mode_cfg and "top:2" in mode_cfg["taps"]:
+                    tap_act = mode_cfg["taps"]["top:2"]
+                    if tap_act.get("action") == "mode":
+                        has_old_switch = True
+                
+                if has_old_switch:
+                    actual_target = mode_cfg["taps"]["top:2"].get("value") or target
+                    if "buttons" not in mode_cfg:
+                        mode_cfg["buttons"] = {}
+                    if mode_cfg["buttons"].get("chord:2", {}).get("value") != actual_target:
+                        mode_cfg["buttons"]["chord:2"] = {"action": "mode", "value": actual_target}
+                        migrated = True
+                    
+                    if mname == "Mouse":
+                        mode_cfg["taps"]["top:2"] = {"action": "mouse_click", "button": "right"}
+                    else:
+                        mode_cfg["taps"]["top:2"] = {"action": "none"}
+                    migrated = True
 
         if migrated and not parsing_error:
             try:

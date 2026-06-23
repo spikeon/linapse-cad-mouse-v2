@@ -5,7 +5,8 @@ All AI agents working on this project MUST follow these guidelines without excep
 ## Versioning System
 
 The current version of this project is stored in the `VERSION` file at the repository root (using `MAJOR.MINOR.PATCH` Semantic Versioning).
-Every time you make any change to the codebase, you MUST:
+You MUST only increment the version number and sync it when the user explicitly requests a push or a release. Do not update the version for minor intermediate changes during a session unless requested.
+When doing a release/push-time version increment:
 1. **Read the current version** from the [VERSION](file:///home/spikeon/Dev/linapse-cad-mouse-v2/VERSION) file.
 2. **Increment the version number** based on your changes:
    - **PATCH** (`x.y.Z`): Increment for backwards-compatible bug fixes, minor documentation updates, test additions, or internal refactoring.
@@ -22,7 +23,7 @@ Every time you make any change to the codebase, you MUST:
 
 ## Changelog Updates
 
-You MUST update [CHANGELOG.md](file:///home/spikeon/Dev/linapse-cad-mouse-v2/CHANGELOG.md) on every change session:
+When performing a push/release version increment, you MUST update [CHANGELOG.md](file:///home/spikeon/Dev/linapse-cad-mouse-v2/CHANGELOG.md) to record the new version's release notes:
 1. Create a section for the new version you are releasing/incrementing to.
 2. List your changes clearly under the standard "Keep a Changelog" headings:
    - `Added` for new features.

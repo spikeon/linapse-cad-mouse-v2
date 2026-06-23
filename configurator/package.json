@@ -1,6 +1,6 @@
 {
   "name": "linapse-configurator",
-  "version": "2.21.21",
+  "version": "2.21.22",
   "description": "CAD Mouse MK2 Linapse Electron Configurator",
   "main": "main.js",
   "scripts": {

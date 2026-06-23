@@ -394,7 +394,7 @@ def reset_test_state(page, mock_serial, temp_actions_path, target_tab="Motion"):
     linapse_service.reset_click_states()
     linapse_service._actions_ref[0] = initial_actions
 
-    page.reload()
+    page.reload(timeout=60000)
     
     # Wait for websocket to connect
     page.locator("#connStatus.connected").wait_for(timeout=5000)

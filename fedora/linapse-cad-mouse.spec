@@ -3,7 +3,7 @@
 %{!?_udevrulesdir: %global _udevrulesdir %{_prefix}/lib/udev/rules.d}
 
 Name:           linapse-cad-mouse
-Version:        2.21.21
+Version:        2.21.22
 Release:        1%{?dist}
 Summary:        CAD Mouse MK2 Linapse driver service and configurator
 
@@ -141,6 +141,9 @@ install -Dm644 service/udev/99-spacemouse.rules %{buildroot}%{_udevrulesdir}/99-
 %{_udevrulesdir}/99-spacemouse.rules
 
 %changelog
+* Tue Jun 23 2026 spikeon <spikeon@example.com> - 2.21.22-1
+- Increase Playwright reload timeout to stabilize Windows build and bump version to 2.21.22
+
 * Tue Jun 23 2026 spikeon <spikeon@example.com> - 2.21.21-1
 - Integrate GPG_PASSPHRASE into workflow steps and wrapper script and bump version to 2.21.21
 

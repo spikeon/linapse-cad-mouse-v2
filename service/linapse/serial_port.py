@@ -347,7 +347,7 @@ def serial_thread(actions_ref):
                             elif current_mode == "Mouse":
                                 global _mouse_x_accumulator, _mouse_y_accumulator
                                 _mouse_x_accumulator += x + ry
-                                _mouse_y_accumulator += y + rx
+                                _mouse_y_accumulator -= y + rx
                                 ix = int(_mouse_x_accumulator)
                                 iy = int(_mouse_y_accumulator)
                                 _mouse_x_accumulator -= ix

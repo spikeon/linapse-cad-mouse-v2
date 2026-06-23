@@ -1087,10 +1087,10 @@ def test_mouse_mode_and_double_chord_switch(running_service):
     
     ydotool_calls.clear()
     
-    # Send pure translation (X=10, Y=-5)
-    # x = 10.0 (right), y = -5.0 (up)
+    # Send pure translation (X=10, Y=5.0)
+    # x = 10.0 (right), y = 5.0 (forward)
     # Should result in mouse movement to right and up (dx=10, dy=-5)
-    mock_serial.input_queue.put(b">MOTION:10.0,-5.0,0,0,0,0\n")
+    mock_serial.input_queue.put(b">MOTION:10.0,5.0,0,0,0,0\n")
     time.sleep(0.05)
     
     # Check ydotool calls
@@ -1099,12 +1099,12 @@ def test_mouse_mode_and_double_chord_switch(running_service):
     ydotool_calls.clear()
     
     # Send pure rotation (ry=8.0, rx=4.0)
-    # rx = 4.0 (down), ry = 8.0 (right)
-    # Should result in mouse movement to right and down (dx=8, dy=4)
+    # rx = 4.0 (tilt forward), ry = 8.0 (tilt right)
+    # Should result in mouse movement to right and up (dx=8, dy=-4)
     mock_serial.input_queue.put(b">MOTION:0,0,0,4.0,8.0,0\n")
     time.sleep(0.05)
     
     assert len(ydotool_calls) == 1
-    assert ydotool_calls[0] == ["ydotool", "mousemove", "--", "8", "4"]
+    assert ydotool_calls[0] == ["ydotool", "mousemove", "--", "8", "-4"]
     ydotool_calls.clear()
 

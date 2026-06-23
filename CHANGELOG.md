@@ -5,6 +5,12 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.21.3] - 2026-06-23
+
+### Fixed
+- **Mouse Mode Direction**: Inverted the Y-axis mouse movement direction in Mouse mode (both translation and rotation) so that pushing the puck forward or tilting it forward moves the screen cursor up instead of down.
+- **Configurator UI Chord Multi-Click**: Added multi-click (double, triple) action configuration tabs for the Both Buttons (chord) action in the configurator side panel, and synced the multi-click counts from the loaded configuration.
+
 ## [2.21.2] - 2026-06-23
 
 ### Fixed

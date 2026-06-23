@@ -1666,7 +1666,7 @@ let currentEffect = 'solid';
 
 const TAP_DIRS = ['top','left','right','front','back'];
 const BTN_KEYS = ['btn-0', 'btn-1', 'btn-chord'];
-const MAX_COUNTS = { 'top': 3, 'left': 2, 'right': 2, 'front': 2, 'back': 2, 'btn-0': 2, 'btn-1': 2 };
+const MAX_COUNTS = { 'top': 3, 'left': 2, 'right': 2, 'front': 2, 'back': 2, 'btn-0': 2, 'btn-1': 2, 'btn-chord': 2 };
 
 const ACTION_TYPES = [
   { id: 'none',        label: 'None' },
@@ -2208,13 +2208,7 @@ function renderBtnPanel(key, body) {
 
   const btnKey = key === 'btn-0' ? '0' : key === 'btn-1' ? '1' : 'chord';
 
-  if (btnKey === 'chord') {
-    const act = getActiveMode().buttons[btnKey] || { action: 'none' };
-    renderActionEditor(act, body, (newAct) => {
-      getActiveMode().buttons[btnKey] = newAct;
-    });
-    return;
-  }
+
 
   // Count tabs
   const maxCount = MAX_COUNTS[key] || 2;
@@ -3446,6 +3440,22 @@ function syncActionsUI() {
         if (TAP_DIRS.includes(dir) && !isNaN(count)) {
           if (!MAX_COUNTS[dir] || count > MAX_COUNTS[dir]) {
             MAX_COUNTS[dir] = count;
+          }
+        }
+      }
+    });
+  }
+
+  if (activeMode && activeMode.buttons) {
+    Object.keys(activeMode.buttons).forEach(key => {
+      const parts = key.split(':');
+      if (parts.length === 2) {
+        const btn = parts[0];
+        const count = parseInt(parts[1]);
+        if (!isNaN(count)) {
+          const panelKey = btn === '0' ? 'btn-0' : (btn === '1' ? 'btn-1' : (btn === 'chord' ? 'btn-chord' : btn));
+          if (!MAX_COUNTS[panelKey] || count > MAX_COUNTS[panelKey]) {
+            MAX_COUNTS[panelKey] = count;
           }
         }
       }

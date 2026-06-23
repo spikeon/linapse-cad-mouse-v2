@@ -130,10 +130,14 @@ info "Environment configuration file written to ~/.config/environment.d/99-spnav
 section "Installing udev rules for device permissions"
 
 if [ -f "$SCRIPT_DIR/udev/99-spacemouse.rules" ]; then
-    sudo cp "$SCRIPT_DIR/udev/99-spacemouse.rules" /etc/udev/rules.d/99-spacemouse.rules
-    info "Copied udev rules to /etc/udev/rules.d/"
-    sudo udevadm control --reload-rules 2>/dev/null || info "Warning: Could not reload udev rules"
-    sudo udevadm trigger --action=add 2>/dev/null || info "Warning: Could not trigger udev rules"
+    if [ -f /etc/udev/rules.d/99-spacemouse.rules ] && cmp -s "$SCRIPT_DIR/udev/99-spacemouse.rules" /etc/udev/rules.d/99-spacemouse.rules; then
+        info "udev rules already up to date."
+    else
+        sudo cp "$SCRIPT_DIR/udev/99-spacemouse.rules" /etc/udev/rules.d/99-spacemouse.rules
+        info "Copied udev rules to /etc/udev/rules.d/"
+        sudo udevadm control --reload-rules 2>/dev/null || info "Warning: Could not reload udev rules"
+        sudo udevadm trigger --action=add 2>/dev/null || info "Warning: Could not trigger udev rules"
+    fi
 else
     err "udev rules file not found"
 fi

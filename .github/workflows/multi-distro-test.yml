@@ -563,6 +563,8 @@ jobs:
     needs: [release]
     runs-on: ubuntu-latest
     if: (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master') && github.event_name == 'push' && vars.UBUNTU_PPA_PUBLISH_ENABLED == 'true'
+    permissions:
+      contents: write
     env:
       GPG_PRIVATE_KEY: ${{ secrets.GPG_PRIVATE_KEY }}
     steps:
@@ -636,17 +638,41 @@ jobs:
             KEY_ID=$(gpg --list-secret-keys --with-colons | grep "^sec" | cut -d: -f5 | head -n 1)
 
             # Build source package unsigned (debuild + debsign)
-            debuild -S -sa -d -i -I -us -uc
+            debuild -S -sa -d -i -I -us -uc > debuild.log 2>&1 || {
+              cat debuild.log
+              mkdir -p ci_logs
+              cp debuild.log ci_logs/debuild_${dist}.log
+              exit 1
+            }
             
             # Sign manually using debsign with loopback GPG wrapper script to prevent TTY prompt
-            debsign -k"$KEY_ID" -p"$HOME/gpg-wrapper.sh" ../linapse-cad-mouse_${VERSION}*_source.changes
+            debsign -k"$KEY_ID" -p"$HOME/gpg-wrapper.sh" ../linapse-cad-mouse_${VERSION}*_source.changes > debsign.log 2>&1 || {
+              cat debsign.log
+              mkdir -p ci_logs
+              cp debsign.log ci_logs/debsign_${dist}.log
+              exit 1
+            }
             
             # Upload
-            dput linapse-ppa ../linapse-cad-mouse_${VERSION}*_source.changes
+            dput linapse-ppa ../linapse-cad-mouse_${VERSION}*_source.changes > dput.log 2>&1 || {
+              cat dput.log
+              mkdir -p ci_logs
+              cp dput.log ci_logs/dput_${dist}.log
+              exit 1
+            }
             
             # Reset changelog
             git checkout debian/changelog
           done
+
+      - name: Commit and push failure logs
+        if: failure()
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git add ci_logs/ || true
+          git commit -m "chore: upload debsign failure logs [skip ci]" || true
+          git push || true
 
 
   release-fedora-copr:

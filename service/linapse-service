@@ -39,6 +39,7 @@ from linapse import websocket
 from linapse import spnav
 from linapse import flashing
 from linapse import equalizer
+from linapse import updater
 
 WS_HOST = "localhost"
 WS_PORT = 13000
@@ -171,7 +172,7 @@ class LinapseServiceModule(types.ModuleType):
             super().__setattr__(name, value)
 
         # Propagate to submodules for test-suite mocking/patching compatibility
-        for m in (state, config, emulation, serial_port, hid, volume, websocket, spnav, flashing):
+        for m in (state, config, emulation, serial_port, hid, volume, websocket, spnav, flashing, updater):
             if hasattr(m, name) or name in ("open", "Path"):
                 setattr(m, name, value)
 
@@ -180,7 +181,7 @@ class LinapseServiceModule(types.ModuleType):
             super().__delattr__(name)
         except AttributeError:
             pass
-        for m in (state, config, emulation, serial_port, hid, volume, websocket, spnav, flashing):
+        for m in (state, config, emulation, serial_port, hid, volume, websocket, spnav, flashing, updater):
             if hasattr(m, name):
                 try:
                     delattr(m, name)
@@ -247,6 +248,16 @@ async def main():
     threading.Thread(target=config.config_watcher, args=(actions_ref,), daemon=True).start()
     threading.Thread(target=volume.volume_watcher, daemon=True).start()
     threading.Thread(target=equalizer.equalizer_watcher, args=(actions_ref,), daemon=True).start()
+
+    def updater_loop():
+        time.sleep(5)  # Wait for WebSocket/Serial to initialize
+        while True:
+            try:
+                updater.check_for_updates(quiet=True)
+            except Exception as e:
+                print(f"[updater] background check error: {e}")
+            time.sleep(86400)
+    threading.Thread(target=updater_loop, daemon=True).start()
 
     asyncio.create_task(serial_writer())
 

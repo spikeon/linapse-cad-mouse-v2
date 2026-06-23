@@ -169,5 +169,6 @@ The **Firmware** tab lets you compile and flash the CAD Mouse MK2 firmware direc
 
 - **Firmware Compilation**: Uses PlatformIO to compile the source code in the repository.
 - **Auto-BOOTSEL Reset**: Automatically detects connected devices and puts them into BOOTSEL mode over the serial link (using a 1200 baud reset).
+- **Auto-Update Firmware**: Optionally configure the service to automatically compile and flash the device on connection if its firmware is older than the service.
 - **Fresh Board Flashing**: If a board has never been flashed before (or is in bootloader mode already), the configurator will automatically search for the `RPI-RP2` block drive, mount it (using `udisksctl` on Linux), copy `firmware.uf2`, and reboot it.
 - **Flashing Console**: A cyberpunk-themed console logs progress in real time, from locating repo roots and invoking PlatformIO to mounting and writing files.

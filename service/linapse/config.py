@@ -90,6 +90,7 @@ def load_actions():
         if actions is None or not isinstance(actions, dict):
             actions = {
                 "button_override": False,
+                "auto_update_firmware": False,
                 "dominant_mode": True,
                 "dominant_mode_bias": 4.8,
                 "sensitivity": {
@@ -274,6 +275,10 @@ def load_actions():
                 },
                 "led": {"effect": "solid", "color": "00FFFF", "brightness": 128}
             }
+            migrated = True
+
+        if "auto_update_firmware" not in actions:
+            actions["auto_update_firmware"] = False
             migrated = True
 
         # Ensure all existing modes have their double chord (chord:2) and triple chord (chord:3)

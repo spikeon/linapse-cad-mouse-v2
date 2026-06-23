@@ -43,6 +43,17 @@ async def ws_handler(websocket, actions_ref=None):
                 await websocket.send(f"EQ:{eq_str}")
             elif message == "version_get":
                 await websocket.send(f"VERSION_INFO:{{\"service\":\"{state.service_version}\",\"firmware\":\"{state.firmware_version}\"}}")
+                # Also send software update info if known
+                if state.latest_software_version:
+                    await websocket.send(f"SOFTWARE_UPDATE:available:{state.latest_software_version}:{state.software_update_url}")
+                else:
+                    await websocket.send(f"SOFTWARE_UPDATE:{state.software_update_status}")
+            elif message == "software_update_check":
+                from . import updater
+                asyncio.create_task(asyncio.to_thread(updater.check_for_updates))
+            elif message == "software_update_start":
+                from . import updater
+                asyncio.create_task(asyncio.to_thread(updater.download_and_install_update))
             elif message == "flash":
                 if state.flashing_active:
                     await websocket.send("FLASH:error:Flash already in progress.")

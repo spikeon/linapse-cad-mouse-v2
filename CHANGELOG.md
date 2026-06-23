@@ -4,6 +4,13 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+## [2.20.0] - 2026-06-23
+
+### Added
+- **Software Auto-Updates**: The background service automatically checks GitHub Releases for new updates. The Electron configurator displays a banner and handles downloading and running the latest setup installer.
+- **Firmware Auto-Updates**: Added a toggle to automatically compile and flash the device on connection if its firmware version is older than the service.
+- **Updater Tests**: Added unit tests to verify version comparisons and GitHub Release updates.
+
 ## [2.19.1] - 2026-06-22
 
 ### Added

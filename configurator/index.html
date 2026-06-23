@@ -982,6 +982,20 @@ input[type=range]::-webkit-slider-thumb {
   <button class="btn-connect" id="btnConnect" onclick="toggleConnect()">Connect</button>
 </div>
 
+<!-- Software Update Banner -->
+<div id="swUpdateBanner" style="display: none; width: 100%; background: rgba(0, 255, 136, 0.1); border-bottom: 1px solid var(--green); padding: 10px 20px; box-sizing: border-box; align-items: center; justify-content: space-between; gap: 15px; font-family: 'Rajdhani', sans-serif; transition: all 0.3s ease;">
+  <div id="swUpdateText" style="display: flex; align-items: center; gap: 10px; color: var(--green); font-weight: 700; font-size: 14px; text-transform: uppercase; letter-spacing: 1px;">
+    🚀 Software Update Available: <span id="swUpdateVersion">vX.Y.Z</span>
+  </div>
+  <div style="display: flex; align-items: center; gap: 10px;">
+    <div id="swUpdateProgressContainer" style="display: none; width: 120px; background: rgba(255,255,255,0.1); height: 6px; border-radius: 3px; overflow: hidden;">
+      <div id="swUpdateProgressBar" style="width: 0%; height: 100%; background: var(--green); transition: width 0.1s ease;"></div>
+    </div>
+    <button id="btnSwUpdateStart" onclick="startSoftwareUpdate()" style="background: var(--green); color: #000; border: none; border-radius: 4px; padding: 6px 16px; font-weight: 700; font-size: 11px; cursor: pointer; text-transform: uppercase; font-family: 'Rajdhani'; letter-spacing: 0.5px; transition: opacity 0.2s;">Update Now</button>
+    <button onclick="closeSwUpdateBanner()" style="background: transparent; color: var(--text3); border: none; cursor: pointer; font-size: 14px; outline: none; margin-left: 5px;">✕</button>
+  </div>
+</div>
+
 <!-- Tab bar -->
 <div class="tabbar">
   <div class="tab active" onclick="switchTab('customize', this)">Controls</div>
@@ -1551,6 +1565,17 @@ input[type=range]::-webkit-slider-thumb {
             <li><strong>Fresh device (out of the box):</strong> If device is in BOOTSEL mode, the tool automatically detects and mounts the RPI-RP2 drive.</li>
           </ul>
         </div>
+      </div>
+
+      <!-- Auto-Update Firmware Form -->
+      <div style="background: var(--bg3); border: 1px solid var(--border); border-radius: 6px; padding: 15px; display: flex; flex-direction: column; gap: 8px; box-sizing: border-box;">
+        <label style="display: flex; align-items: center; gap: 8px; font-weight: 600; cursor: pointer; color: var(--text); font-size: 13px;">
+          <input type="checkbox" id="autoUpdateFwEnabled" onchange="toggleAutoUpdateFw()" style="cursor: pointer;">
+          Auto-Update Firmware on Connection
+        </label>
+        <p style="font-size: 11px; color: var(--text3); margin: 0; line-height: 1.4; margin-left: 20px;">
+          When enabled, the service automatically compiles and flashes the device if its firmware is older than the service. (Requires PlatformIO).
+        </p>
       </div>
 
       <!-- Custom USB PID/VID Form -->
@@ -2720,6 +2745,7 @@ function connectWS() {
     sendCmd('version_get');
     sendCmd('volume_get');
     sendCmd('eq_get');
+    sendCmd('software_update_check');
   };
 
   ws.onclose = () => {
@@ -2734,6 +2760,10 @@ function connectWS() {
 
   ws.onmessage = (e) => {
     const msg = e.data.trim();
+    if (msg.startsWith('SOFTWARE_UPDATE:')) {
+      handleSoftwareUpdateMessage(msg);
+      return;
+    }
     if (msg.startsWith('VOLUME:')) {
       const vol = parseInt(msg.slice(7));
       if (!isNaN(vol)) {
@@ -3489,6 +3519,12 @@ function syncActionsUI() {
   }
   if (customUsbFormFields) {
     customUsbFormFields.style.display = customUsb.enabled ? 'flex' : 'none';
+  }
+
+  // Update Auto-Update Firmware UI checkbox
+  const autoUpdateFwCheckbox = document.getElementById('autoUpdateFwEnabled');
+  if (autoUpdateFwCheckbox) {
+    autoUpdateFwCheckbox.checked = !!actions.auto_update_firmware;
   }
 }
 
@@ -4375,6 +4411,70 @@ function compareVersions(v1, v2) {
     if (p1 > p2) return 1;
   }
   return 0;
+}
+
+let latestSoftwareUrl = '';
+
+function handleSoftwareUpdateMessage(msg) {
+  const banner = document.getElementById('swUpdateBanner');
+  const text = document.getElementById('swUpdateText');
+  const progressContainer = document.getElementById('swUpdateProgressContainer');
+  const progressBar = document.getElementById('swUpdateProgressBar');
+  const btnStart = document.getElementById('btnSwUpdateStart');
+  
+  if (msg === 'SOFTWARE_UPDATE:checking') {
+    // Checking
+  } else if (msg.startsWith('SOFTWARE_UPDATE:available:')) {
+    const parts = msg.split(':');
+    const ver = parts[2];
+    latestSoftwareUrl = parts.slice(3).join(':');
+    
+    document.getElementById('swUpdateVersion').textContent = ver;
+    text.innerHTML = `🚀 Software Update Available: <strong>v${ver}</strong>`;
+    banner.style.display = 'flex';
+    btnStart.style.display = 'block';
+    progressContainer.style.display = 'none';
+  } else if (msg.startsWith('SOFTWARE_UPDATE:downloading:')) {
+    const percent = msg.split(':')[2];
+    banner.style.display = 'flex';
+    btnStart.style.display = 'none';
+    progressContainer.style.display = 'block';
+    text.textContent = `Downloading Software Update... ${percent}%`;
+    progressBar.style.width = percent + '%';
+  } else if (msg === 'SOFTWARE_UPDATE:ready') {
+    banner.style.display = 'flex';
+    btnStart.style.display = 'none';
+    progressContainer.style.display = 'none';
+    text.textContent = 'Update Ready! Applying update and restarting...';
+  } else if (msg.startsWith('SOFTWARE_UPDATE:failed:')) {
+    const reason = msg.slice(23);
+    showToast('Update Failed', reason, 'error');
+    btnStart.style.display = 'block';
+    progressContainer.style.display = 'none';
+    text.innerHTML = `🚀 Update failed. Click Update to retry.`;
+  } else if (msg === 'SOFTWARE_UPDATE:idle') {
+    banner.style.display = 'none';
+  }
+}
+
+function startSoftwareUpdate() {
+  document.getElementById('btnSwUpdateStart').style.display = 'none';
+  document.getElementById('swUpdateProgressContainer').style.display = 'block';
+  document.getElementById('swUpdateText').textContent = 'Downloading Software Update...';
+  sendCmd('software_update_start');
+}
+
+function closeSwUpdateBanner() {
+  document.getElementById('swUpdateBanner').style.display = 'none';
+}
+
+function toggleAutoUpdateFw() {
+  const checkbox = document.getElementById('autoUpdateFwEnabled');
+  if (checkbox) {
+    if (!actions) actions = {};
+    actions.auto_update_firmware = checkbox.checked;
+    sendCmd('actions ' + JSON.stringify(actions));
+  }
 }
 
 initCallouts();

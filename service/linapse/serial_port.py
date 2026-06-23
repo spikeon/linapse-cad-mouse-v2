@@ -389,6 +389,19 @@ def serial_thread(actions_ref):
                     if line.startswith("version="):
                         state.firmware_version = line.split("=")[1].strip()
                         state.broadcast_from_thread(f"VERSION_INFO:{{\"service\":\"{state.service_version}\",\"firmware\":\"{state.firmware_version}\"}}")
+                        
+                        # Trigger firmware auto-update if enabled
+                        actions = actions_ref[0] if actions_ref else None
+                        if actions and actions.get("auto_update_firmware", False):
+                            from .updater import compare_versions
+                            from .flashing import flash_device
+                            if (state.firmware_version != "unknown" and 
+                                state.firmware_version != "legacy" and 
+                                compare_versions(state.firmware_version, state.service_version) < 0 and 
+                                not state.flashing_active):
+                                print(f"[serial] firmware out of date ({state.firmware_version} < {state.service_version}). Triggering auto-flash...")
+                                if state.loop:
+                                    asyncio.run_coroutine_threadsafe(flash_device(), state.loop)
                     state.broadcast_from_thread(line)
         except (serial.SerialException, TypeError, OSError, AttributeError) as e:
             state.ser_holder[0] = None

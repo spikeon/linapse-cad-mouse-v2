@@ -18,3 +18,4 @@ service/.installer_test_tmp/
 
 # Local-only MCP server config (personal localhost discord-mcp)
 .mcp.json
+.playwright-mcp/

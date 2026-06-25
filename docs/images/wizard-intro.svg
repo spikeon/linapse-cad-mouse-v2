@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="460" height="300" viewBox="0 0 460 300" font-family="'Segoe UI',Arial,sans-serif">
+<rect width="460" height="300" fill="#0a0a0a"/><rect x="14" y="14" width="432" height="272" rx="5" fill="#111111" stroke="#252525"/>
+<text x="38" y="52" fill="#FF2400" font-size="17" font-weight="700" letter-spacing="1.5">CALIBRATION WIZARD</text>
+<text x="422" y="50" fill="#555555" font-size="12" font-weight="600" text-anchor="end">Step 0/15</text>
+<line x1="38" y1="66" x2="422" y2="66" stroke="#252525"/><text x="38" y="100" fill="#e8e8e8" font-size="15" font-weight="600">Auto-calibrate your puck.</text><text x="38" y="128" fill="#888888" font-size="12">This sets the tap DE-SPIKE filter, per-axis</text>
+<text x="38" y="146" fill="#888888" font-size="12">SENSITIVITY, and INVERSION in one pass.</text>
+<text x="38" y="164" fill="#888888" font-size="12">Follow each prompt; it measures + applies as</text>
+<text x="38" y="182" fill="#888888" font-size="12">you go.</text>
+<text x="38" y="200" fill="#888888" font-size="12"></text>
+<text x="38" y="218" fill="#888888" font-size="12">Ready? Press Start.</text>
+<line x1="38" y1="242" x2="422" y2="242" stroke="#252525"/><rect x="358" y="256" width="64" height="28" rx="2" fill="#FF2400" stroke="none"/><text x="390" y="275" fill="#000" font-size="11" font-weight="700" letter-spacing="1" text-anchor="middle">START</text>
+<rect x="274" y="256" width="73" height="28" rx="2" fill="none" stroke="#252525"/><text x="311" y="275" fill="#555555" font-size="11" font-weight="700" letter-spacing="1" text-anchor="middle">CANCEL</text></svg>

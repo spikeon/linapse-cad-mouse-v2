@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="460" height="300" viewBox="0 0 460 300" font-family="'Segoe UI',Arial,sans-serif">
+<rect width="460" height="300" fill="#0a0a0a"/><rect x="14" y="14" width="432" height="272" rx="5" fill="#111111" stroke="#252525"/>
+<text x="38" y="52" fill="#FF2400" font-size="17" font-weight="700" letter-spacing="1.5">X+ (RIGHT)</text>
+<text x="422" y="50" fill="#555555" font-size="12" font-weight="600" text-anchor="end">Step 3/15</text>
+<line x1="38" y1="66" x2="422" y2="66" stroke="#252525"/><text x="38" y="100" fill="#e8e8e8" font-size="15" font-weight="600">Deflect puck fully RIGHT.</text><text x="230.0" y="142" fill="#FF2400" font-size="24" font-weight="700" font-family="monospace" text-anchor="middle">184.2</text><rect x="38" y="158" width="384" height="6" rx="3" fill="#303030"/><rect x="38" y="158" width="204" height="6" rx="3" fill="#FF2400"/><text x="38" y="190" fill="#888888" font-size="12">Push the puck right to your comfortable limit,</text>
+<text x="38" y="208" fill="#888888" font-size="12">then let go.</text><text x="38" y="232" fill="#FF2400" font-size="12">Deflection active…  Peak: 184.2</text>
+<line x1="38" y1="242" x2="422" y2="242" stroke="#252525"/><rect x="366" y="256" width="56" height="28" rx="2" fill="#FF2400" stroke="none"/><text x="394" y="275" fill="#000" font-size="11" font-weight="700" letter-spacing="1" text-anchor="middle">NEXT</text>
+<rect x="249" y="256" width="107" height="28" rx="2" fill="none" stroke="#252525"/><text x="302" y="275" fill="#555555" font-size="11" font-weight="700" letter-spacing="1" text-anchor="middle">RESET STEP</text>
+<rect x="166" y="256" width="73" height="28" rx="2" fill="none" stroke="#252525"/><text x="202" y="275" fill="#555555" font-size="11" font-weight="700" letter-spacing="1" text-anchor="middle">CANCEL</text></svg>

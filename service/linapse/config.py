@@ -119,6 +119,11 @@ def load_actions():
                     "deadzone": 0.06,
                     "invert": {"rx": True, "ry": False, "rz": False, "x": False, "y": False}
                 },
+                "controller2d": {
+                    "sensitivity": {"horizontal": 1.0, "vertical": 1.0},
+                    "invert": {"horizontal": False, "vertical": True}
+                },
+                "controller_view": "3d",
                 "modes": {
                     "Default": {
                         "buttons": {
@@ -356,6 +361,16 @@ def load_actions():
             except (TypeError, ValueError):
                 s = 1.0
             actions["controller"]["sensitivity"] = {"look": s, "turn": s, "move": s, "strafe": s}
+            migrated = True
+
+        if "controller2d" not in actions:
+            actions["controller2d"] = {
+                "sensitivity": {"horizontal": 1.0, "vertical": 1.0},
+                "invert": {"horizontal": False, "vertical": True}
+            }
+            migrated = True
+        if "controller_view" not in actions:
+            actions["controller_view"] = "3d"
             migrated = True
 
         # Default mode LED: ship red reactive. Only migrate the old stock rainbow

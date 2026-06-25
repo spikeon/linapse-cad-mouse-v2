@@ -5,6 +5,14 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.25.0] - 2026-06-25
+
+### Added
+- **Separate 2D (top-down) Controller tuning.** The Controller preview's 2D/3D toggle moved to the panel header and is now a saved setting (restored on reconnect). The 2D top-down view has its own control panel — **Horizontal** and **Vertical** sensitivity + inversion for the tilt axes it actually uses — stored independently of the 3D first-person settings, so tuning one no longer affects the other.
+
+### Changed
+- **"Spring Head" renamed to "Axis Mouse"** in the configurator. The underlying hardware preset is unchanged.
+
 ## [2.24.1] - 2026-06-24
 
 ### Changed

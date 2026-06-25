@@ -1,6 +1,6 @@
 {
   "name": "linapse-browser-connector",
-  "version": "2.24.1",
+  "version": "2.25.0",
   "private": true,
   "description": "Official Linapse browser connector for OnShape and SketchUp Web",
   "license": "GPL-3.0",

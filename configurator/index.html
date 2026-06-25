@@ -1188,11 +1188,6 @@ input[type=range]::-webkit-slider-thumb {
     <div id="controllerViewport" style="flex:1;position:relative;background:#0d0d0d;overflow:hidden;min-width:0;display:none">
       <canvas id="controllerCanvas" style="display:block;width:100%;height:100%"></canvas>
       <canvas id="controller2dCanvas" style="display:none;position:absolute;inset:0;width:100%;height:100%"></canvas>
-      <!-- view tabs -->
-      <div style="position:absolute;top:12px;left:12px;z-index:5;display:flex;border:1px solid rgba(255,255,255,0.18);border-radius:6px;overflow:hidden;font-family:'Barlow Condensed',sans-serif;font-size:12px;letter-spacing:2px">
-        <div id="ctrlTab3d" onclick="switchControllerTab('3d')" style="padding:4px 14px;cursor:pointer;background:var(--green-glow);color:var(--green)">3D</div>
-        <div id="ctrlTab2d" onclick="switchControllerTab('2d')" style="padding:4px 14px;cursor:pointer;color:rgba(255,255,255,0.5);border-left:1px solid rgba(255,255,255,0.18)">2D</div>
-      </div>
       <div id="ctrlHint" style="position:absolute;bottom:14px;left:50%;transform:translateX(-50%);font-size:10px;letter-spacing:2px;color:rgba(255,255,255,0.2);pointer-events:none;white-space:nowrap">TILT PUCK TO MOVE · A/B TO ATTACK</div>
       <div id="controllerWaiting" style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-size:12px;letter-spacing:1px;color:rgba(255,255,255,0.45);pointer-events:none;text-align:center">Waiting for joystick…<br><span style="font-size:10px;color:rgba(255,255,255,0.25)">tilt the puck</span></div>
       <!-- live stick monitor (tilt) -->
@@ -1299,7 +1294,7 @@ input[type=range]::-webkit-slider-thumb {
           <div class="field-label" style="color:var(--green);letter-spacing:2px;font-size:10px;font-family:'Barlow Condensed',sans-serif">HARDWARE</div>
           <div style="margin-top: 8px;">
             <div class="toggle-row" style="padding: 4px 0; border: none; margin-bottom: 0;">
-              <span class="toggle-label" style="font-size: 10px; color: var(--text3); margin: 0; text-transform: uppercase; letter-spacing: 1px; font-family: 'Barlow Condensed', sans-serif;">Spring Head</span>
+              <span class="toggle-label" style="font-size: 10px; color: var(--text3); margin: 0; text-transform: uppercase; letter-spacing: 1px; font-family: 'Barlow Condensed', sans-serif;">Axis Mouse</span>
               <div class="toggle" id="sensSpringHead" onclick="toggleSpringHead()"></div>
             </div>
             <div style="font-size:10px;color:var(--text3);margin-top:4px;line-height:1.3;">
@@ -1569,11 +1564,18 @@ input[type=range]::-webkit-slider-thumb {
     <!-- Controller controls panel (shown only in Controller mode) -->
     <div id="controllerPanel" class="side-panel" style="transform:none;display:none">
       <div class="panel-header">
-        <div class="panel-title" style="font-size:15px;letter-spacing:2px">Controller</div>
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:8px">
+          <div class="panel-title" style="font-size:15px;letter-spacing:2px">Controller</div>
+          <div style="display:flex;border:1px solid rgba(255,255,255,0.18);border-radius:6px;overflow:hidden;font-family:'Barlow Condensed',sans-serif;font-size:12px;letter-spacing:2px">
+            <div id="ctrlTab3d" onclick="switchControllerTab('3d')" style="padding:3px 12px;cursor:pointer;background:var(--green-glow);color:var(--green)">3D</div>
+            <div id="ctrlTab2d" onclick="switchControllerTab('2d')" style="padding:3px 12px;cursor:pointer;color:rgba(255,255,255,0.5);border-left:1px solid rgba(255,255,255,0.18)">2D</div>
+          </div>
+        </div>
         <div class="panel-sub">Changes apply live</div>
       </div>
       <div class="panel-body" style="flex:1;overflow-y:auto">
 
+        <div id="ctrlBody3d">
         <div class="field-group">
           <div class="field-label" style="color:var(--green);letter-spacing:2px;font-size:10px;font-family:'Barlow Condensed',sans-serif">SENSITIVITY</div>
           <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:2px">
@@ -1633,6 +1635,41 @@ input[type=range]::-webkit-slider-thumb {
         <div class="field-group" style="font-size:10px;color:var(--text3);line-height:1.4">
           Tilt the puck to aim the camera. Only rotation drives the stick — translation is ignored in Controller mode. Buttons map to gamepad A / B.
         </div>
+        </div><!-- /ctrlBody3d -->
+
+        <div id="ctrlBody2d" style="display:none">
+          <div class="field-group">
+            <div class="field-label" style="color:var(--green);letter-spacing:2px;font-size:10px;font-family:'Barlow Condensed',sans-serif">SENSITIVITY</div>
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:2px">
+              <span class="field-label" style="margin:0">Horizontal</span>
+              <input type="number" id="ctrl2dSensVal_horizontal" min="0.1" max="3" step="0.1" value="1.0" style="width:48px;background:var(--border2);border:1px solid var(--border);color:var(--text);font-size:10px;text-align:right;padding:1px 3px;border-radius:3px;font-family:inherit" oninput="onController2dSens('horizontal',this.value)">
+            </div>
+            <input type="range" id="ctrl2dSens_horizontal" min="0.1" max="3" step="0.1" value="1.0" oninput="onController2dSens('horizontal',this.value)">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:2px;margin-top:10px">
+              <span class="field-label" style="margin:0">Vertical</span>
+              <input type="number" id="ctrl2dSensVal_vertical" min="0.1" max="3" step="0.1" value="1.0" style="width:48px;background:var(--border2);border:1px solid var(--border);color:var(--text);font-size:10px;text-align:right;padding:1px 3px;border-radius:3px;font-family:inherit" oninput="onController2dSens('vertical',this.value)">
+            </div>
+            <input type="range" id="ctrl2dSens_vertical" min="0.1" max="3" step="0.1" value="1.0" oninput="onController2dSens('vertical',this.value)">
+          </div>
+
+          <div class="field-group">
+            <div class="field-label" style="color:var(--green);letter-spacing:2px;font-size:10px;font-family:'Barlow Condensed',sans-serif">INVERT</div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px 16px;margin-top:8px">
+              <div class="toggle-row" style="padding:4px 0;border:none;margin-bottom:0">
+                <span class="toggle-label">Horizontal</span>
+                <div class="toggle" id="ctrl2dInvHorizontal" onclick="onController2dInvert('horizontal','ctrl2dInvHorizontal')"></div>
+              </div>
+              <div class="toggle-row" style="padding:4px 0;border:none;margin-bottom:0">
+                <span class="toggle-label">Vertical</span>
+                <div class="toggle" id="ctrl2dInvVertical" onclick="onController2dInvert('vertical','ctrl2dInvVertical')"></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="field-group" style="font-size:10px;color:var(--text3);line-height:1.4">
+            Top-down view: tilt the puck to set direction and speed. Only the left-stick (tilt) axes apply here.
+          </div>
+        </div><!-- /ctrlBody2d -->
       </div>
     </div>
   </div><!-- /tab-sensitivity -->
@@ -1871,6 +1908,11 @@ const DEFAULT_ACTIONS = {
     deadzone: 0.06,
     invert: { rx: true, ry: false, rz: false, x: false, y: false }
   },
+  controller2d: {
+    sensitivity: { horizontal: 1.0, vertical: 1.0 },
+    invert: { horizontal: false, vertical: true }
+  },
+  controller_view: '3d',
   modes: {
     "Default": {
       buttons: {
@@ -3581,15 +3623,24 @@ function updateControllerView() {
     }
     syncControllerControls();
   }
-  applyControllerTabs();
+  applyControllerView((actions && actions.controller_view) || '3d');
 }
 
 function switchControllerTab(which) {
+  // Persist the chosen view to config, then apply the UI.
+  if (actions) { actions.controller_view = which; sendCmd('actions ' + JSON.stringify(actions)); }
+  applyControllerView(which);
+}
+
+function applyControllerView(which) {
   controller2dTab = which;
   const t3 = document.getElementById('ctrlTab3d'), t2 = document.getElementById('ctrlTab2d');
   const on = 'var(--green)', off = 'rgba(255,255,255,0.5)', bg = 'var(--green-glow)';
   if (t3) { t3.style.color = which === '3d' ? on : off; t3.style.background = which === '3d' ? bg : 'transparent'; }
   if (t2) { t2.style.color = which === '2d' ? on : off; t2.style.background = which === '2d' ? bg : 'transparent'; }
+  const b3 = document.getElementById('ctrlBody3d'), b2 = document.getElementById('ctrlBody2d');
+  if (b3) b3.style.display = which === '2d' ? 'none' : '';
+  if (b2) b2.style.display = which === '2d' ? '' : 'none';
   const hint = document.getElementById('ctrlHint');
   if (hint) hint.textContent = 'TILT PUCK TO MOVE · A/B TO ATTACK';
   applyControllerTabs();
@@ -3633,6 +3684,14 @@ function ctrlCfg() {
   return c;
 }
 
+function ctrl2dCfg() {
+  if (!actions.controller2d) actions.controller2d = {};
+  const c = actions.controller2d;
+  if (typeof c.sensitivity !== 'object' || c.sensitivity === null) c.sensitivity = { horizontal: 1.0, vertical: 1.0 };
+  if (typeof c.invert !== 'object' || c.invert === null) c.invert = { horizontal: false, vertical: true };
+  return c;
+}
+
 function syncControllerControls() {
   if (!actions) return;
   const c = ctrlCfg();
@@ -3651,6 +3710,16 @@ function syncControllerControls() {
   document.getElementById('ctrlInvTurn')?.classList.toggle('on', !!inv.rz);
   document.getElementById('ctrlInvFwd')?.classList.toggle('on', !!inv.y);
   document.getElementById('ctrlInvStrafe')?.classList.toggle('on', !!inv.x);
+
+  const c2 = ctrl2dCfg();
+  ['horizontal', 'vertical'].forEach((k) => {
+    const v = c2.sensitivity[k] ?? 1.0;
+    const el = document.getElementById('ctrl2dSens_' + k), val = document.getElementById('ctrl2dSensVal_' + k);
+    if (el) el.value = v;
+    if (val) val.value = v.toFixed(1);
+  });
+  document.getElementById('ctrl2dInvHorizontal')?.classList.toggle('on', !!c2.invert.horizontal);
+  document.getElementById('ctrl2dInvVertical')?.classList.toggle('on', !!c2.invert.vertical);
 }
 
 function onControllerSens(key, v) {
@@ -3673,6 +3742,21 @@ function onControllerInvert(axis, elId) {
   const el = document.getElementById(elId);
   el.classList.toggle('on');
   ctrlCfg().invert[axis] = el.classList.contains('on');
+  sendCmd('actions ' + JSON.stringify(actions));
+}
+
+function onController2dSens(key, v) {
+  v = parseFloat(v); if (isNaN(v)) return;
+  document.getElementById('ctrl2dSens_' + key).value = v;
+  document.getElementById('ctrl2dSensVal_' + key).value = v.toFixed(1);
+  ctrl2dCfg().sensitivity[key] = v;
+  sendCmd('actions ' + JSON.stringify(actions));
+}
+
+function onController2dInvert(key, elId) {
+  const el = document.getElementById(elId);
+  el.classList.toggle('on');
+  ctrl2dCfg().invert[key] = el.classList.contains('on');
   sendCmd('actions ' + JSON.stringify(actions));
 }
 

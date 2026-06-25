@@ -411,40 +411,63 @@ def serial_thread(actions_ref):
                             elif current_mode == "Controller":
                                 # Controller has its OWN settings (sensitivity / deadzone /
                                 # per-axis invert), decoupled from the global sensitivity +
-                                # inversion that still drive CAD/Mouse modes.
+                                # inversion that still drive CAD/Mouse modes. The 2D (top-down)
+                                # and 3D (first-person) previews tune the stick independently.
+                                _cv = actions_ref[0].get("controller_view", "3d") if actions_ref[0] else "3d"
                                 ctrl = actions_ref[0].get("controller", {}) if actions_ref[0] else {}
                                 cdead = ctrl.get("deadzone", 0.06)
-                                cinv = ctrl.get("invert", {})
-                                if not isinstance(cinv, dict):
-                                    cinv = {}
-                                csens = ctrl.get("sensitivity", {})
-                                if not isinstance(csens, dict):
-                                    csens = {}
-                                s_look = csens.get("look", 1.0)      # tilt -> pitch + left stick
-                                s_turn = csens.get("turn", 1.0)      # twist -> yaw
-                                s_move = csens.get("move", 1.0)      # push fwd/back
-                                s_strafe = csens.get("strafe", 1.0)  # push left/right
+                                if _cv == "2d":
+                                    # Top-down: left stick from tilt only, with per-axis
+                                    # horizontal/vertical sensitivity + invert (deadzone shared).
+                                    c2 = actions_ref[0].get("controller2d", {}) if actions_ref[0] else {}
+                                    c2s = c2.get("sensitivity", {})
+                                    if not isinstance(c2s, dict):
+                                        c2s = {}
+                                    c2i = c2.get("invert", {})
+                                    if not isinstance(c2i, dict):
+                                        c2i = {}
+                                    s_h = c2s.get("horizontal", 1.0)
+                                    s_v = c2s.get("vertical", 1.0)
+                                    sgn_h = -1.0 if c2i.get("horizontal", False) else 1.0
+                                    sgn_v = -1.0 if c2i.get("vertical", True) else 1.0
+                                    raw_v = raw_coords[3] * sgn_v   # vertical tilt (rx)
+                                    raw_h = raw_coords[4] * sgn_h   # horizontal tilt (ry)
+                                    lx, ly = gamepad.tilt_to_stick(raw_v * s_v, raw_h * s_h, AXIS_LIMIT, cdead)
+                                    gamepad.set_left_stick(lx, ly)
+                                    # extra axes are 3D-preview-only; zero them in 2D
+                                    state.broadcast_from_thread(f"STICK:{lx:.3f},{ly:.3f},0.000,0.000,0.000")
+                                else:
+                                    cinv = ctrl.get("invert", {})
+                                    if not isinstance(cinv, dict):
+                                        cinv = {}
+                                    csens = ctrl.get("sensitivity", {})
+                                    if not isinstance(csens, dict):
+                                        csens = {}
+                                    s_look = csens.get("look", 1.0)      # tilt -> pitch + left stick
+                                    s_turn = csens.get("turn", 1.0)      # twist -> yaw
+                                    s_move = csens.get("move", 1.0)      # push fwd/back
+                                    s_strafe = csens.get("strafe", 1.0)  # push left/right
 
-                                def _csgn(ax, default=False):
-                                    return -1.0 if cinv.get(ax, default) else 1.0
+                                    def _csgn(ax, default=False):
+                                        return -1.0 if cinv.get(ax, default) else 1.0
 
-                                raw_rx = raw_coords[3] * _csgn("rx", True)   # look (tilt fwd/back)
-                                raw_ry = raw_coords[4] * _csgn("ry", False)  # left-stick horizontal
-                                raw_tx = raw_coords[0] * _csgn("x", False)   # strafe
-                                raw_ty = raw_coords[1] * _csgn("y", False)   # forward/back
-                                raw_rz = raw_coords[5] * _csgn("rz", False)  # twist (turn)
+                                    raw_rx = raw_coords[3] * _csgn("rx", True)   # look (tilt fwd/back)
+                                    raw_ry = raw_coords[4] * _csgn("ry", False)  # left-stick horizontal
+                                    raw_tx = raw_coords[0] * _csgn("x", False)   # strafe
+                                    raw_ty = raw_coords[1] * _csgn("y", False)   # forward/back
+                                    raw_rz = raw_coords[5] * _csgn("rz", False)  # twist (turn)
 
-                                lx, ly = gamepad.tilt_to_stick(raw_rx * s_look, raw_ry * s_look, AXIS_LIMIT, cdead)
-                                gamepad.set_left_stick(lx, ly)
+                                    lx, ly = gamepad.tilt_to_stick(raw_rx * s_look, raw_ry * s_look, AXIS_LIMIT, cdead)
+                                    gamepad.set_left_stick(lx, ly)
 
-                                def _nd(v):
-                                    n = max(-1.0, min(1.0, v / AXIS_LIMIT))
-                                    return 0.0 if abs(n) < cdead else n
+                                    def _nd(v):
+                                        n = max(-1.0, min(1.0, v / AXIS_LIMIT))
+                                        return 0.0 if abs(n) < cdead else n
 
-                                # STICK:lx,ly,strafe,forward,twist  (extra axes preview-only)
-                                state.broadcast_from_thread(
-                                    f"STICK:{lx:.3f},{ly:.3f},{_nd(raw_tx * s_strafe):.3f},"
-                                    f"{_nd(raw_ty * s_move):.3f},{_nd(raw_rz * s_turn):.3f}")
+                                    # STICK:lx,ly,strafe,forward,twist  (extra axes preview-only)
+                                    state.broadcast_from_thread(
+                                        f"STICK:{lx:.3f},{ly:.3f},{_nd(raw_tx * s_strafe):.3f},"
+                                        f"{_nd(raw_ty * s_move):.3f},{_nd(raw_rz * s_turn):.3f}")
 
                             # Send processed coordinates back to the device to emit via USB HID
                             try:

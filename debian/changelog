@@ -1,3 +1,12 @@
+linapse-cad-mouse (2.25.0-1) unstable; urgency=low
+
+  * Add separate 2D (top-down) Controller tuning: the 2D/3D preview toggle is
+    now a saved setting with its own panel (Horizontal/Vertical sensitivity +
+    invert), independent of the 3D first-person controls. Rename the "Spring
+    Head" configurator toggle to "Axis Mouse".
+
+ -- Michael Flynn <spikeon@gmail.com>  Thu, 25 Jun 2026 04:00:00 -0400
+
 linapse-cad-mouse (2.24.1-1) unstable; urgency=low
 
   * Move the Button Override (raw HID) toggle to the Device tab and grey out

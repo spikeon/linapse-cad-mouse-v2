@@ -61,6 +61,11 @@ const unsigned long LED_CALIBRATING_COLOR = 0x0000FF;
 // A tap on the head registers as a spike in TX (left/right), TY (forward/back),
 // or TZ (top/down) before the spring returns the head to center.
 const float TAP_VELOCITY_THRESHOLD = 3.0f;   // tune on hardware; lower = more sensitive
+// De-spike: per-axis frame-delta clamp on motion output. A delta above the
+// threshold is a spike (e.g. a tap impulse) and gets clamped; sustained motion
+// passes. Output axis units run to AXIS_LIMIT (350). Tune on hardware.
+const float DESPIKE_THRESHOLD_DEFAULT = 40.0f;
+const float DESPIKE_STRENGTH_DEFAULT  = 1.0f;   // 0 = off, 1 = full clamp
 const float TAP_RETURN_ZONE        = 25.0f;  // axis must return within this of zero to confirm
 const unsigned long TAP_MAX_DURATION_MS  = 250;  // longer impulse treated as intentional motion
 const unsigned long TAP_COOLDOWN_MIN_MS  = 50;   // minimum lockout after tap

@@ -17,6 +17,9 @@ constexpr int      kAddrTapSens = kBase + 24;
 constexpr int      kAddrInvTapZ   = kBase + 28;
 constexpr int      kAddrSpherical = kBase + 29;
 constexpr int      kAddrSpringHead = kBase + 30;
+constexpr int      kAddrDespikeEnabled   = kBase + 31;
+constexpr int      kAddrDespikeThreshold = kBase + 32;
+constexpr int      kAddrDespikeStrength  = kBase + 36;
 }
 
 void SensConfig::load() {
@@ -33,6 +36,14 @@ void SensConfig::load() {
   EEPROM.get(kAddrInvTapZ, invertTapZ);
   EEPROM.get(kAddrSpherical, sphericalMode);
   EEPROM.get(kAddrSpringHead, springHead);
+  EEPROM.get(kAddrDespikeEnabled,   despikeEnabled);
+  EEPROM.get(kAddrDespikeThreshold, despikeThreshold);
+  EEPROM.get(kAddrDespikeStrength,  despikeStrength);
+  // Added after kMagic 0xCAD30003: on older devices these bytes are
+  // uninitialized, so clamp the floats back to defaults when out of range.
+  // (despikeEnabled defaults on; erased flash reads non-zero = true.)
+  if (!(despikeThreshold > 0.0f && despikeThreshold < 1000.0f)) despikeThreshold = Config::DESPIKE_THRESHOLD_DEFAULT;
+  if (!(despikeStrength >= 0.0f && despikeStrength <= 1.0f))    despikeStrength  = Config::DESPIKE_STRENGTH_DEFAULT;
 }
 
 void SensConfig::save() {
@@ -48,6 +59,9 @@ void SensConfig::save() {
   EEPROM.put(kAddrInvTapZ, invertTapZ);
   EEPROM.put(kAddrSpherical, sphericalMode);
   EEPROM.put(kAddrSpringHead, springHead);
+  EEPROM.put(kAddrDespikeEnabled,   despikeEnabled);
+  EEPROM.put(kAddrDespikeThreshold, despikeThreshold);
+  EEPROM.put(kAddrDespikeStrength,  despikeStrength);
   EEPROM.commit();
 }
 
@@ -61,4 +75,7 @@ void SensConfig::reset() {
   invertTapZ     = false;
   sphericalMode  = false;
   springHead     = false;
+  despikeEnabled   = true;
+  despikeThreshold = Config::DESPIKE_THRESHOLD_DEFAULT;
+  despikeStrength  = Config::DESPIKE_STRENGTH_DEFAULT;
 }

@@ -18,6 +18,9 @@ class SensConfig {
   bool  invertTapZ;     // whether Z axis tap detection is inverted
   bool  sphericalMode;   // whether spherical vector processing is active
   bool  springHead;      // whether spring head (far-mounted magnets) gain table is active
+  bool  despikeEnabled;  // always-on per-axis spike clamp (false = legacy tap-zeroing)
+  float despikeThreshold;// per-axis frame-delta clamp onset
+  float despikeStrength; // 0 = off, 1 = full clamp
 
   void load();
   void save();

@@ -7,6 +7,7 @@ from pathlib import Path
 
 import uvicorn
 from fastapi import WebSocket
+from starlette.routing import WebSocketRoute
 
 import spacenav_ws.main
 import spacenav_ws.spacenav
@@ -77,11 +78,15 @@ async def nlproxy(ws: WebSocket):
 def patch_app():
     configure_spnav_socket()
     app = spacenav_ws.main.app
-    for route in app.routes:
-        if getattr(route, "path", None) == "/" and hasattr(route, "endpoint"):
-            route.endpoint = nlproxy
-            logging.info("Patched spacenav-ws nlproxy endpoint for Linapse")
-            break
+    # Starlette builds route.app from the endpoint at construction time, so
+    # reassigning route.endpoint is a no-op. Drop the vendored WebSocket "/"
+    # route and register the Linapse nlproxy (with spnav reconnect) in its place.
+    app.router.routes = [
+        r for r in app.router.routes
+        if not (getattr(r, "path", None) == "/" and isinstance(r, WebSocketRoute))
+    ]
+    app.add_api_websocket_route("/", nlproxy)
+    logging.info("Patched spacenav-ws nlproxy endpoint for Linapse")
     return app
 
 

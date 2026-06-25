@@ -246,7 +246,7 @@ void handleSerial() {
       else if (serialBuf.startsWith("sens "))   handleSensCommand(serialBuf.substring(5));
       else if (serialBuf.startsWith("sleep "))  handleSleepCommand(serialBuf.substring(6));
       else if (serialBuf.startsWith("debug "))  handleDebugCommand(serialBuf.substring(6));
-      else if (serialBuf == "version")          { Serial.println("version=2.26.2"); }
+      else if (serialBuf == "version")          { Serial.println("version=2.26.3"); }
       else if (serialBuf.startsWith("volume ")) {
         int val = atoi(serialBuf.c_str() + 7);
         if (val >= 0 && val <= 100) {

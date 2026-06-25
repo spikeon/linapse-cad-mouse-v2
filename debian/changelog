@@ -1,3 +1,13 @@
+linapse-cad-mouse (2.26.3-1) unstable; urgency=low
+
+  * Fix browser bridge (OnShape / SketchUp Web): the WS route patch was a
+    no-op, so the vanilla handler ran without spnav reconnect; now installs
+    the Linapse nlproxy on the WebSocket "/" route properly.
+  * Stop dumping a full traceback on every browser reload by catching the
+    normal WebSocketDisconnect (code 1001).
+
+ -- Michael Flynn <spikeon@gmail.com>  Wed, 25 Jun 2026 09:30:00 -0400
+
 linapse-cad-mouse (2.26.2-1) unstable; urgency=low
 
   * Add Tap sub-tab to the Controller panel (Controls / Tap) exposing

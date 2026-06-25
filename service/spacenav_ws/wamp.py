@@ -9,6 +9,7 @@ from types import CoroutineType
 from typing import Any, ClassVar, Dict, NamedTuple, Optional, Type, Callable
 
 from fastapi import WebSocket
+from starlette.websockets import WebSocketDisconnect
 
 
 def _rand_id(len) -> str:
@@ -175,10 +176,14 @@ class WampSession:
         self.wamp.handle_callerror = self.handle_callerror
 
     async def start_wamp_message_stream(self):
-        while True:
-            msg = await self.wamp.next_message()
-            # They're all like.. interleaved.. have to create one task per message with the current approach.. Not very nice because it means errors don't bubble up
-            asyncio.create_task(self.wamp.run_message_handler(msg))
+        try:
+            while True:
+                msg = await self.wamp.next_message()
+                # They're all like.. interleaved.. have to create one task per message with the current approach.. Not very nice because it means errors don't bubble up
+                asyncio.create_task(self.wamp.run_message_handler(msg))
+        except WebSocketDisconnect as exc:
+            # Browser navigated away / reloaded (1001) — normal teardown, not an error.
+            logging.info("WAMP client disconnected (code %s)", exc.code)
 
     async def client_rpc(self, controller_uri: str, method: str, *args):
         """This function lives for the duration of the rpc. It registers the inflight request and waits for either handle_callresult or handle_callerror to finalize the rpc.."""

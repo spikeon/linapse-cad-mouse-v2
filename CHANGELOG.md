@@ -5,6 +5,12 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.26.3] - 2026-06-25
+
+### Fixed
+- **Browser bridge (OnShape / SketchUp Web) reliability.** The `patch_app` route patch was a no-op (Starlette binds the handler at construction, so reassigning `route.endpoint` did nothing), leaving the vanilla WebSocket handler in place without spnav-socket reconnect. It now drops the vendored WS `/` route and registers the Linapse nlproxy (with reconnect) via `add_api_websocket_route`.
+- **No more traceback spam on browser reload.** An uncaught `WebSocketDisconnect` (code 1001, normal navigate-away) dumped a full ASGI traceback on every OnShape reload; it's now caught and logged as a clean disconnect.
+
 ## [2.26.2] - 2026-06-25
 
 ### Added

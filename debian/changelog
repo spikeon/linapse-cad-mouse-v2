@@ -1,3 +1,12 @@
+linapse-cad-mouse (2.26.1-1) unstable; urgency=low
+
+  * Fix Calibration Wizard overlay so it covers the full app regardless of
+    active tab. Previously the overlay was nested inside the Motion tab div,
+    so opening the Wizard from Controls, Lighting, Device, or Firmware was
+    invisible.
+
+ -- Michael Flynn <spikeon@gmail.com>  Wed, 25 Jun 2026 07:00:00 -0400
+
 linapse-cad-mouse (2.26.0-1) unstable; urgency=low
 
   * Add tap de-spike filter: the firmware clamps the tap impulse on all axes so

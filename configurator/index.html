@@ -852,7 +852,7 @@ input[type=range]::-webkit-slider-thumb {
 
 /* Calibration Wizard Styles */
 .wizard-overlay {
-  position: absolute;
+  position: fixed;
   top: 0;
   left: 0;
   right: 0;
@@ -1164,29 +1164,6 @@ input[type=range]::-webkit-slider-thumb {
       <canvas id="benchyCanvas" style="display:block;width:100%;height:100%"></canvas>
       <div style="position:absolute;bottom:14px;left:50%;transform:translateX(-50%);font-size:10px;letter-spacing:2px;color:rgba(255,255,255,0.2);pointer-events:none;white-space:nowrap">MOVE PUCK TO TEST</div>
       
-      <!-- Calibration Wizard Overlay -->
-      <div id="calibrationWizardOverlay" class="wizard-overlay">
-        <div class="wizard-card">
-          <div class="wizard-header">
-            <div class="wizard-title" id="wizardTitle">Calibration Wizard</div>
-            <div class="wizard-step-indicator" id="wizardStepIndicator">Step 0/13</div>
-          </div>
-          <div class="wizard-body">
-            <canvas id="wizardCanvas" width="460" height="150" style="width:100%;height:150px;background:#0d0d0d;border:1px solid var(--border);border-radius:4px;display:none;margin-bottom:10px"></canvas>
-            <div class="wizard-instruction" id="wizardInstruction">Welcome to Calibration.</div>
-            <div id="wizardDetails">This guide will help you set comfortable sensitivities for your puck.</div>
-            <div class="wizard-live-value" id="wizardLiveValue" style="display: none;">0.0</div>
-            <div class="wizard-progress-bar-container" id="wizardProgressBarContainer" style="display: none; margin-top: 12px;">
-              <div class="wizard-progress-bar" id="wizardProgressBar"></div>
-            </div>
-          </div>
-          <div class="wizard-footer">
-            <button class="wizard-btn wizard-btn-secondary" id="wizardCancelBtn" onclick="cancelCalibrationWizard()">Cancel</button>
-            <button class="wizard-btn wizard-btn-secondary" id="wizardResetBtn" onclick="resetWizardStep()" style="display: none;">Reset Step</button>
-            <button class="wizard-btn wizard-btn-primary" id="wizardNextBtn" onclick="nextCalibrationWizardStep()">Start</button>
-          </div>
-        </div>
-      </div>
     </div>
 
     <!-- Controller preview (shown only in Controller mode) -->
@@ -5499,5 +5476,28 @@ connectWS();
 
 
 </script>
+<!-- Calibration Wizard Overlay — top-level so position:fixed covers full viewport -->
+<div id="calibrationWizardOverlay" class="wizard-overlay">
+  <div class="wizard-card">
+    <div class="wizard-header">
+      <div class="wizard-title" id="wizardTitle">Calibration Wizard</div>
+      <div class="wizard-step-indicator" id="wizardStepIndicator">Step 0/13</div>
+    </div>
+    <div class="wizard-body">
+      <canvas id="wizardCanvas" width="460" height="150" style="width:100%;height:150px;background:#0d0d0d;border:1px solid var(--border);border-radius:4px;display:none;margin-bottom:10px"></canvas>
+      <div class="wizard-instruction" id="wizardInstruction">Welcome to Calibration.</div>
+      <div id="wizardDetails">This guide will help you set comfortable sensitivities for your puck.</div>
+      <div class="wizard-live-value" id="wizardLiveValue" style="display: none;">0.0</div>
+      <div class="wizard-progress-bar-container" id="wizardProgressBarContainer" style="display: none; margin-top: 12px;">
+        <div class="wizard-progress-bar" id="wizardProgressBar"></div>
+      </div>
+    </div>
+    <div class="wizard-footer">
+      <button class="wizard-btn wizard-btn-secondary" id="wizardCancelBtn" onclick="cancelCalibrationWizard()">Cancel</button>
+      <button class="wizard-btn wizard-btn-secondary" id="wizardResetBtn" onclick="resetWizardStep()" style="display: none;">Reset Step</button>
+      <button class="wizard-btn wizard-btn-primary" id="wizardNextBtn" onclick="nextCalibrationWizardStep()">Start</button>
+    </div>
+  </div>
+</div>
 </body>
 </html>

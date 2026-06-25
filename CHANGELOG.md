@@ -5,6 +5,11 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.26.1] - 2026-06-25
+
+### Fixed
+- **Calibration Wizard overlay** now covers the full app regardless of which tab is active. Previously the overlay was nested inside the Motion tab, so opening the Wizard from Controls, Lighting, Device, or Firmware showed nothing.
+
 ## [2.26.0] - 2026-06-25
 
 ### Added

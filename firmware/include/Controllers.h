@@ -21,3 +21,6 @@ extern EffectEngine        effectEngine;
 extern bool g_serviceHidMode;
 extern bool g_serviceButtonMode;
 extern unsigned long g_lastServicePacketMs;
+
+extern long  g_sleepTimeoutMs;      // -1 = disabled; >0 = idle timeout in ms
+extern float g_sleepWakeThreshold;  // raw sensor deviation magnitude to wake from sleep

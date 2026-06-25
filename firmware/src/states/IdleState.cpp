@@ -102,9 +102,9 @@ void IdleState::handleTaps() {
 }
 
 void IdleState::handleSleepTransition(unsigned long now) {
-  if (Config::IDLE_SLEEP_TIMEOUT_MS < 0) return;
+  if (g_sleepTimeoutMs <= 0) return;
   const unsigned long inactiveMs = now - lastActivityMs_;
-  if (inactiveMs >= (unsigned long)Config::IDLE_SLEEP_TIMEOUT_MS) {
+  if (inactiveMs >= (unsigned long)g_sleepTimeoutMs) {
     stateMachine.changeState(&StateMachine::sleepState);
   }
 }

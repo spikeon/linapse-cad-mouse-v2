@@ -1,3 +1,15 @@
+linapse-cad-mouse (2.24.0-1) unstable; urgency=low
+
+  * Add sleep mode: firmware enters sleep state after configurable idle
+    timeout, turning off LEDs and stopping motion output. Fixes Linux
+    wake-from-sleep bug (original firmware only woke on button press;
+    now also wakes on raw sensor motion exceeding a configurable threshold).
+    Idle timeout and wake sensitivity configurable in new Device tab.
+  * Move axis inversions to dedicated Invert sub-tab in Motion panel.
+  * Add Device tab to configurator for device-level settings (sleep mode).
+
+ -- Michael Flynn <spikeon@gmail.com>  Tue, 24 Jun 2026 12:00:00 -0400
+
 linapse-cad-mouse (2.23.0-1) unstable; urgency=low
 
   * Add Spring Head hardware preset: higher asymmetric gains for variant

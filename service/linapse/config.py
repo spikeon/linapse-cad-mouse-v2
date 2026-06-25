@@ -93,6 +93,8 @@ def load_actions():
                 "auto_update_firmware": False,
                 "dominant_mode": True,
                 "dominant_mode_bias": 4.8,
+                "sleep_timeout_ms": 0,
+                "sleep_wake_threshold": 15.0,
                 "sensitivity": {
                     "x_pos": 1.0, "x_neg": 1.0, "y_pos": 1.0, "y_neg": 1.0, "z_pos": 1.0, "z_neg": 1.0,
                     "rx_pos": 1.0, "rx_neg": 1.0, "ry_pos": 1.0, "ry_neg": 1.0, "rz_pos": 1.0, "rz_neg": 1.0
@@ -317,6 +319,14 @@ def load_actions():
 
         if "auto_update_firmware" not in actions:
             actions["auto_update_firmware"] = False
+            migrated = True
+
+        if "sleep_timeout_ms" not in actions:
+            actions["sleep_timeout_ms"] = 0
+            migrated = True
+
+        if "sleep_wake_threshold" not in actions:
+            actions["sleep_wake_threshold"] = 15.0
             migrated = True
 
         if "controller" not in actions:

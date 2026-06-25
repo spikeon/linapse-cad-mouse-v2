@@ -32,6 +32,8 @@ int g_eqLevels[8] = {0};   // accessed by EffectEngine
 bool g_serviceHidMode = false;
 bool g_serviceButtonMode = false;
 unsigned long g_lastServicePacketMs = 0;
+long  g_sleepTimeoutMs     = -1;    // accessed by IdleState; -1 = disabled
+float g_sleepWakeThreshold = 15.0f; // accessed by SleepState
 
 namespace {
 String serialBuf;
@@ -186,6 +188,27 @@ void handleSensCommand(const String& args) {
   Serial.println("ERR unknown: sens get|set <param> <val>|reset");
 }
 
+void handleSleepCommand(const String& args) {
+  if (args == "get") {
+    char buf[64];
+    snprintf(buf, sizeof(buf), "{\"sleep_timeout_ms\":%ld,\"sleep_wake_threshold\":%.2f}\n",
+             g_sleepTimeoutMs, g_sleepWakeThreshold);
+    Serial.print(buf);
+    return;
+  }
+  if (args.startsWith("set timeout ")) {
+    g_sleepTimeoutMs = atol(args.c_str() + 12);
+    Serial.println("OK");
+    return;
+  }
+  if (args.startsWith("set threshold ")) {
+    g_sleepWakeThreshold = atof(args.c_str() + 14);
+    Serial.println("OK");
+    return;
+  }
+  Serial.println("ERR unknown: sleep get|set timeout <ms>|set threshold <val>");
+}
+
 void handleDebugCommand(const String& args) {
   if (args == "axes on")  { g_debugAxes = true;  Serial.println("OK debug axes on");  return; }
   if (args == "axes off") { g_debugAxes = false; Serial.println("OK debug axes off"); return; }
@@ -210,6 +233,7 @@ void handleSerial() {
       else if (serialBuf.startsWith("led "))    handleLedCommand(serialBuf.substring(4));
       else if (serialBuf.startsWith("config ")) handleConfigCommand(serialBuf.substring(7));
       else if (serialBuf.startsWith("sens "))   handleSensCommand(serialBuf.substring(5));
+      else if (serialBuf.startsWith("sleep "))  handleSleepCommand(serialBuf.substring(6));
       else if (serialBuf.startsWith("debug "))  handleDebugCommand(serialBuf.substring(6));
       else if (serialBuf == "version")          { Serial.println("version=2.23.0"); }
       else if (serialBuf.startsWith("volume ")) {

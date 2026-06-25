@@ -990,6 +990,7 @@ input[type=range]::-webkit-slider-thumb {
   <div class="tab active" onclick="switchTab('customize', this)">Controls</div>
   <div class="tab" onclick="switchTab('lighting', this)">Lighting</div>
   <div class="tab" onclick="switchTab('sensitivity', this)">Motion</div>
+  <div class="tab" onclick="switchTab('device', this)">Device</div>
   <div class="tab" onclick="switchTab('firmware', this)" style="position: relative; display: flex; align-items: center; gap: 6px;">
     Firmware
     <span id="fwBadge" style="display: none; width: 8px; height: 8px; background-color: #ff4a4a; border-radius: 50%;"></span>
@@ -1214,6 +1215,7 @@ input[type=range]::-webkit-slider-thumb {
         <div class="sens-tab active" onclick="switchSensTab('general', this)">General</div>
         <div class="sens-tab" onclick="switchSensTab('axes', this)">Axes</div>
         <div class="sens-tab" onclick="switchSensTab('tap', this)">Tap</div>
+        <div class="sens-tab" onclick="switchSensTab('invert', this)">Invert</div>
       </div>
       <div class="panel-body" style="flex:1;overflow-y:auto">
 
@@ -1301,36 +1303,6 @@ input[type=range]::-webkit-slider-thumb {
             </div>
             <div style="font-size:10px;color:var(--text3);margin-top:4px;line-height:1.3;">
               Enable when using a spring head (magnets mounted further from sensors). Applies higher gain values tuned for the spring head variant.
-            </div>
-          </div>
-        </div>
-
-        <div class="field-group">
-          <div class="field-label" style="color:var(--green);letter-spacing:2px;font-size:10px;font-family:'Barlow Condensed',sans-serif">AXIS INVERSIONS</div>
-          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px 16px; margin-top: 8px;">
-            <div class="toggle-row" style="padding: 4px 0; border: none; margin-bottom: 0;">
-              <span class="toggle-label">Invert X</span>
-              <div class="toggle" id="invX" onclick="toggleInversion('x')"></div>
-            </div>
-            <div class="toggle-row" style="padding: 4px 0; border: none; margin-bottom: 0;">
-              <span class="toggle-label">Invert Y</span>
-              <div class="toggle" id="invY" onclick="toggleInversion('y')"></div>
-            </div>
-            <div class="toggle-row" style="padding: 4px 0; border: none; margin-bottom: 0;">
-              <span class="toggle-label">Invert Z</span>
-              <div class="toggle" id="invZ" onclick="toggleInversion('z')"></div>
-            </div>
-            <div class="toggle-row" style="padding: 4px 0; border: none; margin-bottom: 0;">
-              <span class="toggle-label">Invert Rx</span>
-              <div class="toggle" id="invRx" onclick="toggleInversion('rx')"></div>
-            </div>
-            <div class="toggle-row" style="padding: 4px 0; border: none; margin-bottom: 0;">
-              <span class="toggle-label">Invert Ry</span>
-              <div class="toggle" id="invRy" onclick="toggleInversion('ry')"></div>
-            </div>
-            <div class="toggle-row" style="padding: 4px 0; border: none; margin-bottom: 0;">
-              <span class="toggle-label">Invert Rz</span>
-              <div class="toggle" id="invRz" onclick="toggleInversion('rz')"></div>
             </div>
           </div>
         </div>
@@ -1556,6 +1528,38 @@ input[type=range]::-webkit-slider-thumb {
             </div>
           </div>
         </div>
+        <!-- INVERT TAB SECTION -->
+        <div id="sens-section-invert" class="sens-section" style="display:none">
+          <div class="field-group">
+            <div class="field-label" style="color:var(--green);letter-spacing:2px;font-size:10px;font-family:'Barlow Condensed',sans-serif">AXIS INVERSIONS</div>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px 16px; margin-top: 8px;">
+              <div class="toggle-row" style="padding: 4px 0; border: none; margin-bottom: 0;">
+                <span class="toggle-label">Invert X</span>
+                <div class="toggle" id="invX" onclick="toggleInversion('x')"></div>
+              </div>
+              <div class="toggle-row" style="padding: 4px 0; border: none; margin-bottom: 0;">
+                <span class="toggle-label">Invert Y</span>
+                <div class="toggle" id="invY" onclick="toggleInversion('y')"></div>
+              </div>
+              <div class="toggle-row" style="padding: 4px 0; border: none; margin-bottom: 0;">
+                <span class="toggle-label">Invert Z</span>
+                <div class="toggle" id="invZ" onclick="toggleInversion('z')"></div>
+              </div>
+              <div class="toggle-row" style="padding: 4px 0; border: none; margin-bottom: 0;">
+                <span class="toggle-label">Invert Rx</span>
+                <div class="toggle" id="invRx" onclick="toggleInversion('rx')"></div>
+              </div>
+              <div class="toggle-row" style="padding: 4px 0; border: none; margin-bottom: 0;">
+                <span class="toggle-label">Invert Ry</span>
+                <div class="toggle" id="invRy" onclick="toggleInversion('ry')"></div>
+              </div>
+              <div class="toggle-row" style="padding: 4px 0; border: none; margin-bottom: 0;">
+                <span class="toggle-label">Invert Rz</span>
+                <div class="toggle" id="invRz" onclick="toggleInversion('rz')"></div>
+              </div>
+            </div>
+          </div>
+        </div>
 
         <button class="btn-apply" onclick="sensReset()">Reset to Defaults</button>
 
@@ -1633,6 +1637,50 @@ input[type=range]::-webkit-slider-thumb {
   </div><!-- /tab-sensitivity -->
 
   <!-- FIRMWARE TAB -->
+  <!-- DEVICE TAB -->
+  <div class="tab-content" id="tab-device" style="padding: 24px; flex-direction: column; align-items: flex-start; overflow-y: auto; gap: 0; width: 100%; box-sizing: border-box; max-width: 480px;">
+
+    <div class="card-title" style="margin-bottom: 20px;">Device Settings</div>
+
+    <div class="field-group" style="width: 100%;">
+      <div class="field-label" style="color:var(--green);letter-spacing:2px;font-size:10px;font-family:'Barlow Condensed',sans-serif">SLEEP MODE</div>
+      <div style="margin-top: 8px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+          <span class="field-label" style="margin: 0;">Sleep After Idle</span>
+        </div>
+        <select id="sleepTimeoutSelect" onchange="onSleepTimeoutChange()"
+                style="width:100%;background:var(--bg3);border:1px solid var(--border2);color:var(--text);font-family:'Barlow',sans-serif;font-size:12px;padding:7px 10px;outline:none;-webkit-appearance:none;background-image:url(&quot;data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%23555'/%3E%3C/svg%3E&quot;);background-repeat:no-repeat;background-position:right 10px center;padding-right:28px;cursor:pointer;">
+          <option value="0">Off</option>
+          <option value="60000">1 minute</option>
+          <option value="120000">2 minutes</option>
+          <option value="300000">5 minutes</option>
+          <option value="600000">10 minutes</option>
+          <option value="1800000">30 minutes</option>
+          <option value="3600000">1 hour</option>
+        </select>
+        <div style="font-size:10px;color:var(--text3);margin-top:4px;line-height:1.3;">
+          Turns off LEDs and stops sending motion after this period of inactivity.
+        </div>
+      </div>
+      <div id="sleepWakeContainer" style="margin-top: 14px; display: none;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2px;">
+          <span class="field-label" style="margin: 0;">Wake Sensitivity</span>
+          <input type="number" id="sleepWakeVal" min="3" max="60" step="1" value="15"
+                 style="width: 48px; background: var(--border2); border: 1px solid var(--border); color: var(--text); font-size: 10px; text-align: right; padding: 1px 3px; border-radius: 3px; font-family: inherit;"
+                 oninput="onSleepWakeTextChange()" onchange="onSleepWakeTextChange()">
+        </div>
+        <input type="range" id="sleepWakeSlider" min="3" max="60" step="1" value="15" oninput="onSleepWakeSliderChange()">
+        <div style="display:flex;justify-content:space-between;font-size:10px;color:var(--text3);margin-top:2px">
+          <span>Sensitive</span><span>Stable</span>
+        </div>
+        <div style="font-size:10px;color:var(--text3);margin-top:4px;line-height:1.3;">
+          How much movement wakes the device. Lower = wakes on light touch.
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /tab-device -->
+
   <div class="tab-content" id="tab-firmware" style="padding: 40px; flex-direction: column; align-items: center; justify-content: flex-start; overflow-y: auto; gap: 24px; width: 100%; box-sizing: border-box;">
     <!-- Update Notice Container -->
     <div id="fwUpdateNotice" style="display: none; max-width: 600px; width: 100%; background: rgba(255, 74, 74, 0.1); border: 1px solid #ff4a4a; border-radius: 8px; padding: 20px; box-sizing: border-box; flex-direction: column; gap: 10px;">
@@ -1797,6 +1845,8 @@ const DEFAULT_ACTIONS = {
   button_override: false,
   dominant_mode: true,
   dominant_mode_bias: 4.8,
+  sleep_timeout_ms: 0,
+  sleep_wake_threshold: 15.0,
   sensitivity: {
     "x_pos": 1.0, "x_neg": 1.0, "y_pos": 1.0, "y_neg": 1.0, "z_pos": 1.0, "z_neg": 1.0,
     "rx_pos": 1.0, "rx_neg": 1.0, "ry_pos": 1.0, "ry_neg": 1.0, "rz_pos": 1.0, "rz_neg": 1.0
@@ -3041,7 +3091,7 @@ function connectWS() {
       if (parts.length === 3) {
         const [, btnId, stateStr] = parts;
         const state = parseInt(stateStr);
-        if (state === 1) {
+        if (state === 1 || (btnId === 'chord' && state >= 1)) {
           // Left button = cone attack, right button = circle attack (active preview).
           if (controllerActive()) {
             if (btnId === '0') controllerSpawnAttack('cone');
@@ -3059,8 +3109,9 @@ function connectWS() {
               label = 'Right Button';
               actionObj = (activeMode && activeMode.buttons) ? activeMode.buttons['1'] : null;
             } else if (btnId === 'chord') {
-              label = 'Both Buttons';
-              actionObj = (activeMode && activeMode.buttons) ? activeMode.buttons['chord'] : null;
+              label = state > 1 ? `Both Buttons (${state}x)` : 'Both Buttons';
+              const chordKey = state > 1 ? `chord:${state}` : 'chord';
+              actionObj = (activeMode && activeMode.buttons) ? activeMode.buttons[chordKey] : null;
             }
             
             let actionDesc = 'None';
@@ -4263,6 +4314,52 @@ function syncActionsUI() {
   if (autoUpdateFwCheckbox) {
     autoUpdateFwCheckbox.checked = !!actions.auto_update_firmware;
   }
+
+  // Update sleep mode UI
+  if (actions.sleep_timeout_ms === undefined) actions.sleep_timeout_ms = 0;
+  if (actions.sleep_wake_threshold === undefined) actions.sleep_wake_threshold = 15.0;
+  const sleepSelect = document.getElementById('sleepTimeoutSelect');
+  if (sleepSelect) {
+    const ms = actions.sleep_timeout_ms;
+    const opt = sleepSelect.querySelector(`option[value="${ms}"]`);
+    sleepSelect.value = opt ? String(ms) : '0';
+    document.getElementById('sleepWakeContainer').style.display = ms > 0 ? 'block' : 'none';
+  }
+  const sleepWakeSlider = document.getElementById('sleepWakeSlider');
+  const sleepWakeVal = document.getElementById('sleepWakeVal');
+  if (sleepWakeSlider && sleepWakeVal) {
+    const t = parseFloat(actions.sleep_wake_threshold);
+    sleepWakeSlider.value = t;
+    sleepWakeVal.value = t;
+  }
+}
+
+function onSleepTimeoutChange() {
+  if (!actions) return;
+  const ms = parseInt(document.getElementById('sleepTimeoutSelect').value);
+  actions.sleep_timeout_ms = ms;
+  document.getElementById('sleepWakeContainer').style.display = ms > 0 ? 'block' : 'none';
+  sendCmd('actions ' + JSON.stringify(actions));
+  const fw = ms > 0 ? ms : -1;
+  sendCmd(`sleep set timeout ${fw}`);
+}
+
+function onSleepWakeSliderChange() {
+  const v = parseFloat(document.getElementById('sleepWakeSlider').value);
+  document.getElementById('sleepWakeVal').value = v;
+  if (actions) actions.sleep_wake_threshold = v;
+  sendCmd('actions ' + JSON.stringify(actions));
+  sendCmd(`sleep set threshold ${v}`);
+}
+
+function onSleepWakeTextChange() {
+  const v = parseFloat(document.getElementById('sleepWakeVal').value);
+  if (isNaN(v)) return;
+  const clamped = Math.max(3, Math.min(60, v));
+  document.getElementById('sleepWakeSlider').value = clamped;
+  if (actions) actions.sleep_wake_threshold = clamped;
+  sendCmd('actions ' + JSON.stringify(actions));
+  sendCmd(`sleep set threshold ${clamped}`);
 }
 
 function switchSensTab(sectionName, el) {

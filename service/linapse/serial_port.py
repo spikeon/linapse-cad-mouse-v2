@@ -170,6 +170,8 @@ def serial_thread(actions_ref):
                         
             last_invert_z = None
             last_custom_usb = None
+            last_sleep_timeout = None
+            last_sleep_threshold = None
             while True:
                 if state.flashing_active:
                     break
@@ -198,6 +200,24 @@ def serial_thread(actions_ref):
                                   else b"service_buttons 0\n")
                     except Exception as e:
                         print(f"[serial] failed to write service_buttons: {e}")
+
+                # Sync sleep config: 0 in JSON = disabled (-1 in firmware)
+                current_sleep_timeout = int((actions or {}).get("sleep_timeout_ms", 0))
+                if last_sleep_timeout is None or current_sleep_timeout != last_sleep_timeout:
+                    last_sleep_timeout = current_sleep_timeout
+                    fw_timeout = current_sleep_timeout if current_sleep_timeout > 0 else -1
+                    try:
+                        ser.write(f"sleep set timeout {fw_timeout}\n".encode())
+                    except Exception as e:
+                        print(f"[serial] failed to write sleep timeout: {e}")
+
+                current_sleep_threshold = float((actions or {}).get("sleep_wake_threshold", 15.0))
+                if last_sleep_threshold is None or current_sleep_threshold != last_sleep_threshold:
+                    last_sleep_threshold = current_sleep_threshold
+                    try:
+                        ser.write(f"sleep set threshold {current_sleep_threshold}\n".encode())
+                    except Exception as e:
+                        print(f"[serial] failed to write sleep threshold: {e}")
 
                 line = ser.readline().decode(errors="replace").strip()
                 if not line:
